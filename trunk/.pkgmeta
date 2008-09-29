@@ -1,0 +1,19 @@
+package-as: TankPoints
+
+externals:
+    /libs/AceDebug-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceDebug-2.0/
+    /libs/AceAddon-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceAddon-2.0/
+    /libs/Babble-Spell-2.2: http://svn.wowace.com/wowace/trunk/Babble-2.2/Babble-Spell-2.2/
+    /libs/StatLogic-1.0: http://svn.wowace.com/wowace/trunk/StatLogicLib/StatLogic-1.0/
+    /libs/AceLocale-2.2: http://svn.wowace.com/wowace/trunk/Ace2/AceLocale-2.2/
+    /libs/AceLibrary: http://svn.wowace.com/wowace/trunk/Ace2/AceLibrary/
+    /libs/AceHook-2.1: http://svn.wowace.com/wowace/trunk/Ace2/AceHook-2.1/
+    /libs/StatFrameLib-1.0: http://svn.wowace.com/wowace/trunk/StatFrameLib/StatFrameLib-1.0/
+    /libs/AceEvent-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceEvent-2.0/
+    /libs/TipHooker-1.0: http://svn.wowace.com/wowace/trunk/TipHookerLib/TipHooker-1.0/
+    /libs/AceOO-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceOO-2.0/
+    /libs/AceDB-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceDB-2.0/
+    /libs/Waterfall-1.0: http://svn.wowace.com/wowace/trunk/Waterfall-1.0/Waterfall-1.0/
+    /libs/Gratuity-2.0: http://svn.wowace.com/wowace/trunk/GratuityLib/Gratuity-2.0/
+    /libs/AceConsole-2.0: http://svn.wowace.com/wowace/trunk/Ace2/AceConsole-2.0/
+    /libs/Deformat-2.0: http://svn.wowace.com/wowace/trunk/Deformat/Deformat-2.0/
