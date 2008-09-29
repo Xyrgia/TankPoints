@@ -1,0 +1,53 @@
+﻿## Interface: 20300
+## Title: TankPoints |cff7fff7f -Ace2-|r
+## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
+## Notes-zhTW: 計算並顯示你的坦克點。
+## Notes-zhCN: 在角色窗口中计算并显示你的坦克点数
+## Notes-esES: Calcula y muestra tus Puntos de Tanque en la ventana de personaje
+## Author: Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
+## SavedVariables: TankPointsDB
+## OptionalDeps: Ace2, Deformat, GratuityLib, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
+## X-Embeds: Ace2, Deformat, GratuityLib, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
+## X-Category: Interface Enhancements
+## X-RelSite-WoWI: 6419
+## X-RelSite-Curse: 992
+## X-License: GPL v2
+## X-Encoding: UTF-8
+
+#####################
+# Non-Ace Libraries #
+#####################
+UTF8\utf8data.lua
+UTF8\utf8.lua
+
+#################
+# Ace Libraries #
+#################
+embeds.xml
+
+######################
+# Localization Files #
+######################
+TankPoints-Locale-enUS.lua
+TankPoints-Locale-zhTW.lua
+TankPoints-Locale-deDE.lua
+TankPoints-Locale-frFR.lua
+TankPoints-Locale-koKR.lua
+TankPoints-Locale-esES.lua
+TankPoints-Locale-zhCN.lua
+
+########
+# Core #
+########
+TankPoints.lua
+
+##############
+# Calculator #
+##############
+TankPointsCalculator.lua
+TankPointsCalculator.xml
+
+############
+# Tooltips #
+############
+TankPointsTooltips.lua
