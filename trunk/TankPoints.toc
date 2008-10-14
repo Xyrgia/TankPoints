@@ -1,13 +1,14 @@
-﻿## Interface: 20300
+﻿## Interface: 30000
 ## Title: TankPoints |cff7fff7f -Ace2-|r
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
 ## Notes-zhCN: 在角色窗口中计算并显示你的坦克点数
 ## Notes-esES: Calcula y muestra tus Puntos de Tanque en la ventana de personaje
-## Author: Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
+## Author: Whitetooth
+## X-eMail: hotdogee [at] gmail [dot] com
 ## SavedVariables: TankPointsDB
-## OptionalDeps: Ace2, Deformat, GratuityLib, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
-## X-Embeds: Ace2, Deformat, GratuityLib, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
+## OptionalDeps: Ace2, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
+## X-Embeds: Ace2, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
 ## X-Category: Interface Enhancements
 ## X-RelSite-WoWI: 6419
 ## X-RelSite-Curse: 992

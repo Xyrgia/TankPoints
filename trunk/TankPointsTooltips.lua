@@ -2,8 +2,10 @@
 --[[
 Name: TankPoints Tooltips
 Description: Displays TankPoints difference in item tooltips
-Revision: $Revision: 1 $
-Developed by: Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
+Revision: $Revision$
+Author: Whitetooth
+Email: hotdogee [at] gmail [dot] com
+LastUpdate: $Date$
 ]]
 
 ---------------
@@ -166,10 +168,10 @@ function TPTips:BuildChanges(changes, table)
 		changes.defense = floor(StatLogic:GetEffectFromRating(current + table.DEFENSE_RATING, CR_DEFENSE_SKILL, TP.playerLevel)) - floor(StatLogic:GetEffectFromRating(current, CR_DEFENSE_SKILL, TP.playerLevel))
 	end
 	if table.DODGE_RATING then
-		changes.dodgeChance = StatLogic:GetEffectFromRating(table.DODGE_RATING, CR_DODGE, TP.playerLevel) * 0.01
+		changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(table.DODGE_RATING, CR_DODGE, TP.playerLevel)) * 0.01
 	end
 	if table.PARRY_RATING then
-		changes.parryChance = StatLogic:GetEffectFromRating(table.PARRY_RATING, CR_PARRY, TP.playerLevel) * 0.01
+		changes.parryChance = StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(table.PARRY_RATING, CR_PARRY, TP.playerLevel)) * 0.01
 	end
 	if table.BLOCK_RATING then
 		changes.blockChance = StatLogic:GetEffectFromRating(table.BLOCK_RATING, CR_BLOCK, TP.playerLevel) * 0.01

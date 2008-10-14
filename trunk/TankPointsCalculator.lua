@@ -2,8 +2,10 @@
 --[[
 Name: TankPoints Calculator
 Description: Interactive Calculator for TankPoints
-Revision: $Revision: 2 $
-Developed by: Whitetooth@Cenarius (hotdogee@¤Ú«¢©i¯Sbaha)
+Revision: $Revision$
+Author: Whitetooth
+Email: hotdogee [at] gmail [dot] com
+LastUpdate: $Date$
 ]]
 
 ---------------
@@ -299,7 +301,7 @@ function TPCalc:UpdateResults()
 	changes.dodgeChance = 0
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
 	if diff then
-		changes.dodgeChance = StatLogic:GetEffectFromRating(diff, CR_DODGE, newDT.playerLevel) * 0.01
+		changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(diff, CR_DODGE, newDT.playerLevel)) * 0.01
 	end
 	i = i + 1
 	-- Dodge
@@ -309,7 +311,7 @@ function TPCalc:UpdateResults()
 	changes.parryChance = 0
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
 	if diff then
-		changes.parryChance = StatLogic:GetEffectFromRating(diff, CR_PARRY, newDT.playerLevel) * 0.01
+		changes.parryChance = StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(diff, CR_PARRY, newDT.playerLevel)) * 0.01
 	end
 	i = i + 1
 	-- Parry
