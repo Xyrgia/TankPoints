@@ -240,6 +240,39 @@
 			</OnLeave>
 		</Scripts>
 	</Frame>
+	<!-- Template for a Frame Box -->
+	<Frame name="TPCFrameBoxTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentTitle" inherits="GameFontHighlight">
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="9" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Backdrop bgFile="Interface\Tooltips\UI-Tooltip-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Scripts>
+			<OnLoad>
+				this:SetBackdropBorderColor(0.4, 0.4, 0.4);
+				this:SetBackdropColor(0.5, 0.5, 0.5);
+			</OnLoad>
+		</Scripts>
+	</Frame>
 	
 	<!-- Template for TankPoints calculated results -->
 	<Frame name="TPCResultsTemplate" virtual="true">
@@ -404,7 +437,7 @@
 				</Scripts>
 			</Frame>
 			<!-- Results Frame -->
-			<Frame name="TPCResultsFrame" inherits="OptionFrameBoxTemplate">
+			<Frame name="TPCResultsFrame" inherits="TPCFrameBoxTemplate">
 				<Size>
 					<!-- y = 22 * 4 + 10 = 98 -->
 					<AbsDimension x="360" y="98"/>
@@ -464,7 +497,7 @@
 				</Frames>
 			</Frame>
 			<!-- Combat Table Frame -->
-			<Frame name="TPCCombatTableFrame" inherits="OptionFrameBoxTemplate">
+			<Frame name="TPCCombatTableFrame" inherits="TPCFrameBoxTemplate">
 				<Size>
 					<!-- y = 22 * 7 + 10 = 164 -->
 					<AbsDimension x="360" y="164"/>
@@ -531,7 +564,7 @@
 				</Frames>
 			</Frame>
 			<!-- Player Stats Frame -->
-			<Frame name="TPCPlayerStatsFrame" inherits="OptionFrameBoxTemplate">
+			<Frame name="TPCPlayerStatsFrame" inherits="TPCFrameBoxTemplate">
 				<Size>
 					<!-- y = 22 * 11 + 10 = 252 -->
 					<AbsDimension x="360" y="252"/>
@@ -707,7 +740,7 @@
 				</Frames>
 			</Frame>
 			<!-- Mob Stats Frame -->
-			<Frame name="TPCMobStatsFrame" inherits="OptionFrameBoxTemplate">
+			<Frame name="TPCMobStatsFrame" inherits="TPCFrameBoxTemplate">
 				<Size>
 					<!-- y = 22 * 3 + 10 = 76 -->
 					<AbsDimension x="360" y="76"/>

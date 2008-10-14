@@ -157,7 +157,7 @@ end
 - defenseEffect = (defense - attackerLevel * 5) * 0.04 * 0.01
 
 === Block Value From Strength ===
-- blockValueFromStrength = (strength * 0.05) - 1
+- blockValueFromStrength = (strength * 0.5) - 1
 
 === Block Value ===
 - blockValue = floor(blockValueFromStrength) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
@@ -177,8 +177,8 @@ end
 === Mob Miss Chance ===
 - mobMissChance = max(0, 0.05 + defenseEffect)
 
-=== Mob Crush Chance (if mobLevel is +3) ===
-- mobCrushChance = 0.15 + max(0, (playerLevel * 5 - defense) * 0.02)
+=== Mob Crush Chance (if mobLevel is +4 or more) ===
+- mobCrushChance = (mobLevel - playerLevel) * 0.1 - 0.15
 
 === Mob Crit Damage Mod ===
 - mobCritDamageMod = max(0, 1 - resilienceEffect * 2)
@@ -241,7 +241,14 @@ Paladins are not calculated yet.
 
 
 ** Version History **
-
+2.8.0
+- Avoidance diminishing returns support: Calculator, ItemTooltip, TankPoints Per Stat, TankPoints Per StatValue
+- Crushing blows only happen when mob is +4 levels
+- 0.5 block per str
+- Removed Babble-Spell-2.2, Deformat-2.0, Gratuity-2.0
+- Fixed immediate errors in 3.0.2
+- Calculator: Fixed error
+- toc 30000
 2.7.0
 - NEW: You can specify pre-mitigation mob damage using /tp mob drdamage
 - NEW: Ciderhelm's EffectiveHealth and a derived stat, EffectiveHealthWithBlock

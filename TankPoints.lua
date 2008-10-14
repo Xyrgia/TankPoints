@@ -1,16 +1,16 @@
--- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
+﻿-- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
 --[[
 Name: TankPoints
 Description: Calculates and shows your TankPoints in the PaperDall Frame
 Revision: $Revision$
-Developed by: Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
+Author: Whitetooth
+Email: hotdogee [at] gmail [dot] com
+LastUpdate: $Date$
 ]]
 
 ---------------
 -- Libraries --
 ---------------
---local Gratuity = AceLibrary("Gratuity-2.0")
---local Deformat = AceLibrary("Deformat-2.0")
 local TipHooker = AceLibrary("TipHooker-1.0")
 local StatLogic = AceLibrary("StatLogic-1.0")
 local Waterfall = AceLibrary("Waterfall-1.0")
@@ -657,7 +657,7 @@ end
 ------------
 -- event = UNIT_AURA
 -- arg1 = the UnitID of the entity
-function TankPoints:UNIT_AURA()
+function TankPoints:UNIT_AURA(arg1)
 	-- Do nothing if event target is not player
 	if not (arg1 == "player") then return end
 	self:UpdateStats()
@@ -665,14 +665,14 @@ end
 
 -- event = PLAYER_LEVEL_UP
 -- arg1 = New player level
-function TankPoints:PLAYER_LEVEL_UP()
+function TankPoints:PLAYER_LEVEL_UP(arg1)
 	TankPoints.playerLevel = arg1
 	self:UpdateStats()
 end
 
 -- event = UNIT_INVENTORY_CHANGED
 -- arg1 = the UnitID of the entity
-function TankPoints:UNIT_INVENTORY_CHANGED()
+function TankPoints:UNIT_INVENTORY_CHANGED(arg1)
 	if not (arg1 == "player") then return end
 	self:UpdateStats()
 end
@@ -681,7 +681,8 @@ end
 -----------------------------------
 -- Set TankPoints PaperdollStats --
 -----------------------------------
-function TankPoints:PaintTankPoints(line1,line2,line3,line4,line5,line6)
+-- TankPoints:PaintTankPoints(PlayerStatFrameRight1, PlayerStatFrameRight2, PlayerStatFrameRight3, PlayerStatFrameRight4, PlayerStatFrameRight5, PlayerStatFrameRight6)
+function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 	TankPoints:GetTankPointsIfNotFilled(self.resultsTable,nil)
 	if TankPoints.setSchool then
 		TankPoints.currentSchool = TankPoints.setSchool
@@ -703,16 +704,16 @@ function TankPoints:PaintTankPoints(line1,line2,line3,line4,line5,line6)
 	end
 	-- Line1: TankPoints
 	local tankpoints = commafy_integer(math.floor(self.resultsTable.tankPoints[TP_MELEE]))
-	self:StatBoxSet(line1,L["TankPoints"],tankpoints)
+	self:StatBoxSet(line1, L["TankPoints"], tankpoints)
 	-- Line2: MeleeDR
 	local meleeReduction = self.resultsTable.totalReduction[TP_MELEE] * 100
-	self:StatBoxSet(line2,self.SchoolName[TP_MELEE]..L[" DR"], meleeReduction, true)
+	self:StatBoxSet(line2, self.SchoolName[TP_MELEE]..L[" DR"], meleeReduction, true)
 	-- Line3: BlockValue
 	local blockValue = self.resultsTable.blockValue
-	self:StatBoxSet(line3,L["Block Value"], blockValue)
+	self:StatBoxSet(line3, L["Block Value"], blockValue)
 	-- Line4: SpellTankPoints
 	local spellTankPoints = commafy_integer(math.floor(self.resultsTable.tankPoints[TankPoints.currentSchool]))
-	self:StatBoxSet(line4,self.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
+	self:StatBoxSet(line4, self.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
 	-- Line5: SpellReduction
 	local spellReduction = self.resultsTable.totalReduction[TankPoints.currentSchool] * 100          
 	self:StatBoxSet(line5, self.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction, true)
@@ -1207,7 +1208,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 
 	textL = "1 "..SPELL_STAT2_NAME.." = "
 	newDT.armor = newDT.armor + 2
-	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi() * 0.01
+	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()) * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])..L[" TP"]
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
@@ -1258,14 +1259,14 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	if per_stat then
 		textL = "1 "..DEFENSE.." = "
 		newDT.defense = newDT.defense + 1
-		newDT.dodgeChance = newDT.dodgeChance + 0.0004
-		newDT.parryChance = newDT.parryChance + 0.0004
+		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", 0.04) * 0.01
+		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", 0.04) * 0.01
 		newDT.blockChance = newDT.blockChance + 0.0004
 	else
 		textL = "1 "..COMBAT_RATING_NAME2.." = "
 		newDT.defense = newDT.defense + StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
-		newDT.dodgeChance = newDT.dodgeChance + 0.0004 * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
-		newDT.parryChance = newDT.parryChance + 0.0004 * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
+		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
+		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
 		newDT.blockChance = newDT.blockChance + 0.0004 * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
@@ -1280,7 +1281,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 		newDT.dodgeChance = newDT.dodgeChance + 0.01
 	else
 		textL = "1 "..COMBAT_RATING_NAME3.." = "
-		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetEffectFromRating(1, CR_DODGE, newDT.playerLevel) * 0.01
+		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DODGE, newDT.playerLevel)) * 0.01
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
@@ -1294,7 +1295,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 		newDT.parryChance = newDT.parryChance + 0.01
 	else
 		textL = "1 "..COMBAT_RATING_NAME4.." = "
-		newDT.parryChance = newDT.parryChance + StatLogic:GetEffectFromRating(1, CR_PARRY, newDT.playerLevel) * 0.01
+		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_PARRY, newDT.playerLevel)) * 0.01
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
@@ -1343,8 +1344,8 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	GameTooltip:Show()
 
 	-- Performance Analysis
-	-- Before copyTable: 0.25秒
-	-- After copyTable: 0.03秒
+	-- Before copyTable: 0.25 sec
+	-- After copyTable: 0.03 sec
 	--self:Debug(format("%.4f", GetTime() - time))
 end
 
@@ -1682,55 +1683,6 @@ function TankPoints:GetBlockValue(strength, forceShield)
 		return 0
 	end
 	return GetShieldBlock()
-	--[[
-	-----------------------------------
-	-- Get Block Value from strength --
-	-----------------------------------
-	if not strength then
-		_, strength = UnitStat("player", 1)
-	end
-	local blockValueFromStrength = max(0, (strength * 0.05) - 1)
-	--------------------------------
-	-- Get Block Value from items --
-	--------------------------------
-	local blockValueFromItems = 0
-	local scannedSets = {} -- table to flag scanned sets so we don't scan twice
-	for slot = 1, 18 do -- equipped item's slotID 1 to 18
-		local itemsum = StatLogic:GetSum(GetInventoryItemLink("player", slot))
-		if type(itemsum) == "table" then
-			blockValueFromItems = blockValueFromItems + (itemsum["BLOCK_VALUE"] or 0)
-		end
-		Gratuity:SetInventoryItem("player", slot) -- set tooltip
-		for i = 2, Gratuity:NumLines() do -- loop through lines
-			local line = Gratuity:GetLine(i)
-			local setName, _, setTotal = Deformat(line, ITEM_SET_NAME)
-			if setName then
-				if not scannedSets[setName] then
-					scannedSets[setName] = true -- flag scanned
-					for j = i + setTotal + 2, Gratuity:NumLines() do
-						-- ITEM_SET_BONUS =
-						-- Check if set bonus is enabled
-						line = Deformat(Gratuity:GetLine(j), ITEM_SET_BONUS)
-						if line then
-							-- scan for block value
-							for _, pattern in ipairs(L["ItemScan"][TP_BLOCKVALUE]) do
-								local _, _, num = strfind(line, pattern[1])
-								blockValueFromItems = blockValueFromItems + (num or 0)
-							end
-						end
-					end
-				end
-				break -- break out to next slot
-			end
-		end
-	end
-	-----------------------
-	-- Final Calculation --
-	-----------------------
-	-- Tested to be separate floors by Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
-	blockValue = floor(blockValueFromStrength) + floor(blockValueFromItems * StatLogic:GetStatMod("MOD_BLOCK_VALUE") + 0.499)
-	return blockValue, blockValueFromStrength, blockValueFromItems * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
-	--]]
 end
 
 ------------------------------------
@@ -2213,7 +2165,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	if changes.str and changes.str ~= 0 then
 		------- Formulas -------
 		-- str = floor(str * strMod)
-		-- blockValue = floor((strength * 0.05) - 1) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
+		-- blockValue = floor((strength * 0.5) - 1) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
 		------- Talants -------
 		-- Warrior: Vitality (Rank 5) - 3,21
 		--          Increases your total Stamina by 1%/2%/3%/4%/5% and your total Strength by 2%/4%/6%/8%/10%.
@@ -2227,7 +2179,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- Check if player has shield equipped
 		if doBlock then
 			-- Subtract block value from current strength, add block value from new strength
-			tpTable.blockValue = tpTable.blockValue - floor((strength * 0.05) - 1) + floor(((strength + changes.str) * 0.05) - 1)
+			tpTable.blockValue = tpTable.blockValue - floor((strength * 0.5) - 1) + floor(((strength + changes.str) * 0.5) - 1)
 		end
 	end
 	if changes.agi and changes.agi ~= 0 then
@@ -2249,7 +2201,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local agiMod = StatLogic:GetStatMod("MOD_AGI")
 		changes.agi = max(0, floor((ceil(agility / agiMod) + changes.agi) * agiMod)) - agility
 		-- Calculate dodge chance
-		tpTable.dodgeChance = tpTable.dodgeChance + changes.agi * StatLogic:GetDodgePerAgi() * 0.01
+		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", changes.agi * StatLogic:GetDodgePerAgi()) * 0.01
 		-- Armor mods don't effect armor from agi
 		tpTable.armor = tpTable.armor + changes.agi * 2
 	end
@@ -2332,9 +2284,9 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	if changes.defense and changes.defense ~= 0 then
 		tpTable.defense = tpTable.defense + changes.defense
-		tpTable.dodgeChance = tpTable.dodgeChance + changes.defense * 0.0004
+		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", changes.defense * 0.04) * 0.01
 		if GetParryChance() ~= 0 then
-			tpTable.parryChance = tpTable.parryChance + changes.defense * 0.0004
+			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", changes.defense * 0.04) * 0.01
 		end
 		if doBlock then
 			tpTable.blockChance = tpTable.blockChance + changes.defense * 0.0004
@@ -2543,9 +2495,9 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		
 		-- Crushing Blow Chance
 		TP_Table.mobCrushChance = 0
-		if (TP_Table.mobLevel - TP_Table.playerLevel) > 2 then -- if mob is 3 levels or above crushing blow will happen
-			-- minimum 15% and additional 2% every defense point under playerLevel*5
-			TP_Table.mobCrushChance = 0.15 + max(0, (TP_Table.playerLevel * 5 - TP_Table.defense) * 0.02)
+		if (TP_Table.mobLevel - TP_Table.playerLevel) > 3 then -- if mob is 4 levels or above crushing blow will happen
+			-- The chance is 2% per point of difference minus 15%
+			TP_Table.mobCrushChance = (TP_Table.mobLevel - TP_Table.playerLevel) * 0.1 - 0.15
 		end
 
 		-- Mob's Crit Damage Mod
