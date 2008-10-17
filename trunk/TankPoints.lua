@@ -615,17 +615,17 @@ end
 
 function TankPoints:SetupFrameTankPoints(line1,line2,line3,line4,line5,line6)
 	-- FIXME: this gets called a few times per sec during stance change. Old version scheduled to avoid this issue.
-	line1:SetScript("OnEnter", TankPoints.TankPointsFrame_OnEnter) -- OnEnter: function(self, motion)
-	line1:SetScript("OnMouseUp", TankPoints.TankPointsFrame_OnMouseUp)
-	line2:SetScript("OnEnter", TankPoints.MeleeReductionFrame_OnEnter)
-	line3:SetScript("OnEnter", TankPoints.BlockValueFrame_OnEnter)
-	line4:SetScript("OnEnter", TankPoints.SpellTankPointsFrame_OnEnter)
-	line4:SetScript("OnMouseUp", TankPoints.SpellTankPointsFrame_OnMouseUp) -- OnMouseUp: function(self,button)
-	line5:SetScript("OnEnter", TankPoints.SpellReductionFrame_OnEnter)
-	line5:SetScript("OnMouseUp", TankPoints.SpellTankPointsFrame_OnMouseUp)
-	line6:SetScript("OnEnter", TankPoints.TankPointsCalculatorStat_OnEnter)
-	line6:SetScript("OnLeave", TankPoints.TankPointsCalculatorStat_OnLeave) -- OnLeave: function(self, motion)
-	line6:SetScript("OnMouseUp", TankPoints.TankPointsCalculatorStat_OnMouseUp)
+	line1:SetScript("OnEnter", self.TankPointsFrame_OnEnter) -- OnEnter: function(self, motion)
+	line1:SetScript("OnMouseUp", self.TankPointsFrame_OnMouseUp)
+	line2:SetScript("OnEnter", self.MeleeReductionFrame_OnEnter)
+	line3:SetScript("OnEnter", self.BlockValueFrame_OnEnter)
+	line4:SetScript("OnEnter", self.SpellTankPointsFrame_OnEnter)
+	line4:SetScript("OnMouseUp", self.SpellTankPointsFrame_OnMouseUp) -- OnMouseUp: function(self,button)
+	line5:SetScript("OnEnter", self.SpellReductionFrame_OnEnter)
+	line5:SetScript("OnMouseUp", self.SpellTankPointsFrame_OnMouseUp)
+	line6:SetScript("OnEnter", self.TankPointsCalculatorStat_OnEnter)
+	line6:SetScript("OnLeave", self.TankPointsCalculatorStat_OnLeave) -- OnLeave: function(self, motion)
+	line6:SetScript("OnMouseUp", self.TankPointsCalculatorStat_OnMouseUp)
 end
 
 function TankPoints:ShowPerStat()
@@ -644,7 +644,7 @@ function TankPoints:UpdateStats()
 	self:RepaintAllStatFrames()
 end
 
--- Updates scource and recalculates TankPoints
+-- Updates source and recalculate TankPoints
 function TankPoints:UpdateDataTable()
 	self:GetSourceData(self.sourceTable)
 	copyTable(self.resultsTable, self.sourceTable)
@@ -666,7 +666,7 @@ end
 -- event = PLAYER_LEVEL_UP
 -- arg1 = New player level
 function TankPoints:PLAYER_LEVEL_UP(arg1)
-	TankPoints.playerLevel = arg1
+	self.playerLevel = arg1
 	self:UpdateStats()
 end
 
@@ -683,22 +683,23 @@ end
 -----------------------------------
 -- TankPoints:PaintTankPoints(PlayerStatFrameRight1, PlayerStatFrameRight2, PlayerStatFrameRight3, PlayerStatFrameRight4, PlayerStatFrameRight5, PlayerStatFrameRight6)
 function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
-	TankPoints:GetTankPointsIfNotFilled(self.resultsTable,nil)
-	if TankPoints.setSchool then
-		TankPoints.currentSchool = TankPoints.setSchool
+	self:GetTankPointsIfNotFilled(self.resultsTable,nil)
+	if self.setSchool then
+		self.currentSchool = self.setSchool
 	else
 		-- Find highest SpellTankPoints school
-		TankPoints.currentSchool = TP_FIRE
-		assert(self.resultsTable.tankPoints[TP_FIRE],format("please report this to aliset@fake.domain.name: TP_FIRE tankpoints should not be nil! (was nil because: %s) TP dump: %s",
-															tostring(TankPoints.noTPReason),
-															tostring(table.concat(self.resultsTable.tankPoints,","))))
-		for _,s in ipairs(TankPoints.ResistableElementalSchools) do
-			assert(self.resultsTable.tankPoints[s],format("please report this to aliset@fake.domain.name: school %d should not be nil! (was nil because: %s) TP dump: %s",
-														  s,
-														  tostring(TankPoints.noTPReason),
-														  table.concat(self.resultsTable.tankPoints,",")))
-			if self.resultsTable.tankPoints[s] > self.resultsTable.tankPoints[TankPoints.currentSchool] then
-				TankPoints.currentSchool = s
+		self.currentSchool = TP_FIRE
+		if not self.resultsTable.tankPoints[TP_FIRE] then
+			self:UpdateDataTable()
+		end
+		assert(self.resultsTable.tankPoints[TP_FIRE],format("please report this to aliset@fake.domain.name: TP_FIRE tankpoints should not be nil! (was nil because: %s) TP dump: %s", tostring(self.noTPReason), tostring(table.concat(self.resultsTable.tankPoints,","))))
+		for _,s in ipairs(self.ResistableElementalSchools) do
+			if not self.resultsTable.tankPoints[s] then
+				self:UpdateDataTable()
+			end
+			assert(self.resultsTable.tankPoints[s],format("please report this to aliset@fake.domain.name: school %d should not be nil! (was nil because: %s) TP dump: %s", s, tostring(self.noTPReason), table.concat(self.resultsTable.tankPoints,",")))
+			if self.resultsTable.tankPoints[s] > self.resultsTable.tankPoints[self.currentSchool] then
+				self.currentSchool = s
 			end
 		end
 	end
@@ -712,11 +713,11 @@ function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 	local blockValue = self.resultsTable.blockValue
 	self:StatBoxSet(line3, L["Block Value"], blockValue)
 	-- Line4: SpellTankPoints
-	local spellTankPoints = commafy_integer(math.floor(self.resultsTable.tankPoints[TankPoints.currentSchool]))
-	self:StatBoxSet(line4, self.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
+	local spellTankPoints = commafy_integer(math.floor(self.resultsTable.tankPoints[self.currentSchool]))
+	self:StatBoxSet(line4, self.SchoolName[self.currentSchool]..L[" TP"], spellTankPoints)
 	-- Line5: SpellReduction
-	local spellReduction = self.resultsTable.totalReduction[TankPoints.currentSchool] * 100          
-	self:StatBoxSet(line5, self.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction, true)
+	local spellReduction = self.resultsTable.totalReduction[self.currentSchool] * 100          
+	self:StatBoxSet(line5, self.SchoolName[self.currentSchool]..L[" DR"], spellReduction, true)
 	 -- Line6: TankPointsCalculator
 	local calc_label = ""
 	if(TankPointsCalculatorFrame:IsVisible()) then
@@ -729,32 +730,32 @@ end
 
 function TankPoints:PaintEffectiveHealth(line1,line2,line3,line4,line5,line6)
 	self:GetTankPointsIfNotFilled(self.resultsTable,nil)
-	for _,s in ipairs(TankPoints.ResistableElementalSchools) do
+	for _,s in ipairs(self.ResistableElementalSchools) do
 		assert(self.resultsTable.effectiveHealth[s],format("please report this to aliset@fake.domain.name: school %d should not be nil! (was nil because: %s) TP dump: %s",
 														   s,
-														   tostring(TankPoints.noTPReason),
+														   tostring(self.noTPReason),
 														   table.concat(self.resultsTable.effectiveHealth,",")))
 	end
-	if TankPoints.setEHSchool then
-		TankPoints.currentEHSchool = TankPoints.setEHSchool
+	if self.setEHSchool then
+		self.currentEHSchool = self.setEHSchool
 	else
 		-- Find highest SpellTankPoints school
-		TankPoints.currentEHSchool = TankPoints.ResistableElementalSchools[1]
-		for _,s in ipairs(TankPoints.ResistableElementalSchools) do
-			if self.resultsTable.effectiveHealth[s] > self.resultsTable.effectiveHealth[TankPoints.currentEHSchool] then
-				TankPoints.currentEHSchool = s
+		self.currentEHSchool = self.ResistableElementalSchools[1]
+		for _,s in ipairs(self.ResistableElementalSchools) do
+			if self.resultsTable.effectiveHealth[s] > self.resultsTable.effectiveHealth[self.currentEHSchool] then
+				self.currentEHSchool = s
 			end
 		end
 	end
-	if TP_FIRE == TankPoints.currentEHSchool then
-		TankPoints.penultimateEHSchool = TP_ARCANE
+	if TP_FIRE == self.currentEHSchool then
+		self.penultimateEHSchool = TP_ARCANE
 	else
-		TankPoints.penultimateEHSchool = TP_FIRE
+		self.penultimateEHSchool = TP_FIRE
 	end
-	for _,s in ipairs(TankPoints.ResistableElementalSchools) do
-		if self.resultsTable.effectiveHealth[TankPoints.currentEHSchool] > self.resultsTable.effectiveHealth[s] and
-			self.resultsTable.effectiveHealth[s] > self.resultsTable.effectiveHealth[TankPoints.penultimateEHSchool] then
-			TankPoints.penultimateEHSchool = s
+	for _,s in ipairs(self.ResistableElementalSchools) do
+		if self.resultsTable.effectiveHealth[self.currentEHSchool] > self.resultsTable.effectiveHealth[s] and
+			self.resultsTable.effectiveHealth[s] > self.resultsTable.effectiveHealth[self.penultimateEHSchool] then
+			self.penultimateEHSchool = s
 		end
 	end
 
@@ -763,8 +764,8 @@ function TankPoints:PaintEffectiveHealth(line1,line2,line3,line4,line5,line6)
 		self:StatBoxSet(line2,L["EH Block"],commafy_integer(self.resultsTable.effectiveHealthWithBlock[TP_MELEE]))
 	end
  	self:StatBoxSet(line3,L["Block Value"],self.resultsTable.blockValue)
- 	self:StatBoxSet(line4,self.SchoolName[TankPoints.currentEHSchool]..L[" EH"],commafy_integer(self.resultsTable.effectiveHealth[TankPoints.currentEHSchool]))
-	self:StatBoxSet(line5,self.SchoolName[TankPoints.penultimateEHSchool]..L[" EH"],commafy_integer(self.resultsTable.effectiveHealth[TankPoints.penultimateEHSchool]))
+ 	self:StatBoxSet(line4,self.SchoolName[self.currentEHSchool]..L[" EH"],commafy_integer(self.resultsTable.effectiveHealth[self.currentEHSchool]))
+	self:StatBoxSet(line5,self.SchoolName[self.penultimateEHSchool]..L[" EH"],commafy_integer(self.resultsTable.effectiveHealth[self.penultimateEHSchool]))
 end
 
 function TankPoints:PaintEffectiveHealthTooltip()
@@ -801,7 +802,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 2
 	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi() * 0.01
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("1 "..SPELL_STAT2_NAME.." = ",
 			delta_eh(newDT,resultDT))
 	-------------
@@ -809,7 +810,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("1.5 "..SPELL_STAT3_NAME.." = ",
 			delta_eh(newDT,resultDT))
 	-----------
@@ -817,7 +818,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	-----------
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("10 "..ARMOR.." = ",
 			delta_eh(newDT,resultDT))
 
@@ -877,7 +878,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 2
 	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi() * 0.01
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("1 "..SPELL_STAT2_NAME.." = ",
 			delta_eh(newDT,resultDT))
 	-------------
@@ -885,7 +886,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("1.5 "..SPELL_STAT3_NAME.." = ",
 			delta_eh(newDT,resultDT))
 	-----------
@@ -893,7 +894,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-----------
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline("10 "..ARMOR.." = ",
 			delta_eh(newDT,resultDT))
 	-----------------
@@ -901,7 +902,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-----------------
 	copyTable(newDT, sourceDT) -- load default data
 	newDT.blockValue = newDT.blockValue + 1/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	self:GetTankPoints(newDT, TP_MELEE)
 	addline(format("%.2f", 1/0.65).." "..L["Block Value"].." = ",
 			delta_eh(newDT,resultDT))
 	if self.playerClass == "WARRIOR" and
@@ -911,7 +912,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 		-----------------------
 		copyTable(newDT, sourceDT) -- load default data
 		newDT.forceImprovedShieldBlock_True = true
-		TankPoints:GetTankPoints(newDT, TP_MELEE)
+		self:GetTankPoints(newDT, TP_MELEE)
 		addline(L["imp. Shield Block"],
 				delta_eh(newDT,resultDT))
 	end
@@ -935,7 +936,7 @@ function TankPoints:PaintEffectiveHealth_SpellEffectiveHealthTooltip()
 	local pct = function(x)
 					return tostring(round(100*x)).." %"
 				end
-	local s = TankPoints.currentEHSchool
+	local s = self.currentEHSchool
 	GameTooltip:SetText(format(L["Effective Health vs %s %s"],
 							   self.SchoolName[s],
 							   commafy_integer(resultDT.effectiveHealth[s]), HIGHLIGHT_FONT_COLOR.r,HIGHLIGHT_FONT_COLOR.g,HIGHLIGHT_FONT_COLOR.b),
@@ -954,7 +955,7 @@ function TankPoints:PaintEffectiveHealth_SpellEffectiveHealthTooltip()
 	------------
 	copyTable(newDT, sourceDT)
 	newDT.resistance[s] = newDT.resistance[s] + 3
-	TankPoints:GetTankPoints(newDT, s)
+	self:GetTankPoints(newDT, s)
 	addline("3 "..self.SchoolName[s]..L[" resist "].." = ",
 			delta_eh(newDT,resultDT))
 	-------------
@@ -962,7 +963,7 @@ function TankPoints:PaintEffectiveHealth_SpellEffectiveHealthTooltip()
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
-	TankPoints:GetTankPoints(newDT, s)
+	self:GetTankPoints(newDT, s)
 	addline("1.5 "..SPELL_STAT3_NAME.." = ",
 			delta_eh(newDT,resultDT))
 end
@@ -974,7 +975,7 @@ function TankPoints:PaintEffectiveHealth_AllSchoolsEffectiveHealthTooltip()
 	
 	local schools = {}
 	copyTable(schools,
-			  TankPoints.ResistableElementalSchools)
+			  self.ResistableElementalSchools)
 	stable_sort(schools, function(a,b)
 							 return resultDT.effectiveHealth[a] > resultDT.effectiveHealth[b]
 						 end)
@@ -2113,7 +2114,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		-- Resistances
 		TP_Table.resistance = {}
 		if not school then
-			for _,s in ipairs(TankPoints.ResistableElementalSchools) do
+			for _,s in ipairs(self.ResistableElementalSchools) do
 				_, TP_Table.resistance[s] = UnitResistance(unit, s-1)
 			end
 			-- Holy Resistance always 0
@@ -2122,7 +2123,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 			_, TP_Table.resistance[school] = UnitResistance(unit, school - 1)
 		end
 		-- Spell Taken Mod
-		for _,s in ipairs(TankPoints.ElementalSchools) do
+		for _,s in ipairs(self.ElementalSchools) do
 			TP_Table.damageTakenMod[s] = StatLogic:GetStatMod("MOD_DMG_TAKEN", schoolIDToString[s])
 		end
 		-- mobSpellCritDamageMod from talants
@@ -2341,12 +2342,12 @@ end
 
 function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 	local ret = true
-	TankPoints.noTPReason = "should have TankPoints"
+	self.noTPReason = "should have TankPoints"
 	local function cmax(var,max)
 		if ret then
 			if nil == TP_Table[var] then
 				local msg = var.." is nil"
-				TankPoints.noTPReason = msg
+				self.noTPReason = msg
 				self:Print(msg)
 				ret = nil
 			else
@@ -2358,7 +2359,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		if ret then
 			if nil == TP_Table[var1][var2] then
 				local msg = format("TP_Table[%s][%s] is nil",tostring(var1),tostring(var2))
-				TankPoints.noTPReason = msg
+				self.noTPReason = msg
 				self:Print(msg)
 				ret = nil
 			else
@@ -2403,7 +2404,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		cmax("mobSpellMissChance",0)
 		-- Negative resistances don't work anymore?
 		if not school then
-			for _,s in ipairs(TankPoints.ElementalSchools) do
+			for _,s in ipairs(self.ElementalSchools) do
 				cmax2("resistance",s,0)
 				cmax2("damageTakenMod",s,0)
 			end
@@ -2438,7 +2439,7 @@ function TankPoints:GetTankPointsIfNotFilled(table,school)
 				return self:GetTankPoints(table,school)
 			end
 		else
-			for _,s in ipairs(TankPoints.ElementalSchools) do
+			for _,s in ipairs(self.ElementalSchools) do
 				if not table.effectiveHealth[s] or not table.tankPoints[s] then
 					return self:GetTankPoints(table,nil)
 				end
@@ -2457,12 +2458,12 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	if not TP_Table then
 		tempTableFlag = true
 		-- Fill table with player values
-		TP_Table = TankPoints:GetSourceData(nil, school)
+		TP_Table = self:GetSourceData(nil, school)
 	end
 	------------------
 	-- Check Inputs --
 	------------------
-	if not TankPoints:CheckSourceData(TP_Table, school, forceShield) then return end
+	if not self:CheckSourceData(TP_Table, school, forceShield) then return end
 	-- Get a copy for Shield Block skill calculations
 	local inputCopy
 	if self.playerClass == "WARRIOR" then
@@ -2646,7 +2647,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	end
 	if not school then
 		calc_melee()
-		for _,s in ipairs(TankPoints.ElementalSchools) do
+		for _,s in ipairs(self.ElementalSchools) do
 			calc_spell_school(s)
 		end
 	else
@@ -2675,12 +2676,12 @@ function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShiel
 	if not TP_Table then
 		tempTableFlag = true
 		-- Fill table with player values
-		TP_Table = TankPoints:GetSourceData(nil, school)
+		TP_Table = self:GetSourceData(nil, school)
 	end
 	------------------
 	-- Check Inputs --
 	------------------
-	if not TankPoints:CheckSourceData(TP_Table, school, forceShield) then return end
+	if not self:CheckSourceData(TP_Table, school, forceShield) then return end
 	-----------------
 	-- Caculations --
 	-----------------
@@ -2804,7 +2805,7 @@ function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShiel
 		TP_Table.totalReduction[TP_MELEE] = 1 - ((TP_Table.mobCritChance * (1 + TP_Table.mobCritBonus) * TP_Table.mobCritDamageMod) + (TP_Table.mobCrushChance * 1.5) + (1 - TP_Table.mobCrushChance - TP_Table.mobCritChance - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance)) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
 		-- TankPoints
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
-		for _,s in ipairs(TankPoints.ElementalSchools) do
+		for _,s in ipairs(self.ElementalSchools) do
 			-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
 			TP_Table.schoolReduction[s] = 0.75 * (TP_Table.resistance[s] / (max(TP_Table.mobLevel, 20) * 5))
 			-- Total Reduction
