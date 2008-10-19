@@ -110,7 +110,7 @@ L:RegisterTranslations("koKR", function() return {
 	["Health"] = "생명력", -- player health
 	["Armor Reduction"] = "방어도 감소", -- how much armor reduces damage
 	["Resistance Reduction"] = "저항력 감소", -- reduction due to elemental resist (nature, etc)
-	["Other Reductions"] = "기타 감소", -- things like stances, talents
+	--["Talent/Buff/Stance Reductions"] = "기타 감소", -- things like stances, talents
 	["Your Reductions"] = "당신의 감소", -- section header
 	["Guaranteed Reduction"] = "보증 감소", -- how much damage you're guaranteed to mitigate
 	["Mob attacks can critically hit"] = "몹 공격이 치명타일 수 있습니다.",
@@ -164,8 +164,8 @@ L:RegisterTranslations("koKR", function() return {
 	["Player Stats"] = "플레이어 능력치",
 	["Change default player stats"] = "기본 플레이어 능력치를 변경합니다.",
 	-- /tp player sbfreq
-	["Shield Block Key Press Frequency"] = "방패 막기 누름 빈도",
-	["Sets the time in seconds between Shield Block key presses"] = "방패 막기 버튼을 누르는 초단위 간격을 설정합니다.",
+	--["Shield Block Key Press Delay"] = "방패 막기 누름 빈도",
+	--["Sets the time in seconds after Shield Block finishes cooldown"] = "방패 막기 버튼을 누르는 초단위 간격을 설정합니다.",
 	-- /tp mob
 	["Mob Stats"] = "몹 능력치",
 	["Change default mob stats"] = "기본 몹 능력치를 변경합니다.",

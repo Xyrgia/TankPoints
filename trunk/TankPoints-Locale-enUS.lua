@@ -87,8 +87,8 @@ L:RegisterTranslations("enUS", function() return {
 	["Mob Miss"] = true,
 	["Per StatValue"] = true,
 	["Per Stat"] = true,
-        ["Click: show Per StatValue TankPoints"] = true,
-        ["Click: show Per Stat TankPoints"] = true,
+  ["Click: show Per StatValue TankPoints"] = true,
+  ["Click: show Per Stat TankPoints"] = true,
 	-- Melee Reduction Tooltip
 	[" Damage Reduction"] = true, -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
 	["Player Level"] = true,
@@ -122,7 +122,7 @@ L:RegisterTranslations("enUS", function() return {
 	["Health"] = true, -- player health
 	["Armor Reduction"] = true, -- how much armor reduces damage
 	["Resistance Reduction"] = true, -- reduction due to elemental resist (nature, etc)
-	["Other Reductions"] = true, -- things like stances, talents
+	["Talent/Buff/Stance Reductions"] = true, -- things like stances, talents
 	["Your Reductions"] = true, -- section header
 	["Guaranteed Reduction"] = true, -- how much damage you're guaranteed to mitigate
 	["Mob attacks can critically hit"] = true,
@@ -176,8 +176,8 @@ L:RegisterTranslations("enUS", function() return {
 	["Player Stats"] = true,
 	["Change default player stats"] = true,
 	-- /tp player sbfreq
-	["Shield Block Key Press Frequency"] = true,
-	["Sets the time in seconds between Shield Block key presses"] = true,
+	["Shield Block Key Press Delay"] = true,
+	["Sets the time in seconds after Shield Block finishes cooldown"] = true,
 	-- /tp mob
 	["Mob Stats"] = true,
 	["Change default mob stats"] = true,

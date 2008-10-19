@@ -200,9 +200,11 @@ local function set_cache(link,tpleft,tpright,ehleft,ehright,ehbleft,ehbright,drl
 	end
 	cache[link] = cacheValue
 end
+
 local function exist_cache_entry(link)
 	return cache[link]
 end
+
 local function get_cache(link)
 	local tp,eh,ehb,dr = strsplit("$",cache[link])
 	local tpleft,tpright,ehleft,ehright,ehbleft,ehbright,drleft,drright
@@ -266,7 +268,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	end
 	-- Item type
 	local itemType = diffTable1.itemType
-	local tpRight, ehRight, ehbRight,drRight
+	local tpRight, ehRight, ehbRight, drRight
 	-- Calculate current TankPoints
 	local tpSource = {}
 	TP:GetSourceData(tpSource, TP_MELEE)
@@ -308,7 +310,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	-- Calculate TankPoints from tpTable
 	TP:GetTankPoints(tpTable, TP_MELEE, forceShield)
 	-- Calculate tp difference
-	local function rightFromDifference(before,after,diffp,totalp,diff_format,tot_format)
+	local function rightFromDifference(before, after, diffp, totalp, diff_format, tot_format)
 		diff_format = diff_format or "%+d"
 		tot_format = tot_format or "%d"
 		local diff = before - after

@@ -122,7 +122,7 @@ L:RegisterTranslations("zhTW", function() return {
 	["Health"] = "生命值", -- player health
 	["Armor Reduction"] = "護甲減傷", -- how much armor reduces damage
 	["Resistance Reduction"] = "抗性減傷", -- reduction due to elemental resist (nature, etc)
-	["Other Reductions"] = "其他減傷", -- things like stances, talents
+	--["Talent/Buff/Stance Reductions"] = "天賦/姿態減傷", -- things like stances, talents
 	["Your Reductions"] = "你的減傷量", -- section header
 	["Guaranteed Reduction"] = "必定減傷", -- how much damage you're guaranteed to mitigate
 	["Mob attacks can critically hit"] = "怪物攻擊可造成致命一擊",
@@ -176,8 +176,8 @@ L:RegisterTranslations("zhTW", function() return {
 	["Player Stats"] = "玩家狀態",
 	["Change default player stats"] = "改變預設玩家狀態",
 	-- /tp player sbfreq
-	["Shield Block Key Press Frequency"] = "盾牌格擋使用頻率",
---	["Sets the time in seconds between Shield Block key presses"] = true,
+	["Shield Block Key Press Delay"] = "盾牌格擋使用延遲",
+  ["Sets the time in seconds after Shield Block finishes cooldown"] = "設定盾牌格擋冷卻完成後幾秒才按",
 	-- /tp mob
 	["Mob Stats"] = "怪物狀態",
 	["Change default mob stats"] = "改變預設怪物狀態",

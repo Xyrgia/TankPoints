@@ -126,8 +126,8 @@ L:RegisterTranslations("esES", function() return {
 	["Player Stats"] = "Estadísticas del Jugador",
 	["Change default player stats"] = "Cambia las estadísticas del jugador por defecto",
 	-- /tp player sbfreq
-	["Shield Block Key Press Frequency"] = "Frecuencia de pulsación de tecla de Bloqueo con Escudo",
-	["Sets the time in seconds between Shield Block key presses"] = "Establece el tiempo, en segundos, entre cada presión de tecla de Bloqueo con Escudo",
+	--["Shield Block Key Press Delay"] = "Frecuencia de pulsación de tecla de Bloqueo con Escudo",
+	--["Sets the time in seconds after Shield Block finishes cooldown"] = "Establece el tiempo, en segundos, entre cada presión de tecla de Bloqueo con Escudo",
 	-- /tp mob
 	["Mob Stats"] = "Estadísticas del Enemigo",
 	["Change default mob stats"] = "Cambia las estadísticas del enemigo por defecto",
