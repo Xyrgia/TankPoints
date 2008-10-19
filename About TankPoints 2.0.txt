@@ -243,13 +243,19 @@ Paladins are not calculated yet.
 ** Version History **
 2.8.0
 - Avoidance diminishing returns support: Calculator, ItemTooltip, TankPoints Per Stat, TankPoints Per StatValue
+- Supports Death Knight: Forceful Deflection - Increases your Parry Rating by 25% of your total Strength
+- Added Str to TankPoints Per Stat, TankPoints Per StatValue
+- Fixed EffectiveHealth, EffectiveHealthWithBlock
+- Fixed Warrior Shield Block calculations
+- Support for Paladin Holy Shield
 - Crushing blows only happen when mob is +4 levels
-- 0.5 block per str
+- 1 Strength now gives 0.5 Block Value
 - Removed Babble-Spell-2.2, Deformat-2.0, Gratuity-2.0
 - Fixed immediate errors in 3.0.2
 - Calculator: Fixed error
+- Code cleanup and stability tweaks
 - toc 30000
-2.7.0
+2.7.0 by Aliset
 - NEW: You can specify pre-mitigation mob damage using /tp mob drdamage
 - NEW: Ciderhelm's EffectiveHealth and a derived stat, EffectiveHealthWithBlock
 - Moved to StatFrameLib-1.0 for paperdoll stat frames

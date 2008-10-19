@@ -122,7 +122,7 @@ L:RegisterTranslations("zhCN", function() return {
 	["Health"] = "生命值", -- player health
 	["Armor Reduction"] = "护甲减免", -- how much armor reduces damage
 	["Resistance Reduction"] = "抗性减免", -- reduction due to elemental resist (nature, etc)
-	["Other Reductions"] = "其它减免", -- things like stances, talents
+	--["Talent/Buff/Stance Reductions"] = "其它减免", -- things like stances, talents
 	["Your Reductions"] = "你的减免", -- section header
 	["Guaranteed Reduction"] = "实际减免", -- how much damage you're guaranteed to mitigate
 	["Mob attacks can critically hit"] = "怪物能爆击",
@@ -176,8 +176,8 @@ L:RegisterTranslations("zhCN", function() return {
 	["Player Stats"] = "玩家属性",
 	["Change default player stats"] = "改变玩家默认属性",
 	-- /tp player sbfreq
-	["Shield Block Key Press Frequency"] = "盾牌格挡按键频率",
-	["Sets the time in seconds between Shield Block key presses"] = "设定盾牌格挡技能按键的间隔时间",
+	--["Shield Block Key Press Delay"] = "盾牌格挡按键频率",
+	--["Sets the time in seconds after Shield Block finishes cooldown"] = "设定盾牌格挡技能按键的间隔时间",
 	-- /tp mob
 	["Mob Stats"] = "怪物属性",
 	["Change default mob stats"] = "改变怪物默认属性",

@@ -111,11 +111,11 @@ function TankPointsCalculatorFrame_OnEvent(self, event, ...)
 		return
 	end
 	-- Update stuff
-        TPCalc:UpdateResults()
+	TPCalc:UpdateResults()
 end
 
 function TankPointsCalculatorFrame_OnShow()
-        TPCalc:UpdateResults()
+	TPCalc:UpdateResults()
 end
 
 -- VariableFrame
