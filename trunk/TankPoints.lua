@@ -2090,7 +2090,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 	----------------
 --	if (not school) or school == TP_MELEE then
 		-- Mob's Default Crit and Miss Chance
-		TP_Table.mobCritChance = self.db.profile.mobCritChance + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE")
+		TP_Table.mobCritChance = self.db.profile.mobCritChance
 		TP_Table.mobCritBonus = self.db.profile.mobCritBonus
 		TP_Table.mobMissChance = self.db.profile.mobMissChance - StatLogic:GetStatMod("ADD_HIT_TAKEN", "MELEE")
 		-- Armor
@@ -2126,7 +2126,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 	-- Spell Data --
 	----------------
 --	if (not school) or school > TP_MELEE then
-		TP_Table.mobSpellCritChance = self.db.profile.mobSpellCritChance + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY")
+		TP_Table.mobSpellCritChance = self.db.profile.mobSpellCritChance
 		TP_Table.mobSpellCritBonus = self.db.profile.mobSpellCritBonus
 		TP_Table.mobSpellMissChance = self.db.profile.mobSpellMissChance - StatLogic:GetStatMod("ADD_HIT_TAKEN", "HOLY")
 		-- Resistances
@@ -2494,7 +2494,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		-- Defense Mod (may return negative)
 		TP_Table.defenseEffect = self:GetDefenseEffect(TP_Table.defense, TP_Table.mobLevel)
 		-- Mob's Crit, Miss
-		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect)
+		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
 		-- Dodge, Parry, Block
 		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
@@ -2526,7 +2526,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
-		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect)
+		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY"))
 		-- Mob's Spell Crit Damage Mod
 		TP_Table.mobSpellCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
 	end
@@ -2724,7 +2724,7 @@ function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShiel
 		-- Defense Mod (may return negative)
 		TP_Table.defenseEffect = self:GetDefenseEffect(TP_Table.defense, TP_Table.mobLevel)
 		-- Mob's Crit, Miss
-		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect)
+		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
 		-- Dodge, Parry, Block
 		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
@@ -2755,7 +2755,7 @@ function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShiel
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
-		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect)
+		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY"))
 		-- Mob's Spell Crit Damage Mod
 		TP_Table.mobSpellCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
 	end
