@@ -2510,7 +2510,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Warrior Talent: Critical Block (Rank 3) - 3,24
 		--  Your successful blocks have a 10%/20%/30% chance to block double the normal amount
 		if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
-			local critBlock = 1 + GetTalentInfo(3, 24) * 0.1
+			local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.1
 			TP_Table.blockedMod = min(1, TP_Table.blockValue * critBlock / TP_Table.mobDamage)
 		else
 			TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
@@ -2618,9 +2618,6 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		TP_Table.effectiveHealth[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.guaranteedReduction[TP_MELEE])
 		-- Effective Health with Block
 		TP_Table.effectiveHealthWithBlock[TP_MELEE] = TP_Table.effectiveHealth[TP_MELEE]
-		if self.playerClass == "WARRIOR" or (self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0) then
-			TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
-		end
 	end
 	local function calc_spell_school(s)
 		-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
@@ -2687,6 +2684,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
 		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		inputCopy = nil
 	-- Paladin Talent: Holy Shield - 8 sec cooldown - 2,16
 	-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active. Each block expends a charge. 8 charges.
@@ -2707,6 +2705,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
 		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		inputCopy = nil
 	else
 		self:CalculateTankPoints(TP_Table, school, forceShield)
