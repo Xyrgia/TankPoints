@@ -2364,7 +2364,7 @@ end
 function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 	local ret = true
 	self.noTPReason = "should have TankPoints"
-	local function cmax(var,maxi)
+	local function cmax(var, maxi)
 		if ret then
 			if nil == TP_Table[var] then
 				local msg = var.." is nil"
@@ -2376,7 +2376,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 			end
 		end
 	end
-	local function cmax2(var1,var2,maxi)
+	local function cmax2(var1, var2, maxi)
 		if ret then
 			if nil == TP_Table[var1][var2] then
 				local msg = format("TP_Table[%s][%s] is nil", tostring(var1), tostring(var2))
@@ -2462,27 +2462,11 @@ function TankPoints:GetTankPointsIfNotFilled(table, school)
 	end
 end
 
-function TankPoints:GetTankPoints(TP_Table, school, forceShield)
-	-----------------
-	-- Aquire Data --
-	-----------------
-	-- Set true if temp table is created
-	local tempTableFlag
-	if not TP_Table then
-		tempTableFlag = true
-		-- Fill table with player values
-		TP_Table = self:GetSourceData(nil, school)
-	end
+function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	------------------
 	-- Check Inputs --
 	------------------
 	if not self:CheckSourceData(TP_Table, school, forceShield) then return end
-	-- Get a copy for Shield Block skill calculations
-	local inputCopy
-	if self.playerClass == "WARRIOR" or self.playerClass == "PALADIN" then
-		inputCopy = {}
-		copyTable(inputCopy, TP_Table)
-	end
 	-----------------
 	-- Caculations --
 	-----------------
@@ -2510,10 +2494,10 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		-- Crushing Blow Chance
 		TP_Table.mobCrushChance = 0
 		if (TP_Table.mobLevel - TP_Table.playerLevel) > 3 then -- if mob is 4 levels or above crushing blow will happen
-			-- The chance is 2% per point of difference minus 15%
+			-- The chance is 10% per level difference minus 15%
 			TP_Table.mobCrushChance = (TP_Table.mobLevel - TP_Table.playerLevel) * 0.1 - 0.15
 		end
-
+		
 		-- Mob's Crit Damage Mod
 		TP_Table.mobCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
 		-- Mob Damage
@@ -2522,7 +2506,15 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		-- Blocked Damage Percentage (blockedMod)
 		-- ex: if mob hits you for 1000 and you block 200 of it, then you avoid 200/1000 = 20% of the damage
 		-- this value multiplied by block% can now be treated like dodge and parry except that these avoid 100% of the damage
-		TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
+		-------------
+		-- Warrior Talent: Critical Block (Rank 3) - 3,24
+		--  Your successful blocks have a 10%/20%/30% chance to block double the normal amount
+		if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
+			local critBlock = 1 + GetTalentInfo(3, 24) * 0.1
+			TP_Table.blockedMod = min(1, TP_Table.blockValue * critBlock / TP_Table.mobDamage)
+		else
+			TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
+		end
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
@@ -2629,42 +2621,6 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		if self.playerClass == "WARRIOR" or (self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0) then
 			TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		end
-		-- Paladin: Holy Shield - 8 sec cooldown
-		-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active.  Each block expends a charge.  8 charges.
-		-- Warrior: Shield Block - 1 min cooldown
-		-- 	Increases your chance to block and block value by 100% for 10 sec.
-		-- Warrior: Shield Mastery (Rank 2) - 3,8
-		--	Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
-		-- Shield Block Skill
-		if self.playerClass == "WARRIOR" then
-			-- Build shieldBlockChangesTable
-			shieldBlockChangesTable.blockChance = 1
-			shieldBlockChangesTable.blockValue = inputCopy.blockValue
-			-- Calculate TankPoints assuming shield block is always up
-			self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
-			self:GetTankPointsWithoutShieldBlock(inputCopy, TP_MELEE, forceShield)
-			-- Estimate average time Shield Block is up
-			local _, _, _, _, r = GetTalentInfo(3, 8)
-			local shieldBlockCoolDown = 60 - r * 10
-			local shieldBlockUpPercent = 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay)
-			TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
-			TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
-			TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
-		elseif self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 then
-			-- Build shieldBlockChangesTable
-			shieldBlockChangesTable.blockChance = 0.3
-			shieldBlockChangesTable.blockValue = 0
-			-- Calculate TankPoints assuming shield block is always up
-			self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
-			self:GetTankPointsWithoutShieldBlock(inputCopy, TP_MELEE, forceShield)
-			-- Estimate average time Shield Block is up
-			local shieldBlockCoolDown = 8
-			local shieldBlockUpPercent = 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay)
-			if shieldBlockUpPercent > 1 then shieldBlockUpPercent = 1 end
-			TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
-			TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
-			TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
-		end
 	end
 	local function calc_spell_school(s)
 		-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
@@ -2688,17 +2644,10 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 			calc_spell_school(school)
 		end
 	end
-	-------------
-	-- Cleanup --
-	-------------
-	if tempTableFlag and school then
-		local tankPoints, totalReduction, schoolReduction = TP_Table.tankPoints[school], TP_Table.totalReduction[school], TP_Table.schoolReduction[school]
-		return tankPoints, totalReduction, schoolReduction
-	end
 	return TP_Table
 end
 
-function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShield)
+function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	-----------------
 	-- Aquire Data --
 	-----------------
@@ -2716,156 +2665,58 @@ function TankPoints:GetTankPointsWithoutShieldBlock(TP_Table, school, forceShiel
 	-----------------
 	-- Caculations --
 	-----------------
-	-- Resilience Mod
-	TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, CR_CRIT_TAKEN_MELEE, TP_Table.playerLevel) * 0.01
-	if (not school) or school == TP_MELEE then
-		-- Armor Reduction
-		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
-		-- Defense Mod (may return negative)
-		TP_Table.defenseEffect = self:GetDefenseEffect(TP_Table.defense, TP_Table.mobLevel)
-		-- Mob's Crit, Miss
-		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
-		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
-		-- Dodge, Parry, Block
-		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
-		TP_Table.parryChance = max(0, TP_Table.parryChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
-		-- Block Chance, Block Value
-		-- Check if player has shield or forceShield is set to true
-		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
-			TP_Table.blockChance = max(0, TP_Table.blockChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
-		else
-			TP_Table.blockChance = 0
-		end
-		
-		-- Crushing Blow Chance
-		TP_Table.mobCrushChance = 0
-		if (TP_Table.mobLevel - TP_Table.playerLevel) > 2 then -- if mob is 3 levels or above crushing blow will happen
-			-- minimum 15% and additional 2% every defense point under playerLevel*5
-			TP_Table.mobCrushChance = 0.15 + max(0, (TP_Table.playerLevel * 5 - TP_Table.defense) * 0.02)
-		end
-		-- Mob's Crit Damage Mod
-		TP_Table.mobCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
-		-- Mob Damage
-		-- blocked value is subtracted from the damage after armor and stance mods are factored in
-		TP_Table.mobDamage = TP_Table.mobDamage * TP_Table.damageTakenMod[TP_MELEE] * (1 - TP_Table.armorReduction)
-		-- Blocked Damage Percentage (blockedMod)
-		-- ex: if mob hits you for 1000 and you block 200 of it, then you avoid 200/1000 = 20% of the damage
-		-- this value multiplied by block% can now be treated like dodge and parry except that these avoid 100% of the damage
-		TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
-	end
-	if (not school) or school > TP_MELEE then
-		-- Mob's Spell Crit
-		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY"))
-		-- Mob's Spell Crit Damage Mod
-		TP_Table.mobSpellCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
-	end
-	---------------------
-	-- High caps check --
-	---------------------
-	if (not school) or school == TP_MELEE then
-		-- Hit < Crushing < Crit < Block < Parry < Dodge < Miss
-		local combatTable = {}
-		-- build total sums
-		local total = TP_Table.mobMissChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.dodgeChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.parryChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.blockChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.mobCritChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.mobCrushChance
-		tinsert(combatTable, total)
-		-- check caps
-		if combatTable[1] > 1 then
-			TP_Table.mobMissChance = 1
-		end
-		if combatTable[2] > 1 then
-			TP_Table.dodgeChance = max(0, 1 - combatTable[1])
-		end
-		if combatTable[3] > 1 then
-			TP_Table.parryChance = max(0, 1 - combatTable[2])
-		end
-		if combatTable[4] > 1 then
-			TP_Table.blockChance = max(0, 1 - combatTable[3])
-		end
-		if combatTable[5] > 1 then
-			TP_Table.mobCritChance = max(0, 1 - combatTable[4])
-		end
-		if combatTable[6] > 1 then
-			TP_Table.mobCrushChance = max(0, 1 - combatTable[5])
-		end
-	end
-	if (not school) or school > TP_MELEE then
-		-- Hit < Crit < Miss
-		local combatTable = {}
-		-- build total sums
-		local total = TP_Table.mobSpellMissChance
-		tinsert(combatTable, total)
-		total = total + TP_Table.mobSpellCritChance
-		tinsert(combatTable, total)
-		-- check caps
-		if combatTable[1] > 1 then
-			TP_Table.mobSpellMissChance = 1
-		end
-		if combatTable[2] > 1 then
-			TP_Table.mobSpellCritChance = max(0, 1 - combatTable[1])
-		end
-	end
-
-	--self:Debug(TP_Table.mobMissChance, TP_Table.dodgeChance, TP_Table.parryChance, TP_Table.blockChance, TP_Table.mobCritChance, TP_Table.mobCrushChance)
-	------------------------
-	-- Final Calculations --
-	------------------------
-	--self:Debug("TankPoints Caculated")
-	if type(TP_Table.schoolReduction) ~= "table" then
-		TP_Table.schoolReduction = {}
-	end
-	if type(TP_Table.totalReduction) ~= "table" then
-		TP_Table.totalReduction = {}
-	end
-	if type(TP_Table.tankPoints) ~= "table" then
-		TP_Table.tankPoints = {}
-	end
-	if not school then
-		-- School Reduction
-		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
-		-- Total Reduction
-		TP_Table.totalReduction[TP_MELEE] = 1 - ((TP_Table.mobCritChance * (1 + TP_Table.mobCritBonus) * TP_Table.mobCritDamageMod) + (TP_Table.mobCrushChance * 1.5) + (1 - TP_Table.mobCrushChance - TP_Table.mobCritChance - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance)) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
-		-- TankPoints
-		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
-		for _,s in ipairs(self.ElementalSchools) do
-			-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
-			TP_Table.schoolReduction[s] = 0.75 * (TP_Table.resistance[s] / (max(TP_Table.mobLevel, 20) * 5))
-			-- Total Reduction
-			TP_Table.totalReduction[s] = 1 - ((TP_Table.mobSpellCritChance * (1 + TP_Table.mobSpellCritBonus) * TP_Table.mobSpellCritDamageMod) + (1 - TP_Table.mobSpellCritChance - TP_Table.mobSpellMissChance)) * (1 - TP_Table.schoolReduction[s]) * TP_Table.damageTakenMod[s]
-			-- TankPoints
-			TP_Table.tankPoints[s] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[s])
-		end
+	-- Warrior Skill: Shield Block - 1 min cooldown
+	-- 	Increases your chance to block and block value by 100% for 10 sec.
+	-- Warrior Talent: Shield Mastery (Rank 2) - 3,8
+	--	Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
+	if self.playerClass == "WARRIOR" and (not school or school == TP_MELEE) then
+		-- Get a copy for Shield Block skill calculations
+		local inputCopy = {}
+		copyTable(inputCopy, TP_Table)
+		-- Build shieldBlockChangesTable
+		shieldBlockChangesTable.blockChance = 1 -- 100%
+		shieldBlockChangesTable.blockValue = inputCopy.blockValue -- +100%
+		-- Calculate TankPoints assuming shield block is always up
+		self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
+		self:CalculateTankPoints(inputCopy, TP_MELEE, forceShield)
+		self:CalculateTankPoints(TP_Table, school, forceShield)
+		-- Estimate average time Shield Block is up
+		local _, _, _, _, r = GetTalentInfo(3, 8)
+		local shieldBlockCoolDown = 60 - r * 10
+		local shieldBlockUpPercent = 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay)
+		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
+		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
+		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		inputCopy = nil
+	-- Paladin Talent: Holy Shield - 8 sec cooldown - 2,16
+	-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active. Each block expends a charge. 8 charges.
+	elseif self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 and (not school or school == TP_MELEE) then
+		-- Get a copy for Shield Block skill calculations
+		local inputCopy = {}
+		copyTable(inputCopy, TP_Table)
+		-- Build shieldBlockChangesTable
+		shieldBlockChangesTable.blockChance = 0.3 -- 30%
+		shieldBlockChangesTable.blockValue = 0
+		-- Calculate TankPoints assuming shield block is always up
+		self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
+		self:CalculateTankPoints(inputCopy, TP_MELEE, forceShield)
+		self:CalculateTankPoints(TP_Table, school, forceShield)
+		-- Estimate average time Shield Block is up
+		local shieldBlockCoolDown = 8
+		local shieldBlockUpPercent = min(1, 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay))
+		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
+		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
+		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		inputCopy = nil
 	else
-		if school == TP_MELEE then
-			-- School Reduction
-			TP_Table.schoolReduction[school] = TP_Table.armorReduction
-			-- Total Reduction
-			TP_Table.totalReduction[school] = 1 - ((TP_Table.mobCritChance * (1 + TP_Table.mobCritBonus) * TP_Table.mobCritDamageMod) + (TP_Table.mobCrushChance * 1.5) + (1 - TP_Table.mobCrushChance - TP_Table.mobCritChance - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance)) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[school]
-			-- TankPoints
-			TP_Table.tankPoints[school] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[school])
-		else
-			-- Resistance Reduction
-			TP_Table.schoolReduction[school] = 0.75 * (TP_Table.resistance[school] / (max(TP_Table.mobLevel, 20) * 5))
-			-- Total Reduction
-			TP_Table.totalReduction[school] = 1 - ((TP_Table.mobSpellCritChance * (1 + TP_Table.mobSpellCritBonus) * TP_Table.mobSpellCritDamageMod) + (1 - TP_Table.mobSpellCritChance - TP_Table.mobSpellMissChance)) * (1 - TP_Table.schoolReduction[school]) * TP_Table.damageTakenMod[school]
-			-- TankPoints
-			TP_Table.tankPoints[school] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[school])
-		end
+		self:CalculateTankPoints(TP_Table, school, forceShield)
 	end
 	-------------
 	-- Cleanup --
 	-------------
-	if tempTableFlag and school then
+	if tempTableFlag then
 		local tankPoints, totalReduction, schoolReduction = TP_Table.tankPoints[school], TP_Table.totalReduction[school], TP_Table.schoolReduction[school]
+		TP_Table = nil
 		return tankPoints, totalReduction, schoolReduction
 	end
 	return TP_Table
