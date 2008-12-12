@@ -244,6 +244,7 @@ Paladins are not calculated yet.
 2.8.1
 - Support for Warrior talent: Critical Block
 - Fixed Shield Block and Holy Shield calculations
+- Default mob damage at level 83 is now 24365 instead of 10505
 2.8.0
 - Avoidance diminishing returns support: Calculator, ItemTooltip, TankPoints Per Stat, TankPoints Per StatValue
 - Supports Death Knight: Forceful Deflection - Increases your Parry Rating by 25% of your total Strength
