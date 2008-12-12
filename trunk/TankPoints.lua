@@ -1747,7 +1747,9 @@ function TankPoints:GetMobDamage(mobLevel)
 		return profileDB.mobDamage
 	end
 	local levelMod = mobLevel
-	if ( levelMod > 59 ) then
+	if ( levelMod > 70 ) then
+		levelMod = levelMod + (15 * (levelMod - 59))
+	elseif ( levelMod > 59 ) then
 		levelMod = levelMod + (4.5 * (levelMod - 59))
 	end
 	return levelMod * 55 -- this is the value before mitigation, which we will do in GetTankPoints
