@@ -7,8 +7,8 @@
 ## Author: Whitetooth
 ## X-eMail: hotdogee [at] gmail [dot] com
 ## SavedVariables: TankPointsDB
-## OptionalDeps: Ace2, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
-## X-Embeds: Ace2, StatLogicLib, StatFrameLib, TipHookerLib, UTF8, Waterfall-1.0
+## OptionalDeps: Ace2, LibStatLogic-1.1, LibTipHooker-1.1, StatFrameLib, UTF8, Waterfall-1.0
+## X-Embeds: Ace2, LibStatLogic-1.1, LibTipHooker-1.1, StatFrameLib, UTF8, Waterfall-1.0
 ## X-Category: Interface Enhancements
 ## X-RelSite-WoWI: 6419
 ## X-RelSite-Curse: 992

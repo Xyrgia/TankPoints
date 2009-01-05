@@ -11,7 +11,7 @@ LastUpdate: $Date$
 ---------------
 -- Libraries --
 ---------------
-local StatLogic = AceLibrary("StatLogic-1.0")
+local StatLogic = LibStub:GetLibrary("LibStatLogic-1.1")
 local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 
 
