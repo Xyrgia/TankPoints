@@ -82,7 +82,19 @@ local function copyTable(to, from)
 	return to
 end
 
-local commafy_integer = TankPoints.Commafy_Integer
+local function commaValue(integer)
+	local s = tostring(integer)
+	local length = strlen(s)
+	if length < 4 then
+		return s
+	elseif length < 7 then
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)$", "%1,%2", 1))
+	elseif length < 10 then
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)(%d%d%d)$", "%1,%2,%3", 1))
+	else
+		return s
+	end
+end
 
 -- Color Numbers
 local GREEN_FONT_COLOR_CODE = GREEN_FONT_COLOR_CODE -- "|cff20ff20" Green
@@ -319,13 +331,13 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 		end
 		local str = nil
 		if diffp then
-			str = colorNum(commafy_integer(format(diff_format,diff)), diff)
+			str = colorNum(commaValue(format(diff_format,diff)), diff)
 		end
 		if totalp then
 			if diffp then
-				str = str.."("..colorNum(commafy_integer(format(tot_format, after)), diff)..")"
+				str = str.."("..colorNum(commaValue(format(tot_format, after)), diff)..")"
 			else
-				str = colorNum(commafy_integer(format(tot_format, after)), diff)
+				str = colorNum(commaValue(format(tot_format, after)), diff)
 			end
 		end
 		if suffix and str then
