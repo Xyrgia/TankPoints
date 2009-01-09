@@ -21,7 +21,7 @@ local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 -- AceAddon Setup --
 --------------------
 -- AceAddon Initialization
-TankPoints = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "AceConsole-2.0", "AceEvent-2.0", "AceDebug-2.0","AceHook-2.1","StatFrameLib-1.0")
+TankPoints = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "AceConsole-2.0", "AceEvent-2.0", "AceDebug-2.0", "AceHook-2.1", "StatFrameLib-1.0")
 TankPoints.title = "TankPoints"
 TankPoints.version = "2.8.1 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
 TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
@@ -87,6 +87,8 @@ local profileDB -- Initialized in :OnInitialize()
 local _
 local _G = getfenv(0)
 local strfind = strfind
+local strlen = strlen
+local gsub = gsub
 local pairs = pairs
 local ipairs = ipairs
 local type = type
@@ -96,10 +98,15 @@ local unpack = unpack
 local max = max
 local min = min
 local floor = floor
+local ceil = ceil
 local round = function(n)
 	return floor(n + 0.5)
 end
 local loadstring = loadstring
+local tostring = tostring
+local setmetatable = setmetatable
+local getmetatable = getmetatable
+local format = format
 
 -- Localize WoW globals
 local GameTooltip = GameTooltip
@@ -136,7 +143,7 @@ TankPoints.DBDefaults = {
 	showTooltipTotal = false,
 	showTooltipDRDiff = false,
 	showTooltipDRTotal = false,
-	showTooltipEHDiff = true,
+	showTooltipEHDiff = false,
 	showTooltipEHTotal = false,
 	showTooltipEHBDiff = false,
 	showTooltipEHBTotal = false,
@@ -534,36 +541,83 @@ local function copyTable(to, from)
 	return to
 end
 
--- okay, this is not pretty but it only creates one new string per call
--- and it doesn't create any new tables.
--- it also works for all integers and decorates the range we're interested in.
--- incidentally, I really hate Lua's style of multiple value return
-function TankPoints.Commafy_Integer(integer)
-	s = tostring(integer)
-	length = string.len(s)
-	new = nil
+local function commaValue(integer)
+	local s = tostring(integer)
+	local length = strlen(s)
 	if length < 4 then
-		new = s
+		return s
 	elseif length < 7 then
-		new = string.gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)$", "%1,%2", 1)
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)$", "%1,%2", 1))
 	elseif length < 10 then
-		new = string.gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)(%d%d%d)$", "%1,%2,%3", 1)
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)(%d%d%d)$", "%1,%2,%3", 1))
 	else
-		new = s
+		return s
 	end
-	return new
 end
-local commafy_integer = TankPoints.Commafy_Integer
 
--- we're using this to sort very small tables, so bubble sort is actually a pretty good stable sort
-local function stable_sort(sortme,cmp)
+-- bubble sort
+local function stableSort(sortme, cmp)
 	local swap = nil
 	for i = 1, #sortme, 1 do
 		for j = #sortme, i+1, -1 do
-			if cmp(sortme[j],sortme[j-1]) then
+			if cmp(sortme[j], sortme[j-1]) then
 				swap = sortme[j]
 				sortme[j] = sortme[j-1]
 				sortme[j-1] = swap
+			end
+		end
+	end
+end
+
+--------------------
+-- Schedule Tasks --
+--------------------
+TankPoints.ScheduledTasks = {}
+function TankPoints:Schedule(taskName, timeAfter, functionName, ...)
+	if (taskName and timeAfter) then -- functionName not required so we can use IsScheduled as a timer check
+		self.ScheduledTasks[taskName] = {
+			TargetTime = GetTime() + timeAfter,
+			FunctionName = functionName,
+			Arg = {...},
+		}
+	end
+end
+
+function TankPoints:ScheduleRepeat(taskName, repeatRate, functionName, ...)
+	if (taskName and repeatRate and functionName) then -- functionName required
+		self.ScheduledTasks[taskName] = {
+			Elapsed = 0,
+			RepeatRate = repeatRate,
+			FunctionName = functionName,
+			Arg = {...},
+		}
+	end
+end
+
+function TankPoints:UnSchedule(taskName)
+	--WT_RaidWarningAPI.Announce({HOTDOG = taskName})
+	if not taskName then return end
+	self.ScheduledTasks[taskName] = nil
+end
+
+function TankPoints:IsScheduled(taskName)
+	return (self.ScheduledTasks[taskName] ~= nil)
+end
+
+function TankPoints:OnUpdate(elapsed)
+	--TankPoints:Debug("update: "..tostring(elapsed))
+	local currentTime = GetTime()
+	for taskName, task in pairs(TankPoints.ScheduledTasks) do
+		if type(task.TargetTime) ~= "nil" and (currentTime >= task.TargetTime) then
+			TankPoints:UnSchedule(taskName)
+			if (task.FunctionName) then
+				task.FunctionName(unpack(task.Arg))
+			end
+		elseif type(task.Elapsed) ~= "nil" then
+			task.Elapsed = task.Elapsed + arg1
+			if (task.Elapsed >= task.RepeatRate) then
+				task.FunctionName(unpack(task.Arg))
+				task.Elapsed = task.Elapsed - task.RepeatRate
 			end
 		end
 	end
@@ -601,7 +655,6 @@ function TankPoints:OnEnable()
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
-	self:RegisterEvent("UPDATE_SHAPESHIFT_FORM")
 	-- Initialize TankPoints.playerLevel
 	self.playerLevel = UnitLevel("player")
 	-- by default don't show tank points per stat
@@ -609,11 +662,11 @@ function TankPoints:OnEnable()
 	-- Calculate TankPoints
 	self:UpdateDataTable()
 	-- Add "TankPoints" to playerstat drop down list
-	self:AddStatFrame("TankPoints",L["TankPoints"])
-	self:AddStatFrame("EffectiveHealth",L["Effective Health"])
+	self:AddStatFrame("TankPoints", L["TankPoints"])
+	self:AddStatFrame("EffectiveHealth", L["Effective Health"])
 end
 
-function TankPoints:SetupFrameTankPoints(line1,line2,line3,line4,line5,line6)
+function TankPoints:SetupFrameTankPoints(line1, line2, line3, line4, line5, line6)
 	-- FIXME: this gets called a few times per sec during stance change. Old version scheduled to avoid this issue.
 	line1:SetScript("OnEnter", self.TankPointsFrame_OnEnter) -- OnEnter: function(self, motion)
 	line1:SetScript("OnMouseUp", self.TankPointsFrame_OnMouseUp)
@@ -642,6 +695,7 @@ end
 function TankPoints:UpdateStats()
 	self:UpdateDataTable()
 	self:RepaintAllStatFrames()
+	--self:Print("UpdateStats - "..self.resultsTable.tankPoints[TP_MELEE]);
 end
 
 -- Updates source and recalculate TankPoints
@@ -657,28 +711,24 @@ end
 -- Events --
 ------------
 -- event = UNIT_AURA
--- arg1 = the UnitID of the entity
-function TankPoints:UNIT_AURA(arg1, arg2)
-	-- Do nothing if event target is not player
-	if not (arg1 == "player") then return end
-	self:UpdateStats()
-end
-function TankPoints:UPDATE_SHAPESHIFT_FORM(arg1, arg2)
-	self:UpdateStats()
+-- arg1 = UnitID of the entity
+function TankPoints:UNIT_AURA(unit)
+	if not (unit == "player") then return end
+	self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
 end
 
 -- event = PLAYER_LEVEL_UP
 -- arg1 = New player level
-function TankPoints:PLAYER_LEVEL_UP(arg1)
-	self.playerLevel = arg1
-	self:UpdateStats()
+function TankPoints:PLAYER_LEVEL_UP(level)
+	self.playerLevel = level
+	self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
 end
 
 -- event = UNIT_INVENTORY_CHANGED
--- arg1 = the UnitID of the entity
-function TankPoints:UNIT_INVENTORY_CHANGED(arg1)
-	if not (arg1 == "player") then return end
-	self:UpdateStats()
+-- arg1 = UnitID of the entity
+function TankPoints:UNIT_INVENTORY_CHANGED(unit)
+	if not (unit == "player") then return end
+	self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
 end
 
 
@@ -706,7 +756,7 @@ function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 		end
 	end
 	-- Line1: TankPoints
-	local tankpoints = commafy_integer(math.floor(self.resultsTable.tankPoints[TP_MELEE]))
+	local tankpoints = commaValue(floor(self.resultsTable.tankPoints[TP_MELEE]))
 	self:StatBoxSet(line1, L["TankPoints"], tankpoints)
 	-- Line2: MeleeDR
 	local meleeReduction = self.resultsTable.totalReduction[TP_MELEE] * 100
@@ -715,7 +765,7 @@ function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 	local blockValue = self.resultsTable.blockValue
 	self:StatBoxSet(line3, L["Block Value"], blockValue)
 	-- Line4: SpellTankPoints
-	local spellTankPoints = commafy_integer(math.floor(self.resultsTable.tankPoints[self.currentSchool]))
+	local spellTankPoints = commaValue(floor(self.resultsTable.tankPoints[self.currentSchool]))
 	self:StatBoxSet(line4, self.SchoolName[self.currentSchool]..L[" TP"], spellTankPoints)
 	-- Line5: SpellReduction
 	local spellReduction = self.resultsTable.totalReduction[self.currentSchool] * 100          
@@ -760,13 +810,13 @@ function TankPoints:PaintEffectiveHealth(line1, line2, line3, line4, line5, line
 		end
 	end
 
- 	self:StatBoxSet(line1, L["EH"], commafy_integer(floor(self.resultsTable.effectiveHealth[TP_MELEE])))
+ 	self:StatBoxSet(line1, L["EH"], commaValue(floor(self.resultsTable.effectiveHealth[TP_MELEE])))
 	if self.playerClass == "WARRIOR" or self.playerClass == "PALADIN"then
-		self:StatBoxSet(line2, L["EH Block"], commafy_integer(floor(self.resultsTable.effectiveHealthWithBlock[TP_MELEE])))
+		self:StatBoxSet(line2, L["EH Block"], commaValue(floor(self.resultsTable.effectiveHealthWithBlock[TP_MELEE])))
 	end
  	self:StatBoxSet(line3, L["Block Value"], self.resultsTable.blockValue)
- 	self:StatBoxSet(line4, self.SchoolName[self.currentEHSchool]..L[" EH"], commafy_integer(floor(self.resultsTable.effectiveHealth[self.currentEHSchool])))
-	self:StatBoxSet(line5, self.SchoolName[self.penultimateEHSchool]..L[" EH"], commafy_integer(floor(self.resultsTable.effectiveHealth[self.penultimateEHSchool])))
+ 	self:StatBoxSet(line4, self.SchoolName[self.currentEHSchool]..L[" EH"], commaValue(floor(self.resultsTable.effectiveHealth[self.currentEHSchool])))
+	self:StatBoxSet(line5, self.SchoolName[self.penultimateEHSchool]..L[" EH"], commaValue(floor(self.resultsTable.effectiveHealth[self.penultimateEHSchool])))
 end
 
 function TankPoints:PaintEffectiveHealthTooltip()
@@ -780,7 +830,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	end
 	-------------
 	-- Title Line
-	GameTooltip:SetText(format(L["Effective Health vs %s %s"], self.SchoolName[TP_MELEE], commafy_integer(floor(resultDT.effectiveHealth[TP_MELEE]))),
+	GameTooltip:SetText(format(L["Effective Health vs %s %s"], self.SchoolName[TP_MELEE], commaValue(floor(resultDT.effectiveHealth[TP_MELEE]))),
 		HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	---------
 	-- Stance
@@ -800,7 +850,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	-----------
 	-- Your Stats
 	GameTooltip:AddLine(L["Your Reductions"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	addline(L["Health"], commafy_integer(resultDT.playerHealth))
+	addline(L["Health"], commaValue(resultDT.playerHealth))
 	addline(L["Armor Reduction"], format("%.2f%%", 100 * resultDT.armorReduction))
 	addline(L["Talent/Buff/Stance Reductions"], format("%.2f%%", 100 * (1 - StatLogic:GetStatMod("MOD_DMG_TAKEN","MELEE"))))
 	addline(L["Guaranteed Reduction"], format("%.2f%%", 100 * resultDT.guaranteedReduction[TP_MELEE]))
@@ -859,7 +909,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	end
 	-------------
 	-- Title Line
-	GameTooltip:SetText(L["Effective Health (with Block) vs Melee "]..commafy_integer(floor(resultDT.effectiveHealthWithBlock[TP_MELEE])), 
+	GameTooltip:SetText(L["Effective Health (with Block) vs Melee "]..commaValue(floor(resultDT.effectiveHealthWithBlock[TP_MELEE])), 
 		HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	---------
 	-- Stance
@@ -874,14 +924,14 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	end
 	------------
 	-- Mob Stats
-	textL = L["Mob Level"]..": "..resultDT.mobLevel..", "..L["Mob Damage after DR"]..": "..commafy_integer(floor(resultDT.mobDamage))
+	textL = L["Mob Level"]..": "..resultDT.mobLevel..", "..L["Mob Damage after DR"]..": "..commaValue(floor(resultDT.mobDamage))
 	GameTooltip:AddLine(textL, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	GameTooltip:AddLine(L["Mob Attack Speed"]..": "..format("%.2f", resultDT.mobAttackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
 	-----------
 	-- Your Stats
 	GameTooltip:AddLine(L["Your Reductions"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	addline(L["Health"],commafy_integer(resultDT.playerHealth))
+	addline(L["Health"],commaValue(resultDT.playerHealth))
 	addline(L["Block Value"], resultDT.blockValue)
 	addline(L["Armor Reduction"], format("%.2f%%", 100 * resultDT.armorReduction))
 	addline(L["Talent/Buff/Stance Reductions"], format("%.2f%%", 100 * (1 - StatLogic:GetStatMod("MOD_DMG_TAKEN","MELEE"))))
@@ -961,7 +1011,7 @@ function TankPoints:PaintEffectiveHealth_SpellEffectiveHealthTooltip()
 	local s = self.currentEHSchool
 	-------------
 	-- Title Line
-	GameTooltip:SetText(format(L["Effective Health vs %s %s"], self.SchoolName[s], commafy_integer(floor(resultDT.effectiveHealth[s])), 
+	GameTooltip:SetText(format(L["Effective Health vs %s %s"], self.SchoolName[s], commaValue(floor(resultDT.effectiveHealth[s])), 
 		HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b), HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	---------
 	-- Stance
@@ -975,7 +1025,7 @@ function TankPoints:PaintEffectiveHealth_SpellEffectiveHealthTooltip()
 		end
 	end
 	
-	addline(L["Health"], commafy_integer(resultDT.playerHealth))
+	addline(L["Health"], commaValue(resultDT.playerHealth))
 	addline(L["Resistance Reduction"], pct(resultDT.schoolReduction[s]))
 	addline(L["Talent/Buff/Stance Reductions"], pct(1 - resultDT.damageTakenMod[s]))
 	addline(L["Guaranteed Reduction"], pct(resultDT.guaranteedReduction[s]))
@@ -1011,11 +1061,11 @@ function TankPoints:PaintEffectiveHealth_AllSchoolsEffectiveHealthTooltip()
 	
 	local schools = {}
 	copyTable(schools, self.ResistableElementalSchools)
-	stable_sort(schools, function(a,b)
+	stableSort(schools, function(a,b)
 		return resultDT.effectiveHealth[a] > resultDT.effectiveHealth[b]
 	end)
 	for _,s in ipairs(schools) do
-		GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..s],commafy_integer(floor(resultDT.effectiveHealth[s])))
+		GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..s],commaValue(floor(resultDT.effectiveHealth[s])))
 		GameTooltip:AddTexture("Interface\\PaperDollInfoFrame\\SpellSchoolIcon"..s)
 	end
 end
@@ -1192,7 +1242,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	textL = L["Mob Stats"]
 	GameTooltip:AddLine(textL, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	-- Mob Level: 60, Mob Damage: 2000
-	textL = L["Mob Level"]..": "..resultsDT.mobLevel..", "..L["Mob Damage"]..": "..commafy_integer(math.floor(resultsDT.mobDamage))
+	textL = L["Mob Level"]..": "..resultsDT.mobLevel..", "..L["Mob Damage"]..": "..commaValue(floor(resultsDT.mobDamage))
 	GameTooltip:AddLine(textL, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	-- Mob Crit: 5%, Mob Miss: 5%
 	textL = L["Mob Crit"]..": "..format("%.2f", resultsDT.mobCritChance * 100).."%, "..L["Mob Miss"]..": "..format("%.2f", resultsDT.mobMissChance * 100).."%"
