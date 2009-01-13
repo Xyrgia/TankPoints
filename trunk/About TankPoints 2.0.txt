@@ -135,6 +135,7 @@ Use: /tp or /tankpoints
 /tp mob advanced spellcrit (0 - 100) - Sets mob's spell crit chance
 /tp mob advanced spellcritbonus - Sets mob's spell crit bonus
 /tp mob advanced spellmiss (0 - 100) - Sets mob's spell miss chance
+/tp player sbfreq (0 - 1000) - Sets the Shield Block press delay in seconds after Shield Block finishes cooldown
 
 
 ** TankPoints Formulas **
@@ -202,7 +203,9 @@ end
 - schoolReduction[SCHOOL] = 0.75 * (resistance[SCHOOL] / (mobLevel * 5))
 
 === Melee Total Reduction ===
-- totalReduction[MELEE] = 1 - ((mobCritChance * (1 + mobCritBonus) * mobCritDamageMod) + (mobCrushChance * 1.5) + (1 - mobCrushChance - mobCritChance - blockChance * blockedMod - parryChance - dodgeChance - mobMissChance)) * (1 - armorReduction) * meleeTakenMod
+- totalReduction[MELEE]
+ = 1 - (1 - Avoidance) * (1 - Mitigation) * DamageTakenMod
+ = 1 - (1 - blockChance * blockedMod - parryChance - dodgeChance - mobMissChance + (mobCritChance * mobCritBonus * mobCritDamageMod) + (mobCrushChance * 0.5)) * (1 - armorReduction) * meleeTakenMod
 
 === Spell Total Reduction ===
 - totalReduction[SCHOOL] = 1 - ((mobSpellCritChance * (1 + mobSpellCritBonus) * mobSpellCritDamageMod) + (1 - mobSpellCritChance - mobSpellMissChance)) * (1 - schoolReduction[SCHOOL]) * spellTakenMod
@@ -211,8 +214,8 @@ end
 - tankPoints = playerHealth / (1 - totalReduction)
 
 === EffectiveHealth (EH) ===
-- effectiveHealth[MELEE] = playerHealth * 1/(1 - (1-armorReduction) * damageTakenMod)
-- effectiveHealth[SCHOOL] = playerHealth * 1/(1 - damageTakenMod)
+- effectiveHealth[MELEE] = playerHealth * 1 / (1 - (1 - armorReduction) * damageTakenMod)
+- effectiveHealth[SCHOOL] = playerHealth * 1 / (1 - damageTakenMod)
 In other words: how much health you have times how much that health translates into raw damage when you're hit
 
 === EffectiveHealthWithBlock (EHB) ===
