@@ -4,6 +4,7 @@ Name: TankPoints zhTW locale
 Revision: $Revision$
 Translated by: 
 - CuteMiyu@bahamut.twbbs.org
+- Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
 ]]
 -- Global Strings that don't need translations
 --[[
@@ -96,6 +97,8 @@ L:RegisterTranslations("zhTW", function() return {
 	["Crit"] = "致命",
 	["Crushing"] = "輾壓",
 	["Hit"] = "命中",
+	["Avoidance Diminishing Returns"] = "閃避數值遞減計算",
+	["Only includes Dodge, Parry, and Missed"] = "只含閃躲、招架、未擊中",
 	-- Block Value Tooltip
 	["Mob Damage before DR"] = "減傷前怪物傷害",
 	["Mob Damage after DR"] = "減傷後怪物傷害",

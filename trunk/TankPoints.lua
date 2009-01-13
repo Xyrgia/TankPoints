@@ -1517,6 +1517,47 @@ function TankPoints.MeleeReductionFrame_OnEnter(frame, motion)
 	textR = format("%.2f%%", resultsDT.mobHitChance * 100)
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
+	---------------
+	-- Avoidance Diminishing Returns
+	textL = L["Avoidance Diminishing Returns"]
+	GameTooltip:AddLine(textL, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
+
+	-- +16 Strength --
+	if TankPoints.playerClass == "DEATHKNIGHT" then
+		textL = "+16 "..SPELL_STAT1_NAME..":"
+		textR = format("%.2f%%", StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(16 * StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR"), CR_PARRY, TankPoints.playerLevel)))
+		GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	end
+	
+	-- +16 Agility --
+	textL = "+16 "..SPELL_STAT2_NAME..":"
+	textR = format("%.2f%%", StatLogic:GetAvoidanceGainAfterDR("DODGE", 16 * StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()))
+	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	
+	-- +16 Defense Rating --
+	textL = "+16 "..COMBAT_RATING_NAME2..":"
+	local avoid = StatLogic:GetAvoidanceGainAfterDR("MELEE_HIT_AVOID", StatLogic:GetEffectFromRating(16, CR_DEFENSE_SKILL, TankPoints.playerLevel) * 0.04)
+		+ StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(16, CR_DEFENSE_SKILL, TankPoints.playerLevel) * 0.04)
+	if GetParryChance() ~= 0 then
+		avoid = avoid + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(16, CR_DEFENSE_SKILL, TankPoints.playerLevel) * 0.04)
+	end
+	textR = format("%.2f%%", avoid)
+	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	
+	-- +16 Dodge Rating --
+	textL = "+16 "..COMBAT_RATING_NAME3..":"
+	textR = format("%.2f%%", StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(16, CR_DODGE, TankPoints.playerLevel)))
+	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	
+	-- +16 Parry Rating --
+	if GetParryChance() ~= 0 then
+		textL = "+16 "..COMBAT_RATING_NAME4..":"
+		textR = format("%.2f%%", StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(16, CR_PARRY, TankPoints.playerLevel)))
+		GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	end
+	
+	GameTooltip:AddLine(L["Only includes Dodge, Parry, and Missed"], GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b)
+
 	GameTooltip:Show()
 end
 
@@ -2531,7 +2572,9 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		TP_Table.defenseEffect = self:GetDefenseEffect(TP_Table.defense, TP_Table.mobLevel)
 		-- Mob's Crit, Miss
 		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
-		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
+		local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
+		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002 + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", bonusDefense * 0.04) / 100)
+		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
 		-- Dodge, Parry, Block
 		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
 		TP_Table.parryChance = max(0, TP_Table.parryChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
