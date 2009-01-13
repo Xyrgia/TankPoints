@@ -87,8 +87,8 @@ L:RegisterTranslations("enUS", function() return {
 	["Mob Miss"] = true,
 	["Per StatValue"] = true,
 	["Per Stat"] = true,
-  ["Click: show Per StatValue TankPoints"] = true,
-  ["Click: show Per Stat TankPoints"] = true,
+	["Click: show Per StatValue TankPoints"] = true,
+	["Click: show Per Stat TankPoints"] = true,
 	-- Melee Reduction Tooltip
 	[" Damage Reduction"] = true, -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
 	["Player Level"] = true,
@@ -96,6 +96,8 @@ L:RegisterTranslations("enUS", function() return {
 	["Crit"] = true,
 	["Crushing"] = true,
 	["Hit"] = true,
+	["Avoidance Diminishing Returns"] = true,
+	["Only includes Dodge, Parry, and Missed"] = true,
 	-- Block Value Tooltip
 	["Mob Damage before DR"] = true,
 	["Mob Damage after DR"] = true,
