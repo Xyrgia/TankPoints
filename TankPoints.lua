@@ -312,8 +312,8 @@ local consoleOptions = {
 							TPCalc:UpdateResults()
 						end
 					end,
-					min = 5,
-					max = 100,
+					min = 0,
+					max = 1000,
 				},
 			},
 		},
@@ -2661,7 +2661,11 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- School Reduction
 		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
 		-- Total Reduction
-		TP_Table.totalReduction[TP_MELEE] = 1 - ((TP_Table.mobCritChance * (1 + TP_Table.mobCritBonus) * TP_Table.mobCritDamageMod) + (TP_Table.mobCrushChance * 1.5) + (1 - TP_Table.mobCrushChance - TP_Table.mobCritChance - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance)) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
+		TP_Table.totalReduction[TP_MELEE] = 1 - (
+			1 - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance
+			+ (TP_Table.mobCritChance * TP_Table.mobCritBonus * TP_Table.mobCritDamageMod)
+			+ (TP_Table.mobCrushChance * 0.5)
+			) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
 		-- TankPoints
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
 		-- Guaranteed Reduction
@@ -2675,7 +2679,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
 		TP_Table.schoolReduction[s] = 0.75 * (TP_Table.resistance[s] / (max(TP_Table.mobLevel, 20) * 5))
 		-- Total Reduction
-		TP_Table.totalReduction[s] = 1 - ((TP_Table.mobSpellCritChance * (1 + TP_Table.mobSpellCritBonus) * TP_Table.mobSpellCritDamageMod) + (1 - TP_Table.mobSpellCritChance - TP_Table.mobSpellMissChance)) * (1 - TP_Table.schoolReduction[s]) * TP_Table.damageTakenMod[s]
+		TP_Table.totalReduction[s] = 1 - (1 - TP_Table.mobSpellMissChance + (TP_Table.mobSpellCritChance * TP_Table.mobSpellCritBonus * TP_Table.mobSpellCritDamageMod)) * (1 - TP_Table.schoolReduction[s]) * TP_Table.damageTakenMod[s]
 		TP_Table.guaranteedReduction[s] = 1-((1 - TP_Table.schoolReduction[s]) * TP_Table.damageTakenMod[s])
 		TP_Table.effectiveHealth[s] = TP_Table.playerHealth / (1 - TP_Table.guaranteedReduction[s])
 		-- TankPoints
