@@ -156,7 +156,7 @@ TankPoints.DBDefaults = {
 	mobSpellCritChance = 0,
 	mobSpellCritBonus = 0.5,
 	mobSpellMissChance = 0,
-	shieldBlockDelay = 3,
+	shieldBlockDelay = 2,
 }
 -- Register Defaults
 TankPoints:RegisterDefaults("profile", TankPoints.DBDefaults)
@@ -1607,7 +1607,7 @@ function TankPoints.BlockValueFrame_OnEnter(frame, motion)
 	-- Shield Block Up Time
 	if TankPoints.playerClass == "WARRIOR" then
 		textL = L["Shield Block Up Time"]..":"
-		textR = format("%.2f%%", (resultsDT.shieldBlockUpPercent or 0) * 100)
+		textR = format("%.2f%%", (resultsDT.shieldBlockUpTime or 0) * 100)
 		GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	end
 
@@ -1908,8 +1908,8 @@ function TankPoints:GetShieldBlockOnTime(atkCount, mobAtkSpeed, blockChance, tal
 	return time
 end
 
--- TankPoints:GetShieldBlockUpPercent(10, 2, 55, 1)
-function TankPoints:GetShieldBlockUpPercent(timeBetweenPresses, mobAtkSpeed, blockChance, talant)
+-- TankPoints:GetshieldBlockUpTime(10, 2, 55, 1)
+function TankPoints:GetshieldBlockUpTime(timeBetweenPresses, mobAtkSpeed, blockChance, talant)
 	local shieldBlockDuration = 5
 	if talant then
 		shieldBlockDuration = 6
@@ -2194,10 +2194,19 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		-- 2.0.2.6144 includes defense factors in these functions
 		TP_Table.dodgeChance = GetDodgeChance() * 0.01-- + TP_Table.defenseEffect
 		TP_Table.parryChance = GetParryChance() * 0.01-- + TP_Table.defenseEffect
+		-- Shield Block key presse delay
+		TP_Table.shieldBlockDelay = self.db.profile.shieldBlockDelay
 		-- Block Chance, Block Value
 		-- Check if player has shield or forceShield is set to true
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
 			TP_Table.blockChance = GetBlockChance() * 0.01-- + TP_Table.defenseEffect
+			-- If Holy Shield has 100% uptime
+			if self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 and not UnitBuff("player", GetSpellInfo(48951)) then
+				-- Calculate Holy Shield uptime
+				if 10 / (8 + TP_Table.shieldBlockDelay) >= 1 then
+					TP_Table.blockChance = TP_Table.blockChance + 0.3
+				end
+			end
 			TP_Table.blockValue = self:GetBlockValue(nil, forceShield)
 		-- (forceShield == false) or ((not forceShield) and (not self:ShieldIsEquipped()))
 		else
@@ -2212,8 +2221,6 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		TP_Table.mobCritDamageMod = StatLogic:GetStatMod("MOD_CRIT_DAMAGE_TAKEN", "MELEE")
 		-- Mob Attack Speed
 		TP_Table.mobAttackSpeed = self.db.profile.mobAttackSpeed
-		-- Shield Block key presse delay
-		TP_Table.shieldBlockDelay = self.db.profile.shieldBlockDelay
 --	end
 	----------------
 	-- Spell Data --
@@ -2765,7 +2772,8 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	-- 	Increases your chance to block and block value by 100% for 10 sec.
 	-- Warrior Talent: Shield Mastery (Rank 2) - 3,8
 	--	Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
-	if self.playerClass == "WARRIOR" and (not school or school == TP_MELEE) then
+	-- GetSpellInfo(2565) = "Shield Block"
+	if self.playerClass == "WARRIOR" and (not school or school == TP_MELEE) and not UnitBuff("player", GetSpellInfo(2565)) then
 		-- Get a copy for Shield Block skill calculations
 		local inputCopy = {}
 		copyTable(inputCopy, TP_Table)
@@ -2776,18 +2784,20 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
 		self:CalculateTankPoints(inputCopy, TP_MELEE, forceShield)
 		self:CalculateTankPoints(TP_Table, school, forceShield)
-		-- Estimate average time Shield Block is up
+		-- Calculate Shield Block up time
 		local _, _, _, _, r = GetTalentInfo(3, 8)
 		local shieldBlockCoolDown = 60 - r * 10
-		local shieldBlockUpPercent = 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay)
-		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
-		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
-		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		local shieldBlockUpTime = 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay)
+		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpTime
+		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpTime
+		TP_Table.shieldBlockUpTime = shieldBlockUpTime
 		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		inputCopy = nil
 	-- Paladin Talent: Holy Shield - 8 sec cooldown - 2,16
 	-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active. Each block expends a charge. 8 charges.
-	elseif self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 and (not school or school == TP_MELEE) then
+	-- GetSpellInfo(48951) = "Holy Shield"
+	elseif self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 
+	and (not school or school == TP_MELEE) and not UnitBuff("player", GetSpellInfo(48951)) and (10 / (8 + inputCopy.shieldBlockDelay)) < 1 then
 		-- Get a copy for Shield Block skill calculations
 		local inputCopy = {}
 		copyTable(inputCopy, TP_Table)
@@ -2798,12 +2808,12 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
 		self:CalculateTankPoints(inputCopy, TP_MELEE, forceShield)
 		self:CalculateTankPoints(TP_Table, school, forceShield)
-		-- Estimate average time Shield Block is up
+		-- Calculate Holy Shield up time
 		local shieldBlockCoolDown = 8
-		local shieldBlockUpPercent = min(1, 10 / (shieldBlockCoolDown + inputCopy.shieldBlockDelay))
-		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpPercent
-		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpPercent) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpPercent
-		TP_Table.shieldBlockUpPercent = shieldBlockUpPercent
+		local shieldBlockUpTime = min(1, 10 / (8 + inputCopy.shieldBlockDelay))
+		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpTime
+		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpTime
+		TP_Table.shieldBlockUpTime = shieldBlockUpTime
 		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		inputCopy = nil
 	else
