@@ -518,7 +518,7 @@ Waterfall:Register("TankPoints",
 -----------
 -- Tools --
 -----------
--- copyTable
+-- clear "to" and copy "from"
 local function copyTable(to, from)
 	if to then
 		for k in pairs(to) do
@@ -1357,12 +1357,14 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	if per_stat then
 		textL = "1 "..DEFENSE.." = "
 		newDT.defense = newDT.defense + 1
+		newDT.defenseRating = newDT.defenseRating + 1 / StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
 		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", 0.04) * 0.01
 		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", 0.04) * 0.01
 		newDT.blockChance = newDT.blockChance + 0.0004
 	else
 		textL = "1 "..COMBAT_RATING_NAME2.." = "
 		newDT.defense = newDT.defense + StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
+		newDT.defenseRating = newDT.defenseRating + 1
 		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
 		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
 		newDT.blockChance = newDT.blockChance + 0.0004 * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
@@ -1795,10 +1797,6 @@ function TankPoints:GetArmorReduction(armor, attackerLevel)
 	return armorReduction
 end
 
-function TankPoints:GetDefenseEffect(defense, attackerLevel)
-	return (defense - attackerLevel * 5) * 0.04 * 0.01
-end
-
 function TankPoints:GetDefense()
 	local base, modifier = UnitDefense("player");
 	return base + modifier
@@ -2190,6 +2188,8 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		_, TP_Table.armor = UnitArmor(unit)
 		-- Defense
 		TP_Table.defense = self:GetDefense()
+		-- Defense Rating also needed because direct Defense gains are not affected by DR
+		TP_Table.defenseRating = GetCombatRating(CR_DEFENSE_SKILL)
 		-- Dodge, Parry
 		-- 2.0.2.6144 includes defense factors in these functions
 		TP_Table.dodgeChance = GetDodgeChance() * 0.01-- + TP_Table.defenseEffect
@@ -2406,12 +2406,24 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	if changes.defense and changes.defense ~= 0 then
 		tpTable.defense = tpTable.defense + changes.defense
-		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", changes.defense * 0.04) * 0.01
+		tpTable.dodgeChance = tpTable.dodgeChance + changes.defense * 0.0004
 		if GetParryChance() ~= 0 then
-			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", changes.defense * 0.04) * 0.01
+			tpTable.parryChance = tpTable.parryChance + changes.defense * 0.0004
 		end
 		if doBlock then
 			tpTable.blockChance = tpTable.blockChance + changes.defense * 0.0004
+		end
+	end
+	if changes.defenseRating and changes.defenseRating ~= 0 then
+		local defenseChange = floor(StatLogic:GetEffectFromRating(tpTable.defenseRating + changes.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel)) - floor(StatLogic:GetEffectFromRating(tpTable.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel))
+		tpTable.defense = tpTable.defense + defenseChange
+		tpTable.defenseRating = tpTable.defenseRating + changes.defenseRating
+		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", defenseChange * 0.04) * 0.01
+		if GetParryChance() ~= 0 then
+			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", defenseChange * 0.04) * 0.01
+		end
+		if doBlock then
+			tpTable.blockChance = tpTable.blockChance + defenseChange * 0.0004
 		end
 	end
 	if changes.dodgeChance and changes.dodgeChance ~= 0 then
@@ -2459,6 +2471,8 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	if changes.shieldBlockDelay and changes.shieldBlockDelay ~= 0 then
 		tpTable.shieldBlockDelay = tpTable.shieldBlockDelay + changes.shieldBlockDelay
 	end
+	-- debug
+	--self:Print("changes.str = "..(changes.str or "0")..", changes.sta = "..(changes.sta or "0"))
 end
 
 function TankPoints:CheckSourceData(TP_Table, school, forceShield)
@@ -2501,6 +2515,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		cmax("mobMissChance",0)
 		cmax("armor",0)
 		cmax("defense",0)
+		cmax("defenseRating",0)
 		cmax("dodgeChance",0)
 		if GetParryChance() == 0 then
 			TP_Table.parryChance = 0
@@ -2576,19 +2591,21 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Armor Reduction
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
 		-- Defense Mod (may return negative)
-		TP_Table.defenseEffect = self:GetDefenseEffect(TP_Table.defense, TP_Table.mobLevel)
+		local defenseFromLevel = (TP_Table.playerLevel - TP_Table.mobLevel) * 0.002 -- negative for mobs higher level then player
+		local defenseFromDefenseRating = floor(StatLogic:GetEffectFromRating(TP_Table.defenseRating, CR_DEFENSE_SKILL))
+		local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5
 		-- Mob's Crit, Miss
-		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - TP_Table.defenseEffect - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
+		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
-		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002 + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", bonusDefense * 0.04) / 100)
+		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeDefense * 0.0004 + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
 		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
 		-- Dodge, Parry, Block
-		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
-		TP_Table.parryChance = max(0, TP_Table.parryChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
+		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance + defenseFromLevel)
+		TP_Table.parryChance = max(0, TP_Table.parryChance + defenseFromLevel)
 		-- Block Chance, Block Value
 		-- Check if player has shield or forceShield is set to true
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
-			TP_Table.blockChance = max(0, TP_Table.blockChance - (TP_Table.mobLevel - TP_Table.playerLevel) * 0.002)
+			TP_Table.blockChance = max(0, TP_Table.blockChance + defenseFromLevel)
 		else
 			TP_Table.blockChance = 0
 		end

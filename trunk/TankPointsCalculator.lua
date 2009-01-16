@@ -286,16 +286,10 @@ function TPCalc:UpdateResults()
 	changes.armor = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
 	-- Defense Rating
-	changes.defense = 0
-	diff = _G[prefix..i..inputEditBox]:GetNumber()
-	if diff then
-		-- Ratings are floored in game
-		current = GetCombatRating(CR_DEFENSE_SKILL)
-		changes.defense = floor(StatLogic:GetEffectFromRating(current + diff, CR_DEFENSE_SKILL, newDT.playerLevel)) - floor(StatLogic:GetEffectFromRating(current, CR_DEFENSE_SKILL, newDT.playerLevel))
-	end
+	changes.defenseRating = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
 	-- Defense
-	changes.defense = changes.defense + _G[prefix..i..inputEditBox]:GetNumber()
+	changes.defense = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
 	-- Dodge Rating
 	changes.dodgeChance = 0

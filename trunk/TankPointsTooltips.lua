@@ -174,11 +174,7 @@ function TPTips:BuildChanges(changes, table)
 	changes.playerHealth = table.HEALTH
 	changes.armorFromItems = table.ARMOR
 	changes.armor = table.ARMOR_BONUS
-	if table.DEFENSE_RATING then
-		-- Ratings are floored in game
-		current = GetCombatRating(CR_DEFENSE_SKILL)
-		changes.defense = floor(StatLogic:GetEffectFromRating(current + table.DEFENSE_RATING, CR_DEFENSE_SKILL, TP.playerLevel)) - floor(StatLogic:GetEffectFromRating(current, CR_DEFENSE_SKILL, TP.playerLevel))
-	end
+	changes.defenseRating = table.DEFENSE_RATING
 	if table.DODGE_RATING then
 		changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(table.DODGE_RATING, CR_DODGE, TP.playerLevel)) * 0.01
 	end
