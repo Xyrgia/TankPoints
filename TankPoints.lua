@@ -2797,7 +2797,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active. Each block expends a charge. 8 charges.
 	-- GetSpellInfo(48951) = "Holy Shield"
 	elseif self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 16)) > 0 
-	and (not school or school == TP_MELEE) and not UnitBuff("player", GetSpellInfo(48951)) and (10 / (8 + inputCopy.shieldBlockDelay)) < 1 then
+	and (not school or school == TP_MELEE) and not UnitBuff("player", GetSpellInfo(48951)) and (10 / (8 + TP_Table.shieldBlockDelay)) < 1 then
 		-- Get a copy for Shield Block skill calculations
 		local inputCopy = {}
 		copyTable(inputCopy, TP_Table)
