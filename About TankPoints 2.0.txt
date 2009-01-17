@@ -158,10 +158,10 @@ end
 - defenseEffect = (defense - attackerLevel * 5) * 0.04 * 0.01
 
 === Block Value From Strength ===
-- blockValueFromStrength = (strength * 0.5) - 1
+- blockValueFromStrength = floor(totalStr * 0.5 - 10)
 
 === Block Value ===
-- blockValue = floor(blockValueFromStrength) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
+- blockValue = floor((floor(totalStr * 0.5 - 10) + blockValueFromItems + blockValueFromShield) * blockValueMod)
 
 === Mob Damage (default formula) ===
 - mobDamage = (levelModifier * 55) * meleeTakenMod * (1 - armorReduction)
@@ -244,6 +244,8 @@ Paladins are not calculated yet.
 
 
 ** Version History **
+2.8.2
+- Fixed Block Value formula
 2.8.1
 - Support for Warrior talent: Critical Block
 - Fixed Shield Block and Holy Shield calculations

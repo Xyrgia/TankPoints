@@ -2283,23 +2283,24 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
 	if changes.str and changes.str ~= 0 then
 		------- Formulas -------
-		-- str = floor(str * strMod)
-		-- blockValue = floor((strength * 0.5) - 1) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
+		-- totalStr = floor(baseStr * strMod) + floor(bonusStr * strMod)
+		-- blockValue = floor((floor(totalStr * 0.5 - 10) + blockValueFromItems + blockValueFromShield) * blockValueMod)
 		------- Talants -------
 		-- StatLogic:GetStatMod("MOD_STR")
 		-- ADD_CR_PARRY_MOD_STR
 		------------------------
-		local _, _, strength = UnitStat("player", 1)
+		local totalStr, _, bonusStr = UnitStat("player", 1)
 		local strMod = StatLogic:GetStatMod("MOD_STR")
 		-- WoW floors numbers after being multiplied by stat mods, so to obtain the original value, you need to ceil it after dividing it with the stat mods
-		changes.str = max(0, floor((ceil(strength / strMod) + changes.str) * strMod)) - strength
+		changes.str = max(0, floor((ceil(bonusStr / strMod) + changes.str) * strMod)) - bonusStr
 		-- Check if player has shield equipped
 		if doBlock then
+			local blockValueMod = StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 			-- Subtract block value from current strength, add block value from new strength
-			tpTable.blockValue = tpTable.blockValue - floor((strength * 0.5) - 1) + floor(((strength + changes.str) * 0.5) - 1)
+			tpTable.blockValue = floor((ceil(tpTable.blockValue / blockValueMod) - floor(totalStr * 0.5 - 10) + floor((totalStr + changes.str) * 0.5 - 10)) * blockValueMod)
 		end
 		if GetParryChance() ~= 0 and StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR") ~= 0 then
-			local parryRatingIncrease = floor((strength + changes.str) * StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR")) - floor(strength * StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR"))
+			local parryRatingIncrease = floor((bonusStr + changes.str) * StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR")) - floor(bonusStr * StatLogic:GetStatMod("ADD_CR_PARRY_MOD_STR"))
 			local parry = StatLogic:GetEffectFromRating(parryRatingIncrease, CR_PARRY, tpTable.playerLevel)
 			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", parry) * 0.01
 		end
@@ -2334,25 +2335,36 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- I found that the healthMods are mutiplicative instead of additive, this is the same as armor mod
 		-- playerHealth = round((baseHealth + addedHealth + addedSta * 10) * healthMod)
 		------- Talants -------
-		-- Warrior: Vitality (Rank 5) - 3,21
-		--          Increases your total Stamina by 1%/2%/3%/4%/5% and your total Strength by 2%/4%/6%/8%/10%.
+		-- Warrior: Vitality (Rank 3) - 3,20
+		--          Increases your total Strength and Stamina by 2%/4%/6%
+		-- Warrior: Strength of Arms (Rank 2) - 1,22
+		--          Increases your total Strength and Stamina by 2%/4%
 		-- Warlock: Demonic Embrace (Rank 5) - 2,3
-		--          Increases your total Stamina by 3%/6%/9%/12%/15% but reduces your total Spirit by 1%/2%/3%/4%/5%.
-		-- Rogue: Vitality (Rank 2) - 2,20
-		--        Increases your total Stamina by 2%/4% and your total Agility by 1%/2%.
-		-- Priest: Enlightenment (Rank 5) - 1,20
-		--         Increases your total Stamina, Intellect and Spirit by 1%/2%/3%/4%/5%.
+		--          Increases your total Stamina by 2%/4%/6%/8%/10%.
+		-- Priest: Enlightenment (Rank 5) - 1,17
+		--         Increases your total Stamina and Spirit by 1%/2%/3%/4%/5%
 		-- Druid: Bear Form - buff (didn't use stance because Bear Form and Dire Bear Form has the same icon)
 		--        Shapeshift into a bear, increasing melee attack power by 30, armor contribution from items by 180%, and stamina by 25%.
 		-- Druid: Dire Bear Form - buff
 		--        Shapeshift into a dire bear, increasing melee attack power by 120, armor contribution from items by 400%, and stamina by 25%.
+		-- Paladin: Sacred Duty (Rank 2) - 2,14
+		--          Increases your total Stamina by 3%/6%
+		-- Paladin: Combat Expertise (Rank 3) - 2,19
+		--          Increases your total Stamina by 2%/4%/6%.
+		-- Hunter: Survivalist (Rank 5) - 3,8
+		--         Increases your Stamina by 2%/4%/6%/8%/10%.
+		-- Death Knight: Veteran of the Third War (Rank 3) - 1,14
+		--               Increases your total Strength by 2%/4%/6% and your total Stamina by 1%/2%/3%.
+		-- Death Knight: Shadow of Death - 3,13
+		--               Increases your total Strength and Stamina by 2%.
 		------------------------
-		local _, _, stamina = UnitStat("player", 3)
+		local _, _, bonusSta = UnitStat("player", 3)
 		local staMod = StatLogic:GetStatMod("MOD_STA")
-		changes.sta = max(0, floor((ceil(stamina / staMod) + changes.sta) * staMod)) - stamina
+		changes.sta = max(0, floor((ceil(bonusSta / staMod) + changes.sta) * staMod)) - bonusSta
 		-- Calculate player health
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
 		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.sta * 10) * healthMod) + 0.5)
+		--self:Print("changes.sta = "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
 	if changes.playerHealth and changes.playerHealth ~= 0 then
 		------- Formulas -------
@@ -2360,19 +2372,18 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- I found that the healMods are mutiplicative instead of additive, this is the same as armor mod
 		-- playerHealth = round((baseHealth + addedHealth + addedSta * 10) * healthMod)
 		------- Talants -------
-		-- Tauren: Endurance (Rank 3)
-		--         Total Health increased by 5%.
-		-- Warlock: Fel Stamina (Rank 3) - 2,9
-		--          Increases the Stamina of your Imp, Voidwalker, Succubus, Felhunter and Felguard by 5%/10%/15% and increases your maximum health by 1%/2%/3%.
-		-- Hunter: Survivalist (Rank 5) - 3,9
-		--         Increases total health by 2%/4%/6%/8%/10%.
+		-- Warlock: Fel Vitality (Rank 3) - 2,6
+		--          Increases your maximum health and mana by 1%/2%/3%.
 		-- Hunter: Endurance Training (Rank 5) - 1,2
 		--         Increases the Health of your pet by 2%/4%/6%/8%/10% and your total health by 1%/2%/3%/4%/5%.
+		-- Death Knight: Frost Presence - Stance
+		--               Increasing total health by 10%
 		------------------------
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
 		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.playerHealth) * healthMod) + 0.5)
 	end
 	if (changes.armorFromItems and changes.armorFromItems ~= 0) or (changes.armor and changes.armor ~= 0) then
+		------- Talants -------
 		-- Hunter: Thick Hide (Rank 3) - 1,5
 		--         Increases the armor rating of your pets by 20% and your armor contribution from items by 4%/7%/10%.
 		-- Druid: Thick Hide (Rank 3) - 2,5
@@ -2440,20 +2451,17 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		end
 	end
 	if changes.blockValue and changes.blockValue ~= 0 then
-		-- Warrior: Shield Mastery (Rank 3) - 3,16
-		--          Increases the amount of damage absorbed by your shield by 10%/20%/30%.
-		-- Paladin: Shield Specialization (Rank 3) - 2,8
-		--          Increases the amount of damage absorbed by your shield by 10%/20%/30%.
-		-- Shaman: Shield Specialization (Rank 5) - 2,2
-
-		--         Increases your chance to block attacks with a shield by 5% and increases the amount blocked by 5%/10%/15%/20%/25%.
+		------- Formulas -------
+		-- blockValue = floor((floor(totalStr * 0.5 - 10) + blockValueFromItems + blockValueFromShield) * blockValueMod)
+		------- Talants -------
+		-- Warrior: Shield Mastery (Rank 3) - 3,8
+		--          Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
+		-- Paladin: Redoubt (Rank 3) - 2,18
+		--          Increases your block value by 10%/20%/30%
+		------------------------
 		if doBlock then
 			local blockValueMod = StatLogic:GetStatMod("MOD_BLOCK_VALUE")
-			local _, strength = UnitStat("player", 1)
-			if changes.str then
-				strength = strength + changes.str
-			end
-			tpTable.blockValue = floor((ceil((tpTable.blockValue - floor((strength * 0.05) - 1)) / blockValueMod) + changes.blockValue) * blockValueMod) + floor((strength * 0.05) - 1)
+			tpTable.blockValue = floor((ceil(tpTable.blockValue / blockValueMod) + changes.blockValue) * blockValueMod)
 		end
 	end
 	if changes.resilience and changes.resilience ~= 0 then
