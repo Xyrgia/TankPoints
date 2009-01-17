@@ -152,19 +152,19 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetText("0")
+						self:SetText("0")
 					</OnLoad>
 					<OnEnterPressed>
-						this:ClearFocus()
+						self:ClearFocus()
 					</OnEnterPressed>
 					<OnEscapePressed>
-						this:ClearFocus()
+						self:ClearFocus()
 					</OnEscapePressed>
 					<OnEditFocusLost>
-						this:HighlightText(0, 0)
+						self:HighlightText(0, 0)
 					</OnEditFocusLost>
 					<OnEditFocusGained>
-						this:HighlightText()
+						self:HighlightText()
 					</OnEditFocusGained>
 					<OnTextChanged>
 						TankPointsCalculatorVariables_InputEditBox_OnTextChanged()
@@ -202,11 +202,11 @@
 		</Frames>
 		<Scripts>
 			<OnEnter>
-				if this.tooltip then
-					GameTooltip:SetOwner(this, "ANCHOR_LEFT")
-					GameTooltip:SetText(this.tooltip)
-					if this.tooltip2 then
-						GameTooltip:AddLine(this.tooltip2, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
+				if self.tooltip then
+					GameTooltip:SetOwner(self, "ANCHOR_LEFT")
+					GameTooltip:SetText(self.tooltip)
+					if self.tooltip2 then
+						GameTooltip:AddLine(self.tooltip2, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
 					end
 					GameTooltip:Show()
 				end
@@ -220,23 +220,23 @@
 	<Frame name="TPCSwapingVariableTemplate" inherits="TPCVariablesTemplate" virtual="true">
 		<Scripts>
 			<OnMouseUp>
-				this:Hide()
-				getglobal(this.next):Show()
+				self:Hide()
+				getglobal(self.next):Show()
 			</OnMouseUp>
 			<OnEnter>
-				if this.tooltip then
-					GameTooltip:SetOwner(this, "ANCHOR_RIGHT")
-					GameTooltip:SetText(this.tooltip)
-					if this.tooltip2 then
-						GameTooltip:AddLine(this.tooltip2, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
+				if self.tooltip then
+					GameTooltip:SetOwner(self, "ANCHOR_RIGHT")
+					GameTooltip:SetText(self.tooltip)
+					if self.tooltip2 then
+						GameTooltip:AddLine(self.tooltip2, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, 1)
 					end
 					GameTooltip:Show()
 				end
-				getglobal(this:GetName().."_LabelText"):SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
+				getglobal(self:GetName().."_LabelText"):SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 			</OnEnter>
 			<OnLeave>
 				GameTooltip:Hide()
-				getglobal(this:GetName().."_LabelText"):SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+				getglobal(self:GetName().."_LabelText"):SetTextColor(NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 			</OnLeave>
 		</Scripts>
 	</Frame>
@@ -268,8 +268,8 @@
 		</Backdrop>
 		<Scripts>
 			<OnLoad>
-				this:SetBackdropBorderColor(0.4, 0.4, 0.4);
-				this:SetBackdropColor(0.5, 0.5, 0.5);
+				self:SetBackdropBorderColor(0.4, 0.4, 0.4);
+				self:SetBackdropColor(0.5, 0.5, 0.5);
 			</OnLoad>
 		</Scripts>
 	</Frame>
@@ -418,18 +418,18 @@
 				<Scripts>
 					<OnMouseDown>
 						if ( arg1 == "LeftButton" ) then
-							this:GetParent():StartMoving();
+							self:GetParent():StartMoving();
 						elseif ( arg1 == "RightButton" ) then
-							this:GetParent():ClearAllPoints();
-							this:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
+							self:GetParent():ClearAllPoints();
+							self:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
 						end
 					</OnMouseDown>
 					<OnMouseUp>
-						this:GetParent():StopMovingOrSizing();
+						self:GetParent():StopMovingOrSizing();
 					</OnMouseUp>
 					<OnEnter>
-						GameTooltip:SetOwner(this, "ANCHOR_RIGHT");
-						GameTooltip:SetText(this.tooltip);
+						GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+						GameTooltip:SetText(self.tooltip);
 					</OnEnter>
 					<OnLeave>
 						GameTooltip:Hide();
@@ -451,7 +451,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetBackdropColor(0,0,0)
+						self:SetBackdropColor(0,0,0)
 					</OnLoad>
 				</Scripts>
 				<Frames>
@@ -511,7 +511,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetBackdropColor(0,0,0)
+						self:SetBackdropColor(0,0,0)
 					</OnLoad>
 				</Scripts>
 				<Frames>
@@ -578,7 +578,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetBackdropColor(0,0,0)
+						self:SetBackdropColor(0,0,0)
 					</OnLoad>
 				</Scripts>
 				<Frames>
@@ -617,7 +617,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats6"
+								self.next = "TPCPlayerStats6"
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -628,8 +628,8 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats5"
-								this:Hide()
+								self.next = "TPCPlayerStats5"
+								self:Hide()
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -640,7 +640,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats8"
+								self.next = "TPCPlayerStats8"
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -651,8 +651,8 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats7"
-								this:Hide()
+								self.next = "TPCPlayerStats7"
+								self:Hide()
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -663,7 +663,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats10"
+								self.next = "TPCPlayerStats10"
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -674,8 +674,8 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats9"
-								this:Hide()
+								self.next = "TPCPlayerStats9"
+								self:Hide()
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -686,7 +686,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats12"
+								self.next = "TPCPlayerStats12"
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -697,8 +697,8 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats11"
-								this:Hide()
+								self.next = "TPCPlayerStats11"
+								self:Hide()
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -709,7 +709,7 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats14"
+								self.next = "TPCPlayerStats14"
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -720,8 +720,8 @@
 						</Anchors>
 						<Scripts>
 							<OnLoad>
-								this.next = "TPCPlayerStats13"
-								this:Hide()
+								self.next = "TPCPlayerStats13"
+								self:Hide()
 							</OnLoad>
 						</Scripts>
 					</Frame>
@@ -754,7 +754,7 @@
 				</Anchors>
 				<Scripts>
 					<OnLoad>
-						this:SetBackdropColor(0,0,0)
+						self:SetBackdropColor(0,0,0)
 					</OnLoad>
 				</Scripts>
 				<Frames>
@@ -825,6 +825,14 @@
 			<OnShow>
 				TankPointsCalculatorFrame_OnShow()
 			</OnShow>
+			<OnMouseDown>
+				if ( arg1 == "LeftButton" ) then
+					self:StartMoving();
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				self:StopMovingOrSizing();
+			</OnMouseUp>
 		</Scripts>
 	</Frame>
 </Ui>
