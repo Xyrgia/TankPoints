@@ -245,7 +245,33 @@ Paladins are not calculated yet.
 
 ** Version History **
 2.8.2
+- NEW: Avoidance diminishing returns calculations in Melee DR tooltip will show you how much avoidance you gain for +16 of each stat.
+- Diminishing returns for chance to be missed now supported.
+- Paladin: Combat table will now reflect the effects of Holy Shield if you set it at 100% uptime. To set 100% Holy Shield uptime, use a sqfreq lower then or equal to 2 secs, ex: /tp player sbfreq 2
 - Fixed Block Value formula
+- Can set shield block frequency from 0 secs to 1000 secs, set it to 1000 if you don't want TankPoints to calculate the shield block effect
+- Defense isn't affected by DR (Defense Rating is)
+- Fixed StatFrame data not updated correctly during stance/presence/form/aura change
+- Uses LibStatLogic-1.1 and LibTipHooker-1.1 now
+- Made the Calculator movable by dragging the sides
+- Support for enchant statmods:
+- Enchant: Rune of the Stoneskin Gargoyle: +2% Stamina
+- Enchant: Rune of Spellshattering: Deflects 4% of all spell damage
+- Enchant: Rune of Spellbreaking: Deflects 2% of all spell damage
+- Support for meta gem statmods:
+- Austere Earthsiege Diamond: 2% Increased Armor Value from Items
+- MetaGem: Eternal Earthsiege Diamond:+5% Shield Block Value
+- MetaGem: Eternal Earthstorm Diamond: +5% Shield Block Value
+- MetaGem: Effulgent Skyflare Diamond: Reduce Spell Damage Taken by 2%
+- Fixed Warrior talent detection: Vitality, Strength of Arms, Improved Defensive Stance
+- Death Knight: Added Stance: Frost Presence detection fixed
+- Death Knight: Added Buff: Bone Shield: Damage reduced by 40%.
+- 3.0.8: Death Knight: Updated Stance: Frost Presence: The bonus armor has been increased from 60 to 80% and magic damage reduction increased from 5 to 15%.
+- 3.0.8: Death Knight: Updated Buff: Bone Shield: Damage reduced by 20%.
+- 3.0.8: Death Knight: Updated Buff: Will of the Necropolis: Reduce the damage of any attack that takes the DK below 35% health by 5%/10%/15% instead of boosting armor when wounded.
+- 3.0.8: Druid: Updated Talent: Survival of the Fittest: This talent now grants 22/44/66% bonus armor in Bear Form and Dire Bear Form in addition to all of its previous effects. 
+- 3.0.8: Shaman: Updated Talent: Elemental Warding: Now reduces all damage taken by 2/4/6%.
+- Removed Endurance (Tauren racial)
 2.8.1
 - Support for Warrior talent: Critical Block
 - Fixed Shield Block and Holy Shield calculations
