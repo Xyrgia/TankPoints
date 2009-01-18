@@ -1,12 +1,12 @@
-TankPoints 2.0 - A benchmark for tanking gear.
+TankPoints 2.0 - A benchmark for survivalbility gear.
 
 ** About TankPoints **
 
 TankPoints was created to help compare different pieces of tanking gear, because it was difficult to decided at a glance like whether +12 defense is better then +1 dodge.
 
-TankPoints can be seen as how much damage you can take before damage reduction, it considers your max health, armor, defense, dodge, parry, block, block value, resilience, crushing blow chance, miss, crit reduction, talants, buffs, stance/forms, and more.
+TankPoints can be seen as how much raw damage you can take before damage reduction, it considers your max health, armor, defense, dodge, parry, block, block value, resilience, crushing blow chance, miss, crit reduction, talants, buffs, stance/forms, and more.
 
-Keep in mind though, that higher TankPoints does not mean a better tank just maybe better gear, it is only a benchmark for "tanking GEAR" but not "tanking".
+Keep in mind though, that higher TankPoints does not make a better tank, it is only a benchmark for survivalbility gear but does not calculate threat.
 It can not decide for you what you should wear on what boss, but it can provide you with a wealth of information what will hopfully be useful for choosing gear.
 
 
@@ -22,6 +22,21 @@ Luckly, I have suceessfully reverse engineered the rating formula for all levels
 Rating Buster: 
 http://wow.curse-gaming.com/en/files/details/4991/rating-buster/
 http://www.wowinterface.com/downloads/fileinfo.php?s=&id=5819
+
+
+** The value of Block **
+
+The value is Shield Block Value and Block Rating is highly dependent on what you are tanking.
+Its very good for mobs that don't hit very hard like in heroics, but is worth much less on hard hitting bosses in 25 man raids.
+At level 80, TankPoints' default mob damage is tuned to 25 man raids, with a value of 24365 damage before mitigation.
+You can change this value to match what you plan on tanking by using the "/tp mob damage" command in game.
+A mob damage of 10505 for example is a good value for level 80 heroics.
+
+TankPoints also calculates the value of Shield Block for Warriors, and Holy Shield for Paladins.
+You can use the "/tp player sbfreq" command to set a shield block frequency that matches your rotation (in how many seconds AFTER cooldown finishes).
+For most tankadins rotations, you will have a 100% Holy Shield uptime, using "/tp player sbfreq 1" will tell TankPoints that you will use Holy Shield 1 second after cooldown finishes (every 9 secs)
+
+
 
 ** TankPoints 2.0 Features **
 
