@@ -62,7 +62,7 @@ local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 -- To translate AceLocale strings, replace true with the translation string
 -- Before: ["Show Item ID"] = true,
 -- After:  ["Show Item ID"] = "顯示物品編號",
-L:RegisterTranslations("esES", function() return {
+local esES = {
 	-------------
 	-- General --
 	-------------
@@ -226,4 +226,6 @@ L:RegisterTranslations("esES", function() return {
 	[" (Main/Off):"] = " (Derecha/Izquierda):",
 	[" (Main+Off):"] = " (Derecha+Izquierda):",
 	["Gems"] = "Gemas",
-} end)
+}
+L:RegisterTranslations("esES", function() return esES end)
+L:RegisterTranslations("esMX", function() return esES end)
