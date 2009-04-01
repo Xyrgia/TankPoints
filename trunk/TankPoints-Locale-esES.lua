@@ -117,10 +117,10 @@ local esES = {
 	["Tooltip Options"] = "Opciones de Tooltip",
 	["TankPoints tooltip options"] = "Opciones para el tooltip de Tankpoints",
 	-- /tp tooltip diff
-	["Show Tooltips Difference"] = "Mostrar Diferencia en Tooltips",
+	["Show TankPoints Difference"] = "Mostrar Diferencia en Tooltips",
 	["Show TankPoints difference in item tooltips"] = "Muestra la diferencia de Puntos de Tanque en los tooltip de objeto",
 	-- /tp tooltip total
-	["Show Tooltips Total"] = "Mostrar Total en Tooltip",
+	["Show TankPoints Total"] = "Mostrar Total en Tooltip",
 	["Show TankPoints total in item tooltips"] = "Muestra el total de Puntos de Tanque en los tooltip de objeto",
 	-- /tp player
 	["Player Stats"] = "Estadísticas del Jugador",
