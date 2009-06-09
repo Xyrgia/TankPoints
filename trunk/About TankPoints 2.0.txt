@@ -259,6 +259,9 @@ Paladins are not calculated yet.
 
 
 ** Version History **
+2.8.3
+- toc update
+- Packaged with new libraries with 3.1.3 class support
 2.8.2
 - NEW: Avoidance diminishing returns calculations in Melee DR tooltip will show you how much avoidance you gain for +16 of each stat.
 - Diminishing returns for chance to be missed now supported.
