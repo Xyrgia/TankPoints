@@ -973,9 +973,9 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-- Block Value --
 	-----------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.blockValue = newDT.blockValue + 1/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
+	newDT.blockValue = newDT.blockValue + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	self:GetTankPoints(newDT, TP_MELEE)
-	addline(format("%.2f", 1/0.65).." "..L["Block Value"].." = ", delta_eh(newDT, resultDT))
+	addline(format("%.2f", 2/0.65).." "..L["Block Value"].." = ", delta_eh(newDT, resultDT))
 	--[[
 	if self.playerClass == "WARRIOR" and not hasImprovedShieldBlock() then
 		-----------------------
@@ -1183,7 +1183,7 @@ defenseRating, 1, 1
 dodgeRating, 1, 1
 parryRating, 1, 1
 blockRating, 1, 1
-blockValue, 1/0.65, 1
+blockValue, 2/0.65, 1
 --
 TankPoints.MeleePerStatTable = {
 	-- stat name, increase by statValue
@@ -1196,7 +1196,7 @@ TankPoints.MeleePerStatTable = {
 	{COMBAT_RATING_NAME3, 1}, -- dodgeRating
 	{COMBAT_RATING_NAME4, 1}, -- parryRating
 	{COMBAT_RATING_NAME5, 1}, -- blockRating
-	{L["Block Value"], 1/0.65}, -- blockValue
+	{L["Block Value"], 2/0.65}, -- blockValue
 }
 --]]
 
@@ -1257,7 +1257,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	1 Dodge Rating =
 	1 Parry Rating =
 	1 Block Rating =
-	1/0.65 Block Value =
+	2/0.65 Block Value =
 	TankPoints.MeleePerStatTable = {
 		-- stat name, increase by statValue
 		-- {SPELL_STAT1_NAME, 1}, -- strength
@@ -1269,7 +1269,7 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 		{COMBAT_RATING_NAME3, 1}, -- dodgeRating
 		{COMBAT_RATING_NAME4, 1}, -- parryRating
 		{COMBAT_RATING_NAME5, 1}, -- blockRating
-		{L["Block Value"], 1/0.65}, -- blockValue
+		{L["Block Value"], 2/0.65}, -- blockValue
 	}
 	TankPoints:GetSourceData([TP_Table], [school])
 	TankPoints:GetTankPoints([TP_Table], [school])
@@ -1422,8 +1422,8 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 		textL = "1 "..L["Block Value"].." = "
 		newDT.blockValue = newDT.blockValue + StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	else
-		textL = format("%.2f", 1/0.65).." "..L["Block Value"].." = "
-		newDT.blockValue = newDT.blockValue + 1/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
+		textL = format("%.2f", 2/0.65).." "..L["Block Value"].." = "
+		newDT.blockValue = newDT.blockValue + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
