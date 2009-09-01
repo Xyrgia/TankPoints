@@ -1360,23 +1360,19 @@ function TankPoints.TankPointsFrame_OnEnter(frame, motion)
 	-- Defense Rating --
 	--------------------
 	copyTable(newDT, sourceDT) -- load default data
+	newDT.defense = newDT.defense + 1
+	newDT.defenseRating = newDT.defenseRating + 1 / StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
+	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", 0.04) * 0.01
+	newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", 0.04) * 0.01
+	newDT.blockChance = newDT.blockChance + 0.0004
+	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	if per_stat then
 		textL = "1 "..DEFENSE.." = "
-		newDT.defense = newDT.defense + 1
-		newDT.defenseRating = newDT.defenseRating + 1 / StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
-		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", 0.04) * 0.01
-		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", 0.04) * 0.01
-		newDT.blockChance = newDT.blockChance + 0.0004
+		textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
 	else
 		textL = "1 "..COMBAT_RATING_NAME2.." = "
-		newDT.defense = newDT.defense + StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
-		newDT.defenseRating = newDT.defenseRating + 1
-		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
-		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel) * 0.04) * 0.01
-		newDT.blockChance = newDT.blockChance + 0.0004 * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel)
+		textR = format("%.1f"..L[" TP"], (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]) * StatLogic:GetEffectFromRating(1, CR_DEFENSE_SKILL, newDT.playerLevel))
 	end
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	------------------
 	-- Dodge Rating --
@@ -1842,7 +1838,9 @@ function TankPoints:GetMobDamage(mobLevel)
 		return profileDB.mobDamage
 	end
 	local levelMod = mobLevel
-	if ( levelMod > 70 ) then
+	if ( levelMod > 80 ) then
+		levelMod = levelMod + (30 * (levelMod - 59))
+	elseif ( levelMod > 70 ) then
 		levelMod = levelMod + (15 * (levelMod - 59))
 	elseif ( levelMod > 59 ) then
 		levelMod = levelMod + (4.5 * (levelMod - 59))
@@ -2416,13 +2414,13 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	if changes.defense and changes.defense ~= 0 then
 		tpTable.defense = tpTable.defense + changes.defense
-		tpTable.dodgeChance = tpTable.dodgeChance + changes.defense * 0.0004
-		if GetParryChance() ~= 0 then
-			tpTable.parryChance = tpTable.parryChance + changes.defense * 0.0004
-		end
-		if doBlock then
-			tpTable.blockChance = tpTable.blockChance + changes.defense * 0.0004
-		end
+		-- tpTable.dodgeChance = tpTable.dodgeChance + changes.defense * 0.0004
+		-- if GetParryChance() ~= 0 then
+			-- tpTable.parryChance = tpTable.parryChance + changes.defense * 0.0004
+		-- end
+		-- if doBlock then
+			-- tpTable.blockChance = tpTable.blockChance + changes.defense * 0.0004
+		-- end
 	end
 	if changes.defenseRating and changes.defenseRating ~= 0 then
 		local defenseChange = floor(StatLogic:GetEffectFromRating(tpTable.defenseRating + changes.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel)) - floor(StatLogic:GetEffectFromRating(tpTable.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel))
