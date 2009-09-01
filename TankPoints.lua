@@ -2598,21 +2598,21 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Armor Reduction
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
 		-- Defense Mod (may return negative)
-		local defenseFromLevel = (TP_Table.playerLevel - TP_Table.mobLevel) * 0.002 -- negative for mobs higher level then player
 		local defenseFromDefenseRating = floor(StatLogic:GetEffectFromRating(TP_Table.defenseRating, CR_DEFENSE_SKILL))
-		local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5
+		local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5 -- negative for mobs higher level then player
+		local drFreeAvoidance = drFreeDefense * 0.0004
 		-- Mob's Crit, Miss
 		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
-		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeDefense * 0.0004 + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
+		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeAvoidance + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
 		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
 		-- Dodge, Parry, Block
-		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance + defenseFromLevel)
-		TP_Table.parryChance = max(0, TP_Table.parryChance + defenseFromLevel)
+		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance + drFreeAvoidance)
+		TP_Table.parryChance = max(0, TP_Table.parryChance + drFreeAvoidance)
 		-- Block Chance, Block Value
 		-- Check if player has shield or forceShield is set to true
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
-			TP_Table.blockChance = max(0, TP_Table.blockChance + defenseFromLevel)
+			TP_Table.blockChance = max(0, TP_Table.blockChance + drFreeAvoidance)
 		else
 			TP_Table.blockChance = 0
 		end
