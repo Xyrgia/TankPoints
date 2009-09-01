@@ -354,7 +354,7 @@
 	<!-- Main calculator frame -->
 	<Frame name="TankPointsCalculatorFrame" parent="UIParent" enableMouse="true" movable="true" frameStrata="DIALOG" hidden="true" toplevel="true">
 		<Size>
-			<AbsDimension x="400" y="715"/>
+			<AbsDimension x="400" y="693"/>
 		</Size>
 		
 		<Anchors>
@@ -473,27 +473,27 @@
 							</OnLeave>
 						</Scripts>
 					</Frame>
-                                        <!-- Result Lines -->
+                    <!-- Result Lines -->
 					<Frame name="TPCResults2" inherits="TPCResultsTemplate" id="2">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="TPCResults1" relativePoint="BOTTOMLEFT"/>
 						</Anchors>
 					</Frame>
-                                        <Frame name="TPCResults3" inherits="TPCResultsTemplate" id="3">
-                                                <Anchors>
-                                                        <Anchor point="TOPLEFT" relativeTo="TPCResults2" relativePoint="BOTTOMLEFT"/>
-                                                </Anchors>
-                                        </Frame>
-                                        <Frame name="TPCResults4" inherits="TPCResultsTemplate" id="4">
-                                                <Anchors>
-                                                        <Anchor point="TOPLEFT" relativeTo="TPCResults3" relativePoint="BOTTOMLEFT"/>
-                                                </Anchors>
-                                        </Frame>
-                                        <Frame name="TPCResults5" inherits="TPCResultsTemplate" id="5" hidden="true">
-                                                <Anchors>
-                                                        <Anchor point="TOPLEFT" relativeTo="TPCResults4" relativePoint="BOTTOMLEFT"/>
-                                                </Anchors>
-                                        </Frame>
+					<Frame name="TPCResults3" inherits="TPCResultsTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TPCResults2" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="TPCResults4" inherits="TPCResultsTemplate" id="4">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TPCResults3" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
+					<Frame name="TPCResults5" inherits="TPCResultsTemplate" id="5" hidden="true">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="TPCResults4" relativePoint="BOTTOMLEFT"/>
+						</Anchors>
+					</Frame>
 				</Frames>
 			</Frame>
 			<!-- Combat Table Frame -->
@@ -742,8 +742,8 @@
 			<!-- Mob Stats Frame -->
 			<Frame name="TPCMobStatsFrame" inherits="TPCFrameBoxTemplate">
 				<Size>
-					<!-- y = 22 * 3 + 10 = 76 -->
-					<AbsDimension x="360" y="76"/>
+					<!-- y = 22 * 2 + 10 = 54 -->
+					<AbsDimension x="360" y="54"/>
 				</Size>
 				<Anchors>
 					<Anchor point="TOPLEFT" relativeTo="TPCPlayerStatsFrame" relativePoint="BOTTOMLEFT">
@@ -772,12 +772,6 @@
 					<Frame name="TPCMobStats2" inherits="TPCVariablesTemplate" id="2">
 						<Anchors>
 							<Anchor point="TOPLEFT" relativeTo="TPCMobStats1" relativePoint="BOTTOMLEFT"/>
-						</Anchors>
-					</Frame>
-					<!-- Mob Attack Speed -->
-					<Frame name="TPCMobStats3" inherits="TPCVariablesTemplate" id="3">
-						<Anchors>
-							<Anchor point="TOPLEFT" relativeTo="TPCMobStats2" relativePoint="BOTTOMLEFT"/>
 						</Anchors>
 					</Frame>
 				</Frames>

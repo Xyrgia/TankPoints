@@ -84,6 +84,7 @@ function TankPointsCalculatorFrame_OnLoad()
 	TPCPlayerStatsFrameTitle:SetText(L["Player Stats"])
 	TPCMobStatsFrameTitle:SetText(L["Mob Stats"])
 	-- Set label text
+	TPCalc.playerClass = select(2, UnitClass("player"))
 	TPCalc:SetLabels()
 	TPCalc:AdjustResultFrameSize()
 	
@@ -182,7 +183,6 @@ TPCalc.LabelText = {
 	{-- TPCMobStats1
 		L["Mob Level"],
 		L["Mob Damage"],
-		L["Mob Attack Speed"],
 	},
 }
 -- Set label text
@@ -208,19 +208,15 @@ end
 
 function TPCalc:AdjustResultFrameSize()
 	if self:ShouldShowEHB() then
-		 -- see TankPointsCalculator.xml for the origin of these constants!
-		TPCResultsFrame:SetHeight(98 + 22)
-		TankPointsCalculatorFrame:SetHeight(715 + 22)
+		-- see TankPointsCalculator.xml for the origin of these constants!
+		TPCResultsFrame:SetHeight(TPCResultsFrame:GetHeight() + 22)
+		TankPointsCalculatorFrame:SetHeight(TankPointsCalculatorFrame:GetHeight() + 22)
 		TPCResults5:Show()
 	end
 end
 
--- yes, there is a playerClass var in TankPoints, but this ShouldShow is called
--- at load time - before TankPoints.playerClass is initialized. Speed isn't too
--- big of a deal here.
 function TPCalc:ShouldShowEHB()
-	local _, class = UnitClass("player")
-	if "WARRIOR" == class then
+	if self.playerClass == "WARRIOR" then
 		return true
 	end
 end
@@ -334,9 +330,6 @@ function TPCalc:UpdateResults()
 	i = i + 1
 	-- mobDamage
 	changes.mobDamage = _G[prefix..i..inputEditBox]:GetNumber()
-	i = i + 1
-	-- mobDamage
-	changes.mobAttackSpeed = _G[prefix..i..inputEditBox]:GetNumber()
 	
 	----------------
 	-- AlterTable --
@@ -792,20 +785,6 @@ function TPCalc:UpdateResults()
 	new = floor(TankPoints:GetMobDamage(newDT.mobLevel) + _G[prefix..i..inputEditBox]:GetNumber())
 	_G[prefix..i..originalStatText]:SetText(current)
 	_G[prefix..i..newStatText]:SetText(new)
-	if (new > current) then
-		_G[prefix..i..newStatText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
-	elseif (new < current) then
-		_G[prefix..i..newStatText]:SetTextColor(RED_FONT_COLOR.r, RED_FONT_COLOR.g, RED_FONT_COLOR.b)
-	else
-		_G[prefix..i..newStatText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
-	end
-	
-	-- mobAttackSpeed
-	i = i + 1
-	current = floor(self.resultsDT.mobAttackSpeed * 10) / 10
-	new = floor(newDT.mobAttackSpeed * 10) / 10
-	_G[prefix..i..originalStatText]:SetText(format("%.1f", current))
-	_G[prefix..i..newStatText]:SetText(format("%.1f", new))
 	if (new > current) then
 		_G[prefix..i..newStatText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 	elseif (new < current) then

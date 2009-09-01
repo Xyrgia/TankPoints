@@ -155,7 +155,6 @@ TankPoints.DBDefaults = {
 	showTooltipEHBTotal = false,
 	mobLevelDiff = 3,
 	mobDamage = 0,
-	mobAttackSpeed = 2,
 	mobCritChance = 0.05,
 	mobCritBonus = 1,
 	mobMissChance = 0.05,
@@ -171,7 +170,6 @@ TankPoints:RegisterDefaults("profile", TankPoints.DBDefaults)
 function TankPoints:SetDefaultMobStats()
 	profileDB.mobLevelDiff = 3
 	profileDB.mobDamage = 0
-	profileDB.mobAttackSpeed = 2
 	profileDB.mobCritChance = 0.05
 	profileDB.mobCritBonus = 1
 	profileDB.mobMissChance = 0.05
@@ -380,22 +378,6 @@ local consoleOptions = {
 					min = 0,
 					max = 99999,
 					step = 1,
-				},
-				speed = {
-					type = "range",
-					name = L["Mob Attack Speed"],
-					desc = L["Sets mob's attack speed"],
-					get = function() return profileDB.mobAttackSpeed end,
-					set = function(v)
-						profileDB.mobAttackSpeed = v
-						TankPoints:UpdateStats()
-						-- Update Calculator
-						if TankPointsCalculatorFrame:IsVisible() then
-							TPCalc:UpdateResults()
-						end
-					end,
-					min = 0.1,
-					max = 10,
 				},
 				default = {
 					type = "execute",
@@ -932,7 +914,6 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-- Mob Stats
 	textL = L["Mob Level"]..": "..resultDT.mobLevel..", "..L["Mob Damage after DR"]..": "..commaValue(floor(resultDT.mobDamage))
 	GameTooltip:AddLine(textL, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
-	GameTooltip:AddLine(L["Mob Attack Speed"]..": "..format("%.2f", resultDT.mobAttackSpeed), NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
 	-----------
 	-- Your Stats
@@ -1934,68 +1915,47 @@ end
 -- EHB (Effective Health w/ Block) will change depending upon how often you
 -- press the shield block button, the mob attack speed, and mob damage.
 -- This is not gear dependent.
+-- mobDamage is after damage reductions
 function TankPoints:GetEffectiveHealthWithBlock(TP_Table, mobDamage)
-	local playerHealth = TP_Table.playerHealth
-	local guaranteedReduction = TP_Table.guaranteedReduction[TP_MELEE]
-	mobDamage = ceil(mobDamage)
-	local mobAttackSpeed = TP_Table.mobAttackSpeed
-	local mobContactChance = TP_Table.mobContactChance
+	local effectiveHealth = TP_Table.effectiveHealth[TP_MELEE]
+	-- Check for shield
 	local blockValue = floor(TP_Table.blockValue)
-	if self.playerClass == "WARRIOR" then blockValue = blockValue * 2 end
-	local shieldBlockDelay = TP_Table.shieldBlockDelay
-	-- you have no shield on.
 	if blockValue == 0 then
-		return floor(playerHealth * 1 / (1 - guaranteedReduction))
+		return effectiveHealth
 	end
-	if self.playerClass == "PALADIN" and mobContactChance > 30 then
-		return floor(playerHealth * 1 / (1 - guaranteedReduction))
-	end
-	if mobContactChance <= 0 then
-		return 1 / 0
-	end
-	-- I admit to a mental deficiency which has blocked me from coming up with a better way to calculate this.
-	local chargesLeft, sbDuration, sbCharges, blocked, damageTakenThisHit
-	--local currentHealth = floor(playerHealth) * 10 -- times 10 to simulate longer fight
-	local totalDamageTaken = 0
-	local time = 0
-	local lastPress = -100
-	local _, _, _, _, r = GetTalentInfo(3, 8)
-	local shieldBlockCoolDown = 60 - r * 10
+	local mobContactChance = TP_Table.mobContactChance
+	local sbCoolDown, sbDuration, sbDuration
+	-- Check for guaranteed block
 	if self.playerClass == "PALADIN" then
-		shieldBlockCoolDown = 8
-	end
-	local timeBetweenPresses = shieldBlockCoolDown + shieldBlockDelay
-	
-	local sbDuration = 10
-	local sbCharges = 100
-	if self.playerClass == "PALADIN" then
+		if not (select(5, GetTalentInfo(2, 17)) > 0) then -- Check for Holy Shield talent
+			return effectiveHealth
+		end
+		if ((10 / (8 + TP_Table.shieldBlockDelay) >= 1) and not UnitBuff("player", SI["Holy Shield"])) and mobContactChance > 0 then -- If Holy Shield has 100% uptime
+			return effectiveHealth
+		elseif UnitBuff("player", SI["Holy Shield"]) and mobContactChance > 0 then -- If Holy Shield is already up
+			return effectiveHealth
+		elseif mobContactChance > 30 then
+			return effectiveHealth
+		end
+		sbCoolDown = 8
 		sbDuration = 10
 		sbCharges = 8
+	elseif self.playerClass == "WARRIOR" then
+		if not UnitBuff("player", SI["Shield Block"]) then
+			blockValue = blockValue * 2
+		end
+		local _, _, _, _, r = GetTalentInfo(3, 8)
+		sbCoolDown = 60 - r * 10
+		sbDuration = 10
+		sbCharges = 100
+	else -- neither Paladin or Warrior
+		return effectiveHealth
 	end
-	local runTime = shieldBlockCoolDown * 2 -- simulate 2 cooldowns
-	local totalDamageTakenAfterReduction = 0
-	while time < runTime do
-		blocked = nil
-
-		-- shield block pressed?
-		if time >= lastPress + timeBetweenPresses then
-			lastPress = floor(time / timeBetweenPresses) * timeBetweenPresses
-			chargesLeft = sbCharges
-		end
-		if time > lastPress + sbDuration then
-			damageTakenThisHit = max(0, mobDamage * (1 - guaranteedReduction))
-			chargesLeft = 0
-		end
-		if chargesLeft > 0 then
-			damageTakenThisHit = max(0, (mobDamage * (1 - guaranteedReduction)) - blockValue)
-			chargesLeft = chargesLeft - 1
-		end
-		totalDamageTaken = totalDamageTaken + mobDamage
-		totalDamageTakenAfterReduction = totalDamageTakenAfterReduction + damageTakenThisHit
-		time = time + mobAttackSpeed
-	end
-
-	return totalDamageTaken / (totalDamageTakenAfterReduction / playerHealth)
+	
+	mobDamage = ceil(mobDamage)
+	local shieldBlockDelay = TP_Table.shieldBlockDelay
+	local timeBetweenPresses = sbCoolDown + shieldBlockDelay
+	return effectiveHealth * mobDamage / ((mobDamage * (timeBetweenPresses - sbDuration) / timeBetweenPresses) + ((mobDamage - blockValue) * sbDuration / timeBetweenPresses))
 end
 
 ----------------
@@ -2216,8 +2176,6 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		TP_Table.mobDamage = self:GetMobDamage(TP_Table.mobLevel)
 		-- mobCritDamageMod from talants
 		TP_Table.mobCritDamageMod = StatLogic:GetStatMod("MOD_CRIT_DAMAGE_TAKEN", "MELEE")
-		-- Mob Attack Speed
-		TP_Table.mobAttackSpeed = self.db.profile.mobAttackSpeed
 --	end
 	----------------
 	-- Spell Data --
@@ -2470,9 +2428,6 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	if changes.mobDamage and changes.mobDamage ~= 0 then
 		tpTable.mobDamage = tpTable.mobDamage + changes.mobDamage
 	end
-	if changes.mobAttackSpeed and changes.mobAttackSpeed ~= 0 then
-		tpTable.mobAttackSpeed = tpTable.mobAttackSpeed + changes.mobAttackSpeed
-	end
 	if changes.shieldBlockDelay and changes.shieldBlockDelay ~= 0 then
 		tpTable.shieldBlockDelay = tpTable.shieldBlockDelay + changes.shieldBlockDelay
 	end
@@ -2535,7 +2490,6 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		end
 		cmax("mobDamage",0)
 		cmax2("damageTakenMod",TP_MELEE,0)
-		cmax("mobAttackSpeed",0.1)
 		cmax("shieldBlockDelay",0)
 	end
 	-- Spell
@@ -2745,7 +2699,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Effective Health
 		TP_Table.effectiveHealth[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.guaranteedReduction[TP_MELEE])
 		-- Effective Health with Block
-		TP_Table.effectiveHealthWithBlock[TP_MELEE] = TP_Table.effectiveHealth[TP_MELEE]
+		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, TP_Table.mobDamage)
 	end
 	local function calc_spell_school(s)
 		-- Resistance Reduction = 0.75 (resistance / (mobLevel * 5))
@@ -2813,7 +2767,6 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpTime
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpTime
 		TP_Table.shieldBlockUpTime = shieldBlockUpTime
-		TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 		inputCopy = nil
 	-- Paladin Talent: Holy Shield - 8 sec cooldown - 2,17
 	-- 	Increases chance to block by 30% for 10 sec and deals 211 Holy damage for each attack blocked while active. Each block expends a charge. 8 charges.
@@ -2839,7 +2792,6 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 			TP_Table.totalReduction[TP_MELEE] = TP_Table.totalReduction[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.totalReduction[TP_MELEE] * shieldBlockUpTime
 			TP_Table.tankPoints[TP_MELEE] = TP_Table.tankPoints[TP_MELEE] * (1 - shieldBlockUpTime) + inputCopy.tankPoints[TP_MELEE] * shieldBlockUpTime
 			TP_Table.shieldBlockUpTime = shieldBlockUpTime
-			TP_Table.effectiveHealthWithBlock[TP_MELEE] = self:GetEffectiveHealthWithBlock(TP_Table, inputCopy.mobDamage)
 			inputCopy = nil
 		end
 	else
