@@ -119,7 +119,7 @@ L:RegisterTranslations("enUS", function() return {
 	["Effective Health"] = true,
 	["Effective Health vs %s %s"] = true, -- Melee/Nature/Fire followed by EH
 	["Effective Health (with Block) vs Melee "] = true, -- followed by EHB
-	["Effective Health with Block"] = true,
+	["Effective Health with Block"] = "Effective Health w/ Block",
 	["Effective Health - All Schools"] = true, -- heading for the all schools of damage tooltip
 	["Health"] = true, -- player health
 	["Armor Reduction"] = true, -- how much armor reduces damage
