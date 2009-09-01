@@ -264,6 +264,8 @@ Paladins are not calculated yet.
 - Packaged with new libraries with 3.2.0 class support
 - Block Value is now 2/0.65 per statpoint
 - Paladin: Fixed Holy Shield talent location
+- Default mob damage at level 83 is now 44165, up from 24365 to match current raid difficulty.
+- Fixed TankPoints per Defense Rating calculation
 2.8.3
 - toc update
 - Packaged with new libraries with 3.1.3 class support
