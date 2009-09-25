@@ -259,6 +259,13 @@ Paladins are not calculated yet.
 
 
 ** Version History **
+2.8.5
+- Paladin: Ardent Defender is now modeled as an increase of 0.35/(1-[7/13/20%])-0.35 in max health
+- 3.2.2: Paladin: Ardent Defender: This talent now reduces damage taken below 35% health by 7/13/20% instead of 10/20/30%.
+- 3.2.2: Warrior: Critical Block: This talent now grants a 20/40/60% chance to block double the normal amount instead of 10/20/30%.
+- 3.2.2: Death Knight: Unbreakable Armor: Now grants 25% additional armor. The amount of strength granted has been reduced to 10%.
+- 3.2.2: Death Knight: Glyph of Unbreakable Armor: Now increases the armor gained from Unbreakable Armor by 20%.
+- 3.2.2: Death Knight: Frost Presence: The damage reduction granted by this ability has been increased from 5% to 8%.
 2.8.4
 - toc update
 - Packaged with new libraries with 3.2.0 class support
