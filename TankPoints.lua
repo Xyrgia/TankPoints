@@ -23,7 +23,7 @@ local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 -- AceAddon Initialization
 TankPoints = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "AceConsole-2.0", "AceEvent-2.0", "AceDebug-2.0", "AceHook-2.1", "StatFrameLib-1.0")
 TankPoints.title = "TankPoints"
-TankPoints.version = "2.8.4 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
+TankPoints.version = "2.8.5 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
 TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 local TankPoints = TankPoints
@@ -2536,6 +2536,8 @@ function TankPoints:GetTankPointsIfNotFilled(table, school)
 	end
 end
 
+local ArdentDefenderRankEffect = {0.07, 0.13, 0.2}
+
 function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	------------------
 	-- Check Inputs --
@@ -2544,6 +2546,13 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	-----------------
 	-- Caculations --
 	-----------------
+	-- Paladin Talent: Ardent Defender (Rank 3) - 2,18
+	--  Damage that takes you below 35% health is reduced by 7/13/20%
+	if self.playerClass == "PALADIN" and select(5, GetTalentInfo(2, 18)) > 0 then
+		local _, _, _, _, r = GetTalentInfo(2, 18)
+		local inc = 0.35 / (1 - ArdentDefenderRankEffect[r]) - 0.35 -- 8.75% @ rank3
+		TP_Table.playerHealth = TP_Table.playerHealth * (1 + inc)
+	end
 	-- Resilience Mod
 	TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, CR_CRIT_TAKEN_MELEE, TP_Table.playerLevel) * 0.01
 	if (not school) or school == TP_MELEE then
@@ -2586,9 +2595,9 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- this value multiplied by block% can now be treated like dodge and parry except that these avoid 100% of the damage
 		-------------
 		-- Warrior Talent: Critical Block (Rank 3) - 3,24
-		--  Your successful blocks have a 10%/20%/30% chance to block double the normal amount
+		--  Your successful blocks have a 20/40/60% chance to block double the normal amount
 		if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
-			local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.1
+			local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.2
 			TP_Table.blockedMod = min(1, TP_Table.blockValue * critBlock / TP_Table.mobDamage)
 		else
 			TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
