@@ -259,6 +259,8 @@ Paladins are not calculated yet.
 
 
 ** Version History **
+2.8.6
+- toc update for 3.3.0
 2.8.5
 - Paladin: Ardent Defender is now modeled as an increase of 0.35/(1-[7/13/20%])-0.35 in max health
 - 3.2.2: Paladin: Ardent Defender: This talent now reduces damage taken below 35% health by 7/13/20% instead of 10/20/30%.
