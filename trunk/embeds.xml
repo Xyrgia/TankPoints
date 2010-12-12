@@ -2,31 +2,18 @@
 ..\FrameXML\UI.xsd">
 
 <Script file="libs\LibStub\LibStub.lua"/>
-<!-- StatLogic: LibStub -->
-<Include file="libs\LibStatLogic-1.1\lib.xml"/>
-<!-- TipHooker: LibStub -->
+<Include file="libs\LibStatLogic-1.2\lib.xml"/>
 <Include file="libs\LibTipHooker-1.1\lib.xml"/>
-<!-- AceLibrary: LibStub -->
 <Script file="libs\AceLibrary\AceLibrary.lua"/>
-<!-- # AceLocale: AceLibrary -->
 <Script file="libs\AceLocale-2.2\AceLocale-2.2.lua"/>
-<!-- # AceOO: AceLibrary -->
 <Script file="libs\AceOO-2.0\AceOO-2.0.lua"/>
-<!-- # AceConsole: AceLibrary, AceOO -->
 <Script file="libs\AceConsole-2.0\AceConsole-2.0.lua"/>
-<!-- # AceEvent: AceLibrary, AceOO -->
 <Script file="libs\AceEvent-2.0\AceEvent-2.0.lua"/>
-<!-- # AceDebug: AceLibrary, AceOO -->
 <Script file="libs\AceDebug-2.0\AceDebug-2.0.lua"/>
-<!-- # AceDB: AceLibrary, AceOO, AceEvent -->
 <Script file="libs\AceDB-2.0\AceDB-2.0.lua"/>
-<!-- # AceAddon: AceLibrary, AceOO, AceEvent, AceConsole (optional) -->
 <Script file="libs\AceAddon-2.0\AceAddon-2.0.lua"/>
-<!-- # AceHook-2.1: AceOO -->
 <Script file="libs\AceHook-2.1\AceHook-2.1.lua"/>
-<!-- # Waterfall: AceLibrary, AceOO -->
 <Script file="libs\Waterfall-1.0\Waterfall-1.0.lua"/>
-<!-- # StatFrameLib-1.0: AceHook-2.1, AceLibrary, AceOO -->
 <Script file="libs\StatFrameLib-1.0\StatFrameLib-1.0.lua"/>
 
 </Ui>
