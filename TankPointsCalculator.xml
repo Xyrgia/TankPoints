@@ -155,19 +155,19 @@
 						self:SetText("0")
 					</OnLoad>
 					<OnEnterPressed>
-						self:ClearFocus()
+						self:ClearFocus(self)
 					</OnEnterPressed>
 					<OnEscapePressed>
-						self:ClearFocus()
+						self:ClearFocus(self)
 					</OnEscapePressed>
 					<OnEditFocusLost>
 						self:HighlightText(0, 0)
 					</OnEditFocusLost>
 					<OnEditFocusGained>
-						self:HighlightText()
+						self:HighlightText(self)
 					</OnEditFocusGained>
 					<OnTextChanged>
-						TankPointsCalculatorVariables_InputEditBox_OnTextChanged()
+						TankPointsCalculatorVariables_InputEditBox_OnTextChanged(self, isUserInput)
 					</OnTextChanged> 
 				</Scripts>
 				<FontString inherits="ChatFontNormal"/>
@@ -417,9 +417,9 @@
 				</Anchors>
 				<Scripts>
 					<OnMouseDown>
-						if ( arg1 == "LeftButton" ) then
+						if ( button == "LeftButton" ) then
 							self:GetParent():StartMoving();
-						elseif ( arg1 == "RightButton" ) then
+						elseif ( button == "RightButton" ) then
 							self:GetParent():ClearAllPoints();
 							self:GetParent():SetPoint("CENTER", "UIParent", "CENTER");
 						end
@@ -811,7 +811,7 @@
 		
 		<Scripts>
 			<OnLoad>
-				TankPointsCalculatorFrame_OnLoad()
+				TankPointsCalculatorFrame_OnLoad(self)
 			</OnLoad>
 			<OnEvent>
 				TankPointsCalculatorFrame_OnEvent(self, event, ...)
