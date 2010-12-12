@@ -12,7 +12,7 @@ LastUpdate: $Date$
 -- Libraries --
 ---------------
 local TipHooker = LibStub:GetLibrary("LibTipHooker-1.1")
-local StatLogic = LibStub:GetLibrary("LibStatLogic-1.1")
+local StatLogic = LibStub:GetLibrary("LibStatLogic-1.2")
 local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 
 

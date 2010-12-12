@@ -67,9 +67,14 @@ end
 -------------------------------
 -- TankPointsCalculatorFrame --
 -------------------------------
-function TankPointsCalculatorFrame_OnLoad()
+--[[
+	Runs when the frame is created.
+	Arguments:
+		self - Reference to the widget for which the script was run (frame)
+--]]
+function TankPointsCalculatorFrame_OnLoad(self)
 	-- Esc closes the window
-	tinsert(UISpecialFrames, this:GetName())
+	tinsert(UISpecialFrames, self:GetName())
 	
 	-- Set title text
 	TankPointsCalculatorFrame_HeaderText:SetText(L["TankPoints Calculator"])
@@ -88,20 +93,45 @@ function TankPointsCalculatorFrame_OnLoad()
 	TPCalc:SetLabels()
 	TPCalc:AdjustResultFrameSize()
 	
-	-- Set tooltips
+	------------------
+	-- Set tooltips --
+	------------------
 	TPCMobStats2.tooltip = L["Mob Damage before DR"]
+
+
+	TPCPlayerStats5.tooltip =  L["Armor reduces physical damage taken"] --Armor (Items)
+	TPCPlayerStats6.tooltip =  L["Armor reduces physical damage taken"] --Armor
+	TPCPlayerStats7.tooltip =  L["(removed) Defense rating was removed from the game in patch 4.0.1."] --Defense rating
+	TPCPlayerStats8.tooltip =  L["(removed) Defense was removed from the game in patch 4.0.1."] --Defense
+	TPCPlayerStats9.tooltip =  L["Dodge rating improves your chance to dodge. A dodged attack does no damage"] --Dodge rating
+	TPCPlayerStats10.tooltip = L["Your chance to dodge an attack. A dodged attack does no damage"] --Dodge rating
+	TPCPlayerStats11.tooltip = L["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] --Parry Rating
+	TPCPlayerStats12.tooltip = L["Your chance to parry an attack. When you parry an attack, it and the next attack, will each hit for 50% less damage"] --Parry Rating
+	TPCPlayerStats13.tooltip = L["Block rating improves your chance to block. Blocked attacks hit for 30% less damage"] --Block Rating
+	TPCPlayerStats14.tooltip = L["Your chance to block an attack. Blocked attacks hit for 30% less damage."] --Block(%)
+	TPCPlayerStats15.tooltip = L["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] --Block value
 	
 	-- Register events
-	this:RegisterEvent("UNIT_LEVEL")
-	this:RegisterEvent("UNIT_RESISTANCES")
-	this:RegisterEvent("UNIT_STATS")
-	this:RegisterEvent("UNIT_DEFENSE")
-	this:RegisterEvent("UNIT_MAXHEALTH")
-	this:RegisterEvent("UNIT_AURA")
-	this:RegisterEvent("UNIT_INVENTORY_CHANGED")
+	self:RegisterEvent("UNIT_LEVEL")
+	self:RegisterEvent("UNIT_RESISTANCES")
+	self:RegisterEvent("UNIT_STATS")
+	self:RegisterEvent("UNIT_DEFENSE")
+	self:RegisterEvent("UNIT_MAXHEALTH")
+	self:RegisterEvent("UNIT_AURA")
+	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 end
 
 function TankPointsCalculatorFrame_OnEvent(self, event, ...)
+--[[
+	Description
+		Run whenever an event fires for which the frame is registered. 
+		In order for this script to be run, the frame must be registered for at least one event via its :RegisterEvent() method
+	Arguments
+		self	Reference to the widget for which the script was run (frame)
+		event	Name of the event (string)
+		...	Arguments specific to the event (list)
+--]]
+
 	--TankPoints:Print(tostring(self)..", "..event..", "..select(1, ...))
 	-- Do nothing if Calculator frame is not visable
 	if (not self:IsVisible()) then
@@ -121,7 +151,7 @@ end
 
 -- VariableFrame
 function TankPointsCalculatorVariables_IncrementButton_OnClick(self, button, down)
-	--TankPoints:Print(tostring(self)..", "..tostring(button)..", "..tostring(this)..", "..tostring(down))
+	--TankPoints:Print(tostring(self)..", "..tostring(button)..", "..tostring(self)..", "..tostring(down))
 	local inputBox = _G[self:GetParent():GetName().."_InputEditBox"]
 	inputBox:SetNumber(inputBox:GetNumber() + 1)
 	inputBox:ClearFocus()
@@ -133,9 +163,9 @@ function TankPointsCalculatorVariables_DecrementButton_OnClick(self, button, dow
 	inputBox:ClearFocus()
 end
 
-function TankPointsCalculatorVariables_InputEditBox_OnTextChanged()
-	--TankPoints:Print(tostring(self)..", "..tostring(this))
-	local self = this
+function TankPointsCalculatorVariables_InputEditBox_OnTextChanged(self, isUserInput)
+--	TankPoints:Print(tostring(this)..", "..tostring(self))
+--	local self = this   20101017: Removed, since self is now a paramater --Ian
 	if (self:GetNumber() > 0) then
 		self:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 	elseif (self:GetNumber() < 0) then
@@ -163,14 +193,14 @@ TPCalc.LabelText = {
 		L["Hit"]..L["(%)"],
 	},
 	{-- TPCPlayerStats1
-		SPELL_STAT1_NAME, -- "Strength"
-		SPELL_STAT2_NAME, -- "Agility"
+		SPELL_STAT1_NAME.." (n/a)", -- "Strength"
+		SPELL_STAT2_NAME.." (n/a)", -- "Agility"
 		SPELL_STAT3_NAME, -- "Stamina"
 		L["Max Health"],
 		"["..ARMOR.." - "..L["Items"].."]",
 		"["..ARMOR.."]",
-		"["..COMBAT_RATING_NAME2.."]", -- "Defense Rating"
-		"["..DEFENSE.."]",
+		"["..COMBAT_RATING_NAME2.." (removed)]", -- "Defense Rating"
+		"["..DEFENSE.." (removed)]",
 		"["..COMBAT_RATING_NAME3.."]", -- "Dodge Rating"
 		"["..DODGE..L["(%)"].."]",
 		"["..COMBAT_RATING_NAME4.."]", -- "Parry Rating"
@@ -178,7 +208,7 @@ TPCalc.LabelText = {
 		"["..COMBAT_RATING_NAME5.."]", -- "Block Rating"
 		"["..BLOCK..L["(%)"].."]",
 		L["Block Value"],
-		COMBAT_RATING_NAME15, -- "Resilience"
+		COMBAT_RATING_NAME15.. "(removed)", -- "Resilience"
 	},
 	{-- TPCMobStats1
 		L["Mob Level"],
@@ -239,18 +269,31 @@ local round = function(n,decimal_places)
 	return floor((n + 0.5) * (10^decimal_places))/(10^decimal_places)
 end
 
+
+--[[
+	This function is the one responsible for filling in all the values on the calculator screen.
+	It starts with the sourceDT,
+	copies it to a resultsDT; to which TankPoints calculations are applied.
+	
+--]]
 function TPCalc:UpdateResults()
 	-- Update base data
 	TankPoints:GetSourceData(self.sourceDT)
+
+	--perform the TankPoints calculations on the resultsDT table
 	copyTable(self.resultsDT, self.sourceDT)
 	TankPoints:GetTankPoints(self.resultsDT)
+
+	--And since this is a what-if calculation screen, we constuct another table (newDT)
+	--that we apply our sandbox calculations to
 	local newDT = {}
 	copyTable(newDT, self.sourceDT)
-	local prefix
+
 	--------------------
 	-- Get input data --
 	--------------------
 	-- input data is writen in the changes table
+	local prefix
 	local changes = {}
 	local inputEditBox = "_InputEditBox"
 	local currentText = "_CurrentText"
@@ -334,12 +377,20 @@ function TPCalc:UpdateResults()
 	----------------
 	-- AlterTable --
 	----------------
+	
+	--TankPoints:Debug("newDT.dodgeChance before altering = "..newDT.dodgeChance)
 	TankPoints:AlterSourceData(newDT, changes)
+	--TankPoints:Debug("newDT.dodgeChance after altering = "..newDT.dodgeChance)
 	
 	------------------------------
 	-- Calculate new TankPoints --
 	------------------------------
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
+
+
+--	TankPoints:Debug("Done calling GetTankPoints")
+--	TankPoints:Debug("newDT.dodgeChance after getting tankpoints = "..newDT.dodgeChance)
+
 	
 	------------------
 	-- Display data --
@@ -532,7 +583,7 @@ function TPCalc:UpdateResults()
 		_G[prefix..i..resultText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	end
-	
+
 	------------------------
 	-- Player Stats Frame --
 	------------------------
@@ -581,7 +632,7 @@ function TPCalc:UpdateResults()
 	
 	-- Max Health
 	i = i + 1
-	current = self.resultsDT.playerHealth
+	current = floor(self.resultsDT.playerHealth)
 	new = floor(newDT.playerHealth)
 	_G[prefix..i..originalStatText]:SetText(current)
 	_G[prefix..i..newStatText]:SetText(new)
@@ -664,6 +715,7 @@ function TPCalc:UpdateResults()
 	end
 	
 	-- Dodge
+	--TankPoints:Debug("newDT.dodgeChance = "..newDT.dodgeChance)
 	i = i + 1
 	current = floor(self.resultsDT.dodgeChance * 100 * 100) / 100
 	new = floor(newDT.dodgeChance * 100 * 100) / 100

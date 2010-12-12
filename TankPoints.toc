@@ -1,4 +1,4 @@
-﻿## Interface: 30300
+﻿## Interface: 40000
 ## Title: TankPoints |cff7fff7f -Ace2-|r
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
@@ -29,13 +29,7 @@ embeds.xml
 ######################
 # Localization Files #
 ######################
-TankPoints-Locale-enUS.lua
-TankPoints-Locale-zhTW.lua
-TankPoints-Locale-deDE.lua
-TankPoints-Locale-frFR.lua
-TankPoints-Locale-koKR.lua
-TankPoints-Locale-esES.lua
-TankPoints-Locale-zhCN.lua
+Locales\Locales.xml
 
 ########
 # Core #
