@@ -901,6 +901,7 @@ function TankPoints:GetBlockValue(mobDamage, forceShield)
 	--return GetShieldBlock() --a built-in WoW api
 	
 	--As of patch 4.0.1 all blocked attacks are a straight 30% reduction
+	--Note: paladin's HolyShield talent, when active, increases the amount blocked by 10%. But we don't handle that here
 	return round(mobDamage * BLOCK_DAMAGE_REDUCTION);
 end
 
@@ -1225,6 +1226,44 @@ TP_ARCANE = 7
 -- Returns
 	TP_Table
 	    table - obtained data is to be stored in this table
+		
+		{
+			playerLevel=83,
+			playerHealth = 66985,
+			playerClass="PALADIN",
+			mobLevel=86,
+			resilience=0
+			
+			--Melee data
+			mobCritChance=0.05,
+			mobCritBonus=1,
+			mobMissChance=0.05,
+			armor=23576,
+			defense=0,
+			defenseRating=0,
+			dodgeChance = 0.1197537982178,
+			parryChance = 0.13563053131104,
+			shieldBlockDelay=2,
+			mobDamage=49280,
+			blockChance=0.26875,
+			blockValue = 14784,
+			damageTakenMod={0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9),
+			mobCritDamageMod=1,
+
+			--Spell Data
+			mobSpellCritChance = 0,
+			mobSpellCritBonus = 0.5, 
+			mobSpellMissChance = 0,
+			resistance = { 
+				[2]=0,
+				[3]=15,
+				[4]=0,
+				[5]=0
+				[6]=0,
+				[7]=0},
+			mobSpellCritDamageMod = 1,
+		}
+		
 -- Examples
 }
 -----------------------------------]]
@@ -1391,8 +1430,12 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			-- Subtract block value from current strength, add block value from new strength
 			tpTable.blockValue = floor((ceil(tpTable.blockValue / blockValueMod) - floor(totalStr * 0.5 - 10) + floor((totalStr + changes.str) * 0.5 - 10)) * blockValueMod)
 		end--]]
+		
 		if GetParryChance() ~= 0 and StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") ~= 0 then
-			local parryRatingIncrease = floor((bonusStr + changes.str) * StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR")) - floor(bonusStr * StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR"))
+			local addParryRatingModStr = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR");
+		
+			local parryRatingIncrease = floor((bonusStr + changes.str) * addParryRatingModStr) - floor(bonusStr * addParryRatingModStr)
+			
 			local parry = StatLogic:GetEffectFromRating(parryRatingIncrease, CR_PARRY, tpTable.playerLevel)
 			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", parry) * 0.01
 		end
@@ -1472,13 +1515,24 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		------------------------
 		local _, _, bonusSta = UnitStat("player", 3) --WoW api. 3=stamina
 		local staMod = StatLogic:GetStatMod("MOD_STA")
-		self:Debug("TankPoints:AlterSource() LibStatLogic:GetStatMod(\"MOD_STA\") = "..staMod)
+		self:Debug("AlterSourceData() LibStatLogic:GetStatMod(\"MOD_STA\") = "..staMod)
 
+		--20101213 Updated to LibStatLogic1.2, it's returning real values. Hack removed
 		--20101117 MOD_STA is temporarily returning 1.0. Let's force it a reasonable paladin default
-		--staMod = staMod * 1.05 * 1.15 * 1.05 --Kings 5% * Touched by the Light 5% * Plate specialization 5%
-		--self:Debug("TankPoints:AlterSource() [temp hack] setting staMod = "..staMod)
+		--staMod = staMod * 1.05 * 1.15 * 1.05 --Kings 5% * Touched by the Light 15% * Plate specialization 5%
+		--self:Debug("AlterSourceData() [temp hack] setting staMod = "..staMod)
 
-		changes.sta = max(0, floor((ceil(bonusSta / staMod) + changes.sta) * staMod)) - bonusSta
+		
+		--[[this floor/ceil contraption isn't working for a case i found:
+				Protection paladin with 15% stamina bonus
+					Paperdoll stamina before: 2548
+					Equip item with stamina (listed in tooltip): 228
+					Paperdoll stamina after: 2811 (increase of 263)
+				
+				Assume 15% applies to item: 228 * 1.15 = 262.2
+				
+		--]]
+		changes.sta = max(0, round((ceil(bonusSta / staMod) + changes.sta) * staMod)) - bonusSta --20101213 Changed to ceil, from round, to make example i found work
 
 		-- Calculate player health
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
@@ -1486,7 +1540,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 
 		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.sta * 10) * healthMod) + 0.5)
 --		self:Print("changes.sta = "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
-		self:Debug("AlterSourceData: Changing stamina by "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
+		self:Debug("AlterSourceData()[modify stamina] Changing stamina by "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
 	
 	if (changes.playerHealth and changes.playerHealth ~= 0) then
@@ -1769,15 +1823,28 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
 		
 		-- Defense Mod (may return negative)
-		local defenseFromDefenseRating = floor(StatLogic:GetEffectFromRating(TP_Table.defenseRating, CR_DEFENSE_SKILL))
-		local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5 -- negative for mobs higher level then player
-		local drFreeAvoidance = drFreeDefense * 0.0004
+		--self:Debug("TP_Table.defense = "..TP_Table.defense)
+		
+		--local defenseFromDefenseRating = floor(StatLogic:GetEffectFromRating(TP_Table.defenseRating, CR_DEFENSE_SKILL))
+		--self:Debug("defenseFromDefenseRating = "..defenseFromDefenseRating)
+		
+		--local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5 -- negative for mobs higher level then player
+		--self:Debug("drFreeDefense = "..drFreeDefense)
+		local drFreeAvoidance = 0; --drFreeDefense * 0.0004
 		
 		-- Mob's Crit, Miss
-		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
-		local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
-		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeAvoidance + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
-		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + TP_Table.defenseEffect)
+		--self:Debug("todo: figure out how levels affect a mob's crit chance")
+		--TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
+		
+		--local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
+		
+		--self:Debug("before miss chance calc. mobMissChance = "..TP_Table.mobMissChance)
+--		self:Debug("drFreeAvoidance = "..drFreeAvoidance)
+		
+		--self:Debug("todo: figure out what affects a mob's crit chance")
+		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeAvoidance + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
+--		self:Debug("after miss chance calc. TP_Table.mobMissChance = "..TP_Table.mobMissChance)
+		
 		
 		-- Dodge, Parry, Block
 		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance + drFreeAvoidance)
@@ -1972,6 +2039,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		-- Fill table with player values
 		TP_Table = self:GetSourceData(nil, school)
 	end
+	
 	------------------
 	-- Check Inputs --
 	------------------
@@ -2009,12 +2077,15 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		inputCopy = nil
 
 	-- Paladin Talent: Holy Shield - 2,15
-	-- 	Increases chance to block by 15% when active
+	-- 	Shield blocks for an additional 10% for 20 sec.
 	elseif (self.playerClass == "PALADIN") and (select(5, GetTalentInfo(2, 15)) > 0)
 			and (not school or school == TP_MELEE) and not UnitBuff("player", SI["Holy Shield"]) then
-		--self:Debug("TankPoints:GetTankPoints: Player is a paladin who has Holy Shield talent, but it's not active. Increasing block chance by 15%")
+
+		--self:Debug("TankPoints:GetTankPoints: Player is a paladin who has Holy Shield talent, but it's not active. Increasing block by 10%")
+		--normally all blocked attacks are reduced by a fixed 30%. Holy shield increases the blocked amount by 10%
+
 		--Assume 100% uptime on Holy Shield
-		TP_Table.blockChance = TP_Table.blockChance + 0.15
+		TP_Table.blockValue = round(TP_Table.blockValue * 1.10)
 		
 		--self:Debug("TankPoints:GetTankPoints: Calling paladin version of TankPoints:CalculateTankPoints")
 		self:CalculateTankPoints(TP_Table, school, forceShield)
@@ -2181,7 +2252,7 @@ function TankPoints:PaintEffectiveHealthTooltip()
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
-	newDT.playerHealth = floor(newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")) --20101017: added floor
+	newDT.playerHealth = newDT.playerHealth + floor(1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")) --20101213: found exampe where wow is doing ceil on statmod
 	self:GetTankPoints(newDT, TP_MELEE)
 	addline("1.5 "..SPELL_STAT3_NAME.." = ", delta_eh(newDT, resultDT))
 	-----------
