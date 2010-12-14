@@ -78,11 +78,14 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	
 	-- Set title text
 	TankPointsCalculatorFrame_HeaderText:SetText(L["TankPoints Calculator"])
+
 	-- Set drag frame tooltip
 	TankPointsCalculatorFrame_DragFrame.tooltip = L["Left click to drag\nRight click to reset position"]
+
 	-- Set button text
 	TankPointsCalculatorFrame_ResetButton:SetText(L["Reset"])
 	TankPointsCalculatorFrame_CloseButton:SetText(L["Close"])
+	
 	-- Set option frame box title
 	TPCResultsFrameTitle:SetText(L["Results"])
 	TPCCombatTableFrameTitle:SetText(L["Combat Table"])
@@ -193,7 +196,7 @@ TPCalc.LabelText = {
 		L["Hit"]..L["(%)"],
 	},
 	{-- TPCPlayerStats1
-		SPELL_STAT1_NAME.." (n/a)", -- "Strength"
+		SPELL_STAT1_NAME, -- "Strength" (hidden Forceful Deflection ability gives 0.25 parry per strength)
 		SPELL_STAT2_NAME.." (n/a)", -- "Agility"
 		SPELL_STAT3_NAME, -- "Stamina"
 		L["Max Health"],
@@ -215,7 +218,16 @@ TPCalc.LabelText = {
 		L["Mob Damage"],
 	},
 }
--- Set label text
+
+
+--[[ 
+	Set label text
+	
+	LabelText is an array that contains all the text to show in the calculator.
+	This function copies all the strings into TankPointsCalculatorFrame
+	
+	20101213: Where are the labels set!?
+--]]
 function TPCalc:SetLabels()
 	if self:ShouldShowEHB() then
 		if self.LabelText[1][3] ~= L["Effective Health with Block"] then
@@ -272,22 +284,35 @@ end
 
 --[[
 	This function is the one responsible for filling in all the values on the calculator screen.
-	It starts with the sourceDT,
-	copies it to a resultsDT; to which TankPoints calculations are applied.
-	
+	- start with the sourceDT
+	- copy it to a resultsDT
+	- apply TankPoints calculations to resultsDT
 --]]
 function TPCalc:UpdateResults()
+	--TankPoints:Debug("TPCalc:UpdateResults()")
+
 	-- Update base data
-	TankPoints:GetSourceData(self.sourceDT)
+	TankPoints:GetSourceData(self.sourceDT) --sourceDT holds our initial real stats
 
-	--perform the TankPoints calculations on the resultsDT table
-	copyTable(self.resultsDT, self.sourceDT)
-	TankPoints:GetTankPoints(self.resultsDT)
+	--TankPoints:Debug(table.tostring(self.sourceDT))
+	--TankPoints:Debug("1. sourceDT.mobMissChance = "..self.sourceDT.mobMissChance);
+	
+	copyTable(self.resultsDT, self.sourceDT) --perform TankPoints calculations on a resultsDT table (we want a copy because it applies modifiers to things like stamina and health)
+	--TankPoints:Debug("2. resultsDT.mobMissChance = "..self.resultsDT.mobMissChance);
 
-	--And since this is a what-if calculation screen, we constuct another table (newDT)
-	--that we apply our sandbox calculations to
+	TankPoints:GetTankPoints(self.resultsDT) --this will hold our "before" tankpoints and effective health, as opposed to newDT, which will hold the "after" tankpoints and effective health
+
+	--And since this is a what-if calculation screen, we constuct another table (newDT) that we apply our sandbox calculations to
 	local newDT = {}
 	copyTable(newDT, self.sourceDT)
+	--TankPoints:Debug("3. newDT.mobMissChance = "..newDT.mobMissChance);
+	
+	--TankPoints:Debug(table.tostring(newDT))
+
+	--TankPoints:Debug("4. sourceDT.mobMissChance = "..self.sourceDT.mobMissChance);
+	--TankPoints:Debug("5. resultsDT.mobMissChance = "..self.resultsDT.mobMissChance);
+	--TankPoints:Debug("6. newDT.mobMissChance = "..newDT.mobMissChance);
+	
 
 	--------------------
 	-- Get input data --
@@ -304,6 +329,9 @@ function TPCalc:UpdateResults()
 	
 	local current, new, diff
 	
+	--[[
+		Pull any numbers the user may have entered out of the edit boxes, and put them in the "changes" table
+	--]]
 	prefix = "TPCPlayerStats"
 	local i = 1
 	-- Strength
@@ -377,10 +405,9 @@ function TPCalc:UpdateResults()
 	----------------
 	-- AlterTable --
 	----------------
-	
-	--TankPoints:Debug("newDT.dodgeChance before altering = "..newDT.dodgeChance)
+	--Takes a table of stats (newDT) and applies the "changes" we've asked for.
+
 	TankPoints:AlterSourceData(newDT, changes)
-	--TankPoints:Debug("newDT.dodgeChance after altering = "..newDT.dodgeChance)
 	
 	------------------------------
 	-- Calculate new TankPoints --
