@@ -1835,13 +1835,14 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Mob's Crit, Miss
 		--self:Debug("todo: figure out how levels affect a mob's crit chance")
 		--TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
+		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		
 		--local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
 		
 		--self:Debug("before miss chance calc. mobMissChance = "..TP_Table.mobMissChance)
 --		self:Debug("drFreeAvoidance = "..drFreeAvoidance)
 		
-		--self:Debug("todo: figure out what affects a mob's crit chance")
+		--self:Debug("todo: figure out what affects a mob's miss chance")
 		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeAvoidance + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
 --		self:Debug("after miss chance calc. TP_Table.mobMissChance = "..TP_Table.mobMissChance)
 		
