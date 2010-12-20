@@ -312,8 +312,9 @@ L:RegisterTranslations("enUS", function() return {
 -------------------------
 	["Armor reduces physical damage taken"] = true,
 	["Armor reduces physical damage taken"] = true,
-	["(removed) Defense rating was removed from the game in patch 4.0.1."] = "(removed)\nDefense rating was removed\nfrom the game in patch 4.0.3.",
-	["(removed) Defense was removed from the game in patch 4.0.1."] = "(removed)\nDefense was removed\nfrom the game in patch 4.0.3.",
+	["TPCalc_PlayerStatsTooltip_MasteryRating"] = "Mastery Rating increases your Mastery.\nMastery increases your chance to block an attack.",
+	["TPCalc_PlayerStatsTooltip_Mastery"] = "Mastery increases your chance to block an attack.",
+
 	["Dodge rating improves your chance to dodge. A dodged attack does no damage"] = "Dodge rating improves your chance to dodge.\nA dodged attack does no damage",
 	["Your chance to dodge an attack. A dodged attack does no damage"] = "Your chance to dodge an attack.\nA dodged attack does no damage",
 	["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "Parry rating improves your chance to parry.\nWhen you parry an attack it, and the next attack,\nwill each hit for 50% less damage",

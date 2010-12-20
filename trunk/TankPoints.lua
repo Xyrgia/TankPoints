@@ -42,7 +42,7 @@ local TankPoints = TankPoints
 		This method determintes the various attributes of the player (health, dodge, block chance, etc)
 		and stores it in the passed table. 
 		This this function is normally called by UpdateDataTable, which uses it to update the
-		member varialbe TP_MELEE. Because of this TP_MELEE is the variable that is understood to hold
+		member varialbe TP_MELEE. Because of this, TP_MELEE is the variable that is understood to hold
 		the player's current unmodified attributes.
 		
 	AlterSourceData(tpTable, changes, [forceShield])
@@ -119,7 +119,7 @@ TankPoints.SchoolName = {
 }
 
 --LibStatLogic uses hard-coded strings as a lookup if a player takes a particular kind of damage
---This lookup translates our contants to those used by LibStatLogic
+--This lookup translates our constants to those used by LibStatLogic
 local schoolIDToString = {
 	[TP_RANGED] = "RANGED",
 	[TP_MELEE] = "MELEE",
@@ -276,6 +276,14 @@ local consoleOptions = {
 				TankPoints:UpdateStats()
 			end,
 		}, --calc
+		dumptable = {
+			type = "execute",
+			name = "Dump TankPoints table",
+			desc = "Print the TankPoints calculations table to the console",
+			func = function()
+					TankPoints:DumpTable(TankPoints.resultsTable);
+				end;
+		},
 		tip = {
 			type = "group",
 			name = L["Tooltip Options"],
@@ -406,42 +414,6 @@ local consoleOptions = {
 					end,
 					min = -20,
 					max = 20,
-					step = 1,
-				},
-				damage = {
-					type = "range",
-					name = L["Mob Damage"],
-					desc = L["Sets mob's damage before damage reduction"],
-					get = function() return profileDB.mobDamage or TankPoints:GetMobDamage(UnitLevel("player") + profileDB.mobLevelDiff) end,
-					set = function(v)
-						profileDB.mobDamage = v
-						TankPoints:UpdateStats()
-						-- Update Calculator
-						if TankPointsCalculatorFrame:IsVisible() then
-							TPCalc:UpdateResults()
-						end
-					end,
-					min = 0,
-					max = 99999,
-					step = 1,
-				},
-				drdamage = {
-					type = "range",
-					name = L["Mob Damage after DR"],
-					desc = L["Sets mob's damage after melee damage reduction"],
-					get = function()
-						return floor((profileDB.mobDamage or TankPoints:GetMobDamage(UnitLevel("player") + profileDB.mobLevelDiff)) * (1-TankPoints.resultsTable.guaranteedReduction[TP_MELEE]))
-					end,
-					set = function(v)
-						profileDB.mobDamage = floor(v / (1-TankPoints.resultsTable.guaranteedReduction[TP_MELEE]))
-						TankPoints:UpdateStats()
-						-- Update Calculator
-						if TankPointsCalculatorFrame:IsVisible() then
-						TPCalc:UpdateResults()
-						end
-					end,
-					min = 0,
-					max = 99999,
 					step = 1,
 				},
 				default = {
@@ -688,6 +660,80 @@ function TankPoints:OnUpdate(elapsed)
 	end
 end
 
+function table.val_to_str ( v )
+  if "string" == type( v ) then
+    v = string.gsub( v, "\n", "\\n" )
+    if string.match( string.gsub(v,"[^'\"]",""), '^"+$' ) then
+      return "'" .. v .. "'"
+    end
+    return '"' .. string.gsub(v,'"', '\\"' ) .. '"'
+  else
+    return "table" == type( v ) and table.tostring( v ) or
+      tostring( v )
+  end
+end
+
+function table.key_to_str ( k )
+  if "string" == type( k ) and string.match( k, "^[_%a][_%a%d]*$" ) then
+    return k
+  else
+    return "[" .. table.val_to_str( k ) .. "]"
+  end
+end
+
+function table.tostring( tbl )
+  local result, done = {}, {}
+  for k, v in ipairs( tbl ) do
+    table.insert( result, table.val_to_str( v ) )
+    done[ k ] = true
+  end
+  for k, v in pairs( tbl ) do
+    if not done[ k ] then
+      table.insert( result,
+        table.key_to_str( k ) .. "=" .. table.val_to_str( v ) )
+    end
+  end
+  return "{" .. table.concat( result, ", " ) .. "}"
+end
+
+function TankPoints:VarAsString(value)
+--[[Convert a variable to a string
+--]]
+
+	local Result = "["..type(value).."] = "
+	
+	--[[
+		Some types in LUA refuse to be converted to a string, so we have to do it for it.
+	
+		LUA type() function returns a lowercase string that contains one of the following:
+			- "nil"			we must manually return "nil"
+			- "boolean"		we must manually convert to "true" or "false"
+			- "number"
+			- "string"
+			- "function"
+			- "userdata"
+			- "thread"
+			- "table"		we must manually convert to a string
+			
+	]]--
+	
+	if (value == nil) then
+		Result = Result.."nil"
+	elseif (type(value) == "table") then
+		Result = Result..table.tostring(value)
+	elseif (type(value) == "boolean") then
+		if (value) then
+			Result = Result.."true"
+		else
+			Result = Result.."false"
+		end
+	else
+		Result = Result..value
+	end
+	
+	return Result;
+end
+
 ---------------------
 -- Initializations --
 ---------------------
@@ -784,7 +830,7 @@ end
 function TankPoints:UpdateDataTable()
 	self:GetSourceData(self.sourceTable)
 
-	copyTable(self.resultsTable, self.sourceTable) --copyTable(destination, source)
+	copyTable(self.resultsTable, self.sourceTable) --destination, source
 	self:GetTankPoints(self.resultsTable)
 
 	TankPointsTooltips.ClearCache()
@@ -824,15 +870,15 @@ armorReductionTemp = armor / ((85 * levelModifier) + 400)
 armorReduction = armorReductionTemp / (armorReductionTemp + 1)
 defenseEffect = (defense - attackerLevel * 5) * 0.04 * 0.01
 blockValueFromStrength = (strength * 0.05) - 1
-blockValue = floor(blockValueFromStrength) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
-mobDamage = (levelModifier * 55) * meleeTakenMod * (1 - armorReduction)
+[removed] blockValue = floor(blockValueFromStrength) + floor((blockValueFromItems + blockValueFromShield) * blockValueMod)
+[removed]mobDamage = (levelModifier * 55) * meleeTakenMod * (1 - armorReduction)
 resilienceEffect = StatLogic:GetEffectFromRating(resilience, playerLevel) * 0.01
 mobCritChance = max(0, 0.05 - defenseEffect - resilienceEffect)
 mobCritBonus = 1
 mobMissChance = max(0, 0.05 + defenseEffect)
 mobCrushChance = 0.15 + max(0, (playerLevel * 5 - defense) * 0.02) (if mobLevel is +3)
 mobCritDamageMod = max(0, 1 - resilienceEffect * 2)
-blockedMod = min(1, blockValue / mobDamage)
+blockedMod = 30/40/30*crit
 mobSpellCritChance = max(0, 0 - resilienceEffect)
 mobSpellCritBonus = 0.5
 mobSpellMissChance = 0
@@ -845,6 +891,11 @@ effectiveHealth = playerHealth * 1/reduction (armor, school, etc) - this is by C
 effectiveHealthWithBlock = effectiveHealth modified by expected guaranteed blocks. This is done through simulation using the mob attack speed, etc. See GetEffectiveHealthWithBlock.
 --]]
 function TankPoints:GetArmorReduction(armor, attackerLevel)
+
+	--Use LibStatLogic, it's been updated for Cataclysm
+	return StatLogic:GetReductionFromArmor(armor, attackerLevel)
+
+	--[[ Following hasn't been updated for Cataclysm. LibStatLogic is right.
 	local levelModifier = attackerLevel
 	if ( levelModifier > 59 ) then
 		levelModifier = levelModifier + (4.5 * (levelModifier - 59))
@@ -859,6 +910,7 @@ function TankPoints:GetArmorReduction(armor, attackerLevel)
 		armorReduction = 0
 	end
 	return armorReduction
+	]]--
 end
 
 --[[
@@ -878,8 +930,7 @@ end
 --[[
 	Returns your shield block value, Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
 	If you don't have a shield equipped (or you force it false), then your blocked amount is zero
---]]
-function TankPoints:GetBlockValue(mobDamage, forceShield)
+function TankPoints:GetBlockValue(mobDamageDepricated, forceShield)
 	-- Block from Strength
 	-- Talents: Pal, War
 	-- (%d+) Block (on shield)
@@ -902,9 +953,13 @@ function TankPoints:GetBlockValue(mobDamage, forceShield)
 	
 	--As of patch 4.0.1 all blocked attacks are a straight 30% reduction
 	--Note: paladin's HolyShield talent, when active, increases the amount blocked by 10%. But we don't handle that here
-	return round(mobDamage * BLOCK_DAMAGE_REDUCTION);
+	return round(mobDamageDepricated * BLOCK_DAMAGE_REDUCTION);
 end
-
+--]]
+------------------
+-- GetMobDamage --
+------------------
+--[[
 ------------------------------------
 -- mobDamage, for factoring in block
 -- I designed this formula with the goal to model the normal damage of a raid boss at your level
@@ -930,7 +985,7 @@ function TankPoints:GetMobDamage(mobLevel)
 	end
 	return levelMod * 55 -- this is the value before mitigation, which we will do in GetTankPoints
 end
-
+]]--
 
 ------------------------
 -- Shield Block Skill --
@@ -1019,9 +1074,10 @@ end
 -- This is not gear dependent.
 -- mobDamage is after damage reductions
 function TankPoints:GetEffectiveHealthWithBlock(TP_Table, mobDamage)
+
 	local effectiveHealth = TP_Table.effectiveHealth[TP_MELEE]
 	-- Check for shield
-	local blockValue = floor(TP_Table.blockValue)
+	local blockValue = 0; --floor(TP_Table.blockValue)
 	if blockValue == 0 then
 		return effectiveHealth
 	end
@@ -1244,9 +1300,7 @@ TP_ARCANE = 7
 			dodgeChance = 0.1197537982178,
 			parryChance = 0.13563053131104,
 			shieldBlockDelay=2,
-			mobDamage=49280,
 			blockChance=0.26875,
-			blockValue = 14784,
 			damageTakenMod={0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9),
 			mobCritDamageMod=1,
 
@@ -1285,6 +1339,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 	TP_Table.resilience = GetCombatRating(COMBAT_RATING_RESILIENCE_CRIT_TAKEN) --20101017: Changed in Patch4.0 from CR_CRIT_TAKEN_MELEE --Ian
 
 	TP_Table.damageTakenMod = {}
+	TP_Table.mobSpellCritDamageMod = {} --20101213 added initialziation
 	----------------
 	-- Melee Data --
 	----------------
@@ -1306,6 +1361,10 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		-- Defense Rating also needed because direct Defense gains are not affected by DR
 		TP_Table.defenseRating = 0 --GetCombatRating(CR_DEFENSE_SKILL)
 		--]]
+		
+		-- Mastery
+		TP_Table.mastery = GetMastery(); 
+		TP_Table.masteryRating = GetCombatRating(CR_MASTERY);
 
 		-- Dodge, Parry
 		-- 2.0.2.6144 includes defense factors in these functions
@@ -1315,17 +1374,12 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		-- Shield Block key press delay
 		TP_Table.shieldBlockDelay = self.db.profile.shieldBlockDelay
 
-		-- mobDamage, for factoring in block
-		TP_Table.mobDamage = self:GetMobDamage(TP_Table.mobLevel)
-
 		-- Block Chance, Block Value
 		-- Check if player has shield or forceShield is set to true
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
 			TP_Table.blockChance = GetBlockChance() * 0.01-- + TP_Table.defenseEffect
-			TP_Table.blockValue = self:GetBlockValue(TP_Table.mobDamage, forceShield)
 		else
 			TP_Table.blockChance = 0
-			TP_Table.blockValue = 0
 		end
 
 		-- Melee Taken Mod
@@ -1388,11 +1442,9 @@ end
 					dodgeChance = ,
 					parryChance = ,
 					blockChance = ,
-					blockValue = ,
 					resilience = ,
 					-- mob stats
 					mobLevel = ,
-					mobDamage = ,
 				}
 		
 		forceShield
@@ -1407,13 +1459,15 @@ end
 -- 4. TP_Table is then passed in TankPoints:GetTankPoints(TP_Table, TP_MELEE), and the results are writen in TP_Table
 -- 5. Read the results from TP_Table
 function TankPoints:AlterSourceData(tpTable, changes, forceShield)
+	
+	--self:Debug("AlterSourceData(): changes="..self:VarAsString(changes));
+
 
 	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
 
 	if changes.str and changes.str ~= 0 then
 		------- Formulas -------
 		-- totalStr = floor(baseStr * strMod) + floor(bonusStr * strMod)
-		-- blockValue = floor((floor(totalStr * 0.5 - 10) + blockValueFromItems + blockValueFromShield) * blockValueMod)
 		------- Talants -------
 		-- StatLogic:GetStatMod("MOD_STR")
 		-- ADD_PARRY_RATING_MOD_STR (formerly ADD_CR_PARRY_MOD_STR)
@@ -1422,14 +1476,6 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local strMod = StatLogic:GetStatMod("MOD_STR")
 		-- WoW floors numbers after being multiplied by stat mods, so to obtain the original value, you need to ceil it after dividing it with the stat mods
 		changes.str = max(0, floor((ceil(bonusStr / strMod) + changes.str) * strMod)) - bonusStr
-		
-		--[[As of patch 4.0.1 strength no longer affects the blocked amount; it's a flat 30% reduction			
-		-- Check if player has shield equipped
-		if doBlock then
-			local blockValueMod = StatLogic:GetStatMod("MOD_BLOCK_VALUE")
-			-- Subtract block value from current strength, add block value from new strength
-			tpTable.blockValue = floor((ceil(tpTable.blockValue / blockValueMod) - floor(totalStr * 0.5 - 10) + floor((totalStr + changes.str) * 0.5 - 10)) * blockValueMod)
-		end--]]
 		
 		if GetParryChance() ~= 0 and StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") ~= 0 then
 			local addParryRatingModStr = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR");
@@ -1515,7 +1561,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		------------------------
 		local _, _, bonusSta = UnitStat("player", 3) --WoW api. 3=stamina
 		local staMod = StatLogic:GetStatMod("MOD_STA")
-		self:Debug("AlterSourceData() LibStatLogic:GetStatMod(\"MOD_STA\") = "..staMod)
+		--self:Debug("AlterSourceData() LibStatLogic:GetStatMod(\"MOD_STA\") = "..staMod)
 
 		--20101213 Updated to LibStatLogic1.2, it's returning real values. Hack removed
 		--20101117 MOD_STA is temporarily returning 1.0. Let's force it a reasonable paladin default
@@ -1536,11 +1582,11 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 
 		-- Calculate player health
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
-		self:Debug("AlterSourceData()[modify stamina] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
+		--self:Debug("AlterSourceData()[modify stamina] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 
 		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.sta * 10) * healthMod) + 0.5)
 --		self:Print("changes.sta = "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
-		self:Debug("AlterSourceData()[modify stamina] Changing stamina by "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
+		--self:Debug("AlterSourceData()[modify stamina] Changing stamina by "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
 	
 	if (changes.playerHealth and changes.playerHealth ~= 0) then
@@ -1557,11 +1603,11 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		--               Increasing total health by 10%
 		------------------------
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
-		self:Debug("AlterSourceData()[modify health] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
+		--self:Debug("AlterSourceData()[modify health] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 		
 		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.playerHealth) * healthMod) + 0.5)
 
-		self:Debug("changes.playerHealth = "..(changes.playerHealth or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
+		--self:Debug("changes.playerHealth = "..(changes.playerHealth or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
 	
 	if (changes.armorFromItems and changes.armorFromItems ~= 0) or (changes.armor and changes.armor ~= 0) then
@@ -1633,24 +1679,40 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	
 	if changes.blockChance and changes.blockChance ~= 0 then
+		--self:Debug("Apply blockChance change "..changes.blockChance);
 		if doBlock then
 			tpTable.blockChance = tpTable.blockChance + changes.blockChance
 		end
 	end
 	
-	if changes.blockValue and changes.blockValue ~= 0 then
-		------- Formulas -------
-		-- blockValue = floor((floor(totalStr * 0.5 - 10) + blockValueFromItems + blockValueFromShield) * blockValueMod)
-		------- Talants -------
-		-- Warrior: Shield Mastery (Rank 3) - 3,8
-		--          Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
-		-- Paladin: Redoubt (Rank 3) - 2,18
-		--          Increases your block value by 10%/20%/30%
-		------------------------
-		if doBlock then
-			local blockValueMod = StatLogic:GetStatMod("MOD_BLOCK_VALUE")
-			tpTable.blockValue = floor((ceil(tpTable.blockValue / blockValueMod) + changes.blockValue) * blockValueMod)
-		end
+	--Convert Mastery Rating & Mastery into Block (paladins and warriors)
+	--self:Debug("changes.masteryRating="..self:VarAsString(changes.masteryRating));
+	if (changes.masteryRating and changes.masteryRating ~= 0) then
+		if (not changes.mastery) then --initialize mastery if needed
+			changes.mastery = 0;
+		end;
+
+		--GetEffectFromRating returns a percentage, divide by 100 to convert to fraction
+		local masteryFromRating = StatLogic:GetEffectFromRating(changes.masteryRating, "MASTERY_RATING", tpTable.playerLevel) * 0.01;
+		
+		
+		self:Debug("Adding %i Mastery Rating (%.2f%% Mastery) to existing %.2f%% Mastery", changes.masteryRating, masteryFromRating, tpTable.mastery);
+			
+		changes.mastery = changes.mastery + masteryFromRating / 100;
+	end
+	
+	if (changes.mastery and changes.mastery ~= 0) then
+		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 3) then
+			self:Debug("Adding %.2f Mastery for warrior to blockChance");
+			
+			tpTable.blockChance = tpTable.blockChance + StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)
+        elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 2) then
+			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)
+
+			self:Debug(string.format("Applying %.2f Mastery to paladin block chance (%.2f block chance)", changes.mastery*100, blockChanceFromMastery*100));
+			
+			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
+        end	
 	end
 	
 	if changes.resilience and changes.resilience ~= 0 then
@@ -1670,38 +1732,42 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 end
 
 function TankPoints:CheckSourceData(TP_Table, school, forceShield)
-	local ret = true
+	local result = true
+	
 	self.noTPReason = "should have TankPoints"
+	
 	local function cmax(var, maxi)
-		if ret then
+		if result then
 			if nil == TP_Table[var] then
 				local msg = var.." is nil"
 				self.noTPReason = msg
 				--self:Print(msg)
-				ret = nil
+				result = nil
 			else
 				TP_Table[var] = max(maxi, TP_Table[var])
 			end
 		end
 	end
 	local function cmax2(var1, var2, maxi)
-		if ret then
+		if result then
 			if nil == TP_Table[var1][var2] then
 				local msg = format("TP_Table[%s][%s] is nil", tostring(var1), tostring(var2))
 				self.noTPReason = msg
 				--self:Print(msg)
-				ret = nil
+				result = nil
 			else
 				TP_Table[var1][var2] = max(maxi, TP_Table[var1][var2])
 			end
 		end
 	end
+	
 	-- Check for nil
 	-- Fix values that are below minimum
 	cmax("playerLevel",1)
 	cmax("playerHealth",0)
 	cmax("mobLevel",1)
 	cmax("resilience",0)
+	
 	-- Melee
 	if (not school) or school == TP_MELEE then
 		cmax("mobCritChance",0)
@@ -1717,15 +1783,16 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		cmax("parryChance",0)
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
 			cmax("blockChance",0)
-			cmax("blockValue",0)
+			--cmax("blockValue",0)
 		else
 			TP_Table.blockChance = 0
-			TP_Table.blockValue = 0
+			--TP_Table.blockValue = 0
 		end
-		cmax("mobDamage",0)
+		--cmax("mobDamage",0)
 		cmax2("damageTakenMod",TP_MELEE,0)
 		cmax("shieldBlockDelay",0)
 	end
+	
 	-- Spell
 	if (not school) or school > TP_MELEE then
 		cmax("mobSpellCritChance",0)
@@ -1744,10 +1811,10 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 	end
 	
 	--force a display of the bad reason
-	if (not ret) then
+	if (not result) then
 		self:Debug("CheckSourceData: Source table is invalid ("..self.noTPReason..")")
 	end
-	return ret
+	return result
 end
 
 local shieldBlockChangesTable = {}
@@ -1777,7 +1844,56 @@ end
 
 --local ArdentDefenderRankEffect = {0.07, 0.13, 0.2}  20101017 Removed in patch 4.0.1
 
+-------------------
+-- GetBlockedMod --
+-------------------
+function TankPoints:GetBlockedMod(forceShield)
+	--[[
+		GetBlockedMod returns the average damage reduction due to a shield.
+		
+		Arguments
+			forceShield: Forces the calculation to assume that a shield is equipped. The default
+				behaviour is to check if the player has a shield equipped.
+				If the player has no shield equipped then GetBlockdMod returns zero (since nothing can be blocked)
+
+		Returns
+			The amount of damage blocked by a shield
+			
+			e.g. Warrior: 30%
+			     Warriorreduction due to blocking attacks. For example: 
+			
+			A block chance of 36%, with paladin's shield blocking 40% of the damage the shield reduces damage by 14.4%. (36% * 40% = 14.4%)
+	--]]
+
+	if (not self:ShieldIsEquipped()) and (forceShield ~= true) then -- doesn't have shield equipped
+		return 0
+	end
+
+	local result = 0.30; --by default all blocked attacks block a flat 30% of incoming damage
+		
+	if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
+		-- Warrior Talent: Critical Block (Rank 3) - 3,24
+		--  Your successful blocks have a 20/40/60% chance to block double the normal amount
+		local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.2
+		result = result * critBlock
+	elseif (self.playerClass == "PALADIN") then
+		-- Paladin Talent: Holy Shield - 2,15
+		-- 	Shield blocks for an additional 10% for 20 sec.
+		local holyShieldTalentRank = select(5, GetTalentInfo(2, 15));
+
+		--self:Debug("GetBlockedMod: Paladin has "..holyShieldTalentRank.." points in Holy Shield");
+		if (holyShieldTalentRank > 0) then
+			result = 0.40
+		end;
+	end;
+	
+	return result
+end;
+
+
 function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
+	--Called by GetTankPoints(...)
+
 	------------------
 	-- Check Inputs --
 	------------------
@@ -1803,16 +1919,16 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--]]
 		local _, _, _, _, r = GetTalentInfo(2, 20) --page 2, talent 20
 
---		self:Debug("Ardent Defender points = "..r)
+		self:Debug("Ardent Defender points = "..r)
 
-		local forceARdentDefender = true
+		local forceArdentDefender = true
 		if (r > 0) or (forceArdentDefender) then
 			--local inc = 0.35 / (1 - ArdentDefenderRankEffect[r]) - 0.35 -- 8.75% @ rank3    20101017: Old model, when ardent defender was passive
 			local inc = round(TP_Table.playerHealth * ARDENT_DEFENDER_DAMAGE_REDUCTION * (10/180)); --20% increase for some fraction of the time
 
 			TP_Table.playerHealth = TP_Table.playerHealth + inc
 
-			self:Debug("TankPoints:CalculateTankPoints(): Applied Ardent Defender health effective increase of "..inc..". New health = "..TP_Table.playerHealth)
+			--self:Debug("TankPoints:CalculateTankPoints(): Applied Ardent Defender health effective increase of "..inc..". New health = "..TP_Table.playerHealth)
 		end
 	end
 	
@@ -1868,21 +1984,9 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		
 		-- Mob's Crit Damage Mod
 		TP_Table.mobCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
-		-- Mob Damage
-		-- blocked value is subtracted from the damage after armor and stance mods are factored in
-		TP_Table.mobDamage = TP_Table.mobDamage * TP_Table.damageTakenMod[TP_MELEE] * (1 - TP_Table.armorReduction)
-		-- Blocked Damage Percentage (blockedMod)
-		-- ex: if mob hits you for 1000 and you block 200 of it, then you avoid 200/1000 = 20% of the damage
-		-- this value multiplied by block% can now be treated like dodge and parry except that these avoid 100% of the damage
-		-------------
-		-- Warrior Talent: Critical Block (Rank 3) - 3,24
-		--  Your successful blocks have a 20/40/60% chance to block double the normal amount
-		if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
-			local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.2
-			TP_Table.blockedMod = min(1, TP_Table.blockValue * critBlock / TP_Table.mobDamage)
-		else
-			TP_Table.blockedMod = min(1, TP_Table.blockValue / TP_Table.mobDamage)
-		end
+		
+		--Get the percentage of an attack that is blocked, if it is blocked
+		TP_Table.blockedMod = self:GetBlockedMod(forceShield);
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
@@ -1977,11 +2081,19 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	local function calc_melee()
 		-- School Reduction
 		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
-		-- Total Reduction
-		TP_Table.totalReduction[TP_MELEE] = 1 - (
-			1 - TP_Table.blockChance * TP_Table.blockedMod - TP_Table.parryChance - TP_Table.dodgeChance - TP_Table.mobMissChance
-			+ (TP_Table.mobCritChance * TP_Table.mobCritBonus * TP_Table.mobCritDamageMod)
-			+ (TP_Table.mobCrushChance * 0.5)
+		
+		
+		-- Total Reduction 
+		TP_Table.totalReduction[TP_MELEE] = 1 - 
+			(
+				--this is the heart of the combat table
+				1 
+				- TP_Table.mobMissChance
+				- TP_Table.dodgeChance 
+				- TP_Table.parryChance 
+				- TP_Table.blockChance * TP_Table.blockedMod 
+				+ (TP_Table.mobCritChance * TP_Table.mobCritBonus * TP_Table.mobCritDamageMod)
+				+ (TP_Table.mobCrushChance * 0.5)
 			) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
 		-- TankPoints
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
@@ -2063,7 +2175,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		copyTable(inputCopy, TP_Table)
 		-- Build shieldBlockChangesTable
 		shieldBlockChangesTable.blockChance = 1 -- 100%
-		shieldBlockChangesTable.blockValue = inputCopy.blockValue -- +100%
+		shieldBlockChangesTable.blockValue = 0 --inputCopy.blockValue -- +100%
 		-- Calculate TankPoints assuming shield block is always up
 		self:AlterSourceData(inputCopy, shieldBlockChangesTable, forceShield)
 		self:CalculateTankPoints(inputCopy, TP_MELEE, forceShield)
@@ -2086,7 +2198,6 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		--normally all blocked attacks are reduced by a fixed 30%. Holy shield increases the blocked amount by 10%
 
 		--Assume 100% uptime on Holy Shield
-		TP_Table.blockValue = round(TP_Table.blockValue * 1.10)
 		
 		--self:Debug("TankPoints:GetTankPoints: Calling paladin version of TankPoints:CalculateTankPoints")
 		self:CalculateTankPoints(TP_Table, school, forceShield)
@@ -2105,6 +2216,66 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	end
 	return TP_Table
 end
+
+function TankPoints:IntToStr(value)
+	local s = tostring(value)
+	local length = strlen(s)
+	if length < 4 then
+		return s
+	elseif length < 7 then
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)$", "%1,%2", 1))
+	elseif length < 10 then
+		return (gsub(s, "^([+-]?%d%d?%d?)(%d%d%d)(%d%d%d)$", "%1,%2,%3", 1))
+	else
+		return s
+	end
+end
+
+function TankPoints:DumpTable(tpTable)
+
+--	self:UpdateDataTable();
+
+	if not (tpTable) then
+		self:Print("TankPoints table is empty");
+		return;
+	end
+
+	--self:Print(self:VarAsString(tpTable));
+	
+	--see UpdateDataTable for TP clculation
+	
+	local function IntToStr(value)
+		return self:IntToStr(value)
+	end;
+	
+	local function PercentToStr(value)
+		return string.format("%.2f%%", value*100)
+	end;
+	
+	self:Print("TankPoints table:");
+	self:Print("   playerHealth: "..IntToStr(tpTable.playerHealth));
+	self:Print("   playerLevel: "..IntToStr(tpTable.playerLevel));
+	self:Print("   mobLevel: "..IntToStr(tpTable.mobLevel));
+	self:Print("   armor: "..IntToStr(tpTable.armor));
+	self:Print("   mobMissChance: "..PercentToStr(tpTable.mobMissChance));
+	self:Print("   dodgeChance: "..PercentToStr(tpTable.dodgeChance));
+	self:Print("   parryChance: "..PercentToStr(tpTable.parryChance));
+	self:Print("   blockChance: "..PercentToStr(tpTable.blockChance));
+	self:Print("   mobCritChance: "..PercentToStr(tpTable.mobCritChance));
+	self:Print("   mobCritBonus: "..PercentToStr(tpTable.mobCritBonus));
+	self:Print("   mobCritDamageMod: "..PercentToStr(tpTable.mobCritDamageMod));
+	self:Print("   mobCrushChance: "..PercentToStr(tpTable.mobCrushChance));
+	self:Print("   armorReduction: "..PercentToStr(tpTable.armorReduction));
+	self:Print("   blockedMod: "..PercentToStr(tpTable.blockedMod));
+	self:Print("   mobHitChance: "..PercentToStr(tpTable.mobHitChance));
+	self:Print("   mobContactChance: "..PercentToStr(tpTable.mobContactChance));
+	self:Print("   guaranteedReduction: "..PercentToStr(tpTable.guaranteedReduction[TP_MELEE]));
+	self:Print("   effectiveHealth: "..IntToStr(tpTable.effectiveHealth[TP_MELEE]));
+	self:Print("   effectiveHealthWithBlock: "..IntToStr(tpTable.effectiveHealthWithBlock[TP_MELEE]));
+	self:Print("   totalReduction: "..PercentToStr(tpTable.totalReduction[TP_MELEE]));
+	self:Print("   tankPoints: "..IntToStr(tpTable.tankPoints[TP_MELEE]));
+
+end;
 
 
 -----------------------------------
@@ -2137,7 +2308,7 @@ function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 	local meleeReduction = self.resultsTable.totalReduction[TP_MELEE] * 100
 	self:StatBoxSet(line2, self.SchoolName[TP_MELEE]..L[" DR"], meleeReduction, true)
 	-- Line3: BlockValue
-	local blockValue = self.resultsTable.blockValue
+	local blockValue = 0; --self.resultsTable.blockValue
 	self:StatBoxSet(line3, L["Block Value"], blockValue)
 	-- Line4: SpellTankPoints
 	local spellTankPoints = commaValue(floor(self.resultsTable.tankPoints[self.currentSchool]))
@@ -2189,7 +2360,7 @@ function TankPoints:PaintEffectiveHealth(line1, line2, line3, line4, line5, line
 	if self.playerClass == "WARRIOR" or self.playerClass == "PALADIN"then
 		self:StatBoxSet(line2, L["EH Block"], commaValue(floor(self.resultsTable.effectiveHealthWithBlock[TP_MELEE])))
 	end
- 	self:StatBoxSet(line3, L["Block Value"], self.resultsTable.blockValue)
+ 	self:StatBoxSet(line3, L["Block Value"], 0) --self.resultsTable.blockValue)
  	self:StatBoxSet(line4, self.SchoolName[self.currentEHSchool]..L[" EH"], commaValue(floor(self.resultsTable.effectiveHealth[self.currentEHSchool])))
 	self:StatBoxSet(line5, self.SchoolName[self.penultimateEHSchool]..L[" EH"], commaValue(floor(self.resultsTable.effectiveHealth[self.penultimateEHSchool])))
 end
@@ -2306,7 +2477,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-- Your Stats
 	GameTooltip:AddLine(L["Your Reductions"], HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	addline(L["Health"],commaValue(resultDT.playerHealth))
-	addline(L["Block Value"], resultDT.blockValue)
+	addline(L["Block Value"], 0) --resultDT.blockValue)
 	addline(L["Armor Reduction"], format("%.2f%%", 100 * resultDT.armorReduction))
 	addline(L["Talent/Buff/Stance Reductions"], format("%.2f%%", 100 * (1 - StatLogic:GetStatMod("MOD_DMG_TAKEN","MELEE"))))
 	addline(L["Guaranteed Reduction"], format("%.2f%%", 100 * resultDT.guaranteedReduction[TP_MELEE]))
@@ -2347,7 +2518,7 @@ function TankPoints:PaintEffectiveHealth_EffectiveHealthWithBlockTooltip()
 	-- Block Value --
 	-----------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.blockValue = newDT.blockValue + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
+	newDT.blockValue = 0; --newDT.blockValue + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	self:GetTankPoints(newDT, TP_MELEE)
 	addline(format("%.2f", 2/0.65).." "..L["Block Value"].." = ", delta_eh(newDT, resultDT))
 	--[[
@@ -2957,9 +3128,9 @@ function TankPoints.BlockValueFrame_OnEnter(frame, motion)
 
 	-----------------------
 	-- Mob Damage before DR
-	textL = L["Mob Damage before DR"]..":"
-	textR = format("%d", TankPoints:GetMobDamage(resultsDT.mobLevel))
-	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	--textL = L["Mob Damage before DR"]..":"
+	--textR = format("%d", TankPoints:GetMobDamage(resultsDT.mobLevel))
+	--GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	----------------------
 	-- Mob Damage after DR
 	textL = L["Mob Damage after DR"]..":"
