@@ -167,7 +167,10 @@ end
 -- Core --
 ----------
 -- Build changes table for TP:AlterSourceData from StatLogic:GetDiff table
-function TPTips:BuildChanges(changes, table)
+function TPTips:BuildChanges(reserved, table)
+	TP:Debug("TPTips:BuildChanges()  StatLogic changes table="..TP:VarAsString(table))
+
+	local changes = {}
 	changes.str = table.STR
 	changes.agi = table.AGI
 	changes.sta = table.STA
@@ -183,6 +186,9 @@ function TPTips:BuildChanges(changes, table)
 	end
 	if table.BLOCK_RATING then
 		changes.blockChance = StatLogic:GetEffectFromRating(table.BLOCK_RATING, CR_BLOCK, TP.playerLevel) * 0.01
+	end
+	if table.MASTERY_RATING then
+		changes.masteryRating = table.MASTERY_RATING;
 	end
 	changes.blockValue = table.BLOCK_VALUE
 	changes.resilience = table.RESILIENCE_RATING
@@ -235,16 +241,30 @@ end
 -- TankPointsTooltips:BuildChanges({}, StatLogic:GetDiff(24396))
 function TPTips.ProcessTooltip(tooltip, name, link)
 	if not (TP.resultsTable and TP.resultsTable.tankPoints) then
+		TP:Debug("(TPTips.ProcessTooltip) TP:resultsTable or TP:resultsTable.tankPoints is nil; building with call to TP:ProcessTooltip");
+		TP:Debug("(TPTips.ProcessTooltip) TP:resultsTable = "..TP:VarAsString(TP.resultsTable));
+		TP:Debug("(TPTips.ProcessTooltip) TP:resultsTable = "..TP:VarAsString(TP.resultsTable.tankPoints));
 		TP:UpdateDataTable()
 	end
+
+	assert(TP)
+	assert(TP.resultsTable)
+	assert(TP.resultsTable.tankPoints)	
+	
 	local profile = TankPoints.db.profile
+	
 	-- Check if option is enabled
 	if not (profile.showTooltipDiff or profile.showTooltipTotal or
 			profile.showTooltipDRDiff or profile.showtooltipDRTotal or
 		    profile.showTooltipEHDiff or profile.showTooltipEHTotal or
-		    profile.showTooltipEHBDiff or profile.showTooltipEHBTotal) then return end
+		    profile.showTooltipEHBDiff or profile.showTooltipEHBTotal) then 
+		TP:Debug("TPTips:ProcessTooltip: No option to show toolsips enabled. Exiting");
+			return 
+	end
+			
 	-- Check if item is equippable, bags will still pass through
 	if not (IsEquippableItem(link) or (TPTips:GetItemSubType(link) == L["Gems"])) then return end
+	
 	-- Get data from cache if available
 	if exist_cache_entry(link) then
 		local tpleft,tpright, ehleft,ehright, ehbleft,ehbright,drleft,drright = get_cache(link)
@@ -263,6 +283,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 		tooltip:Show()
 		return
 	end
+	
 	-- Get diff tables
 	local diffTable1, diffTable2
 	if TPTips:GetItemSubType(link) == L["Gems"] then
@@ -270,25 +291,31 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	else
 		diffTable1, diffTable2 = StatLogic:GetDiff(link)
 	end
+	
 	-- Check for bags
 	if not diffTable1 then
 		return
 	end
+	
 	-- Item type
 	local itemType = diffTable1.itemType
 	local tpRight, ehRight, ehbRight, drRight
+	
 	-- Calculate current TankPoints
 	local tpSource = {}
 	TP:GetSourceData(tpSource, TP_MELEE)
+	
 	local tpResults = {}
 	copyTable(tpResults, tpSource)
 	TP:GetTankPoints(tpResults, TP_MELEE)
+	
 	-- Update and ClearCache if different
 	assert(TP)
 	assert(TP.resultsTable)
 	assert(TP.resultsTable.tankPoints)
 	assert(tpResults)
 	assert(tpResults.tankPoints)
+	
 	if floor(TP.resultsTable.tankPoints[TP_MELEE]) ~= floor(tpResults.tankPoints[TP_MELEE]) then
 		copyTable(TP.sourceTable, tpSource)
 		copyTable(TP.resultsTable, tpResults)
@@ -298,6 +325,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	-- Calculate TP difference with 1st equipped item --
 	----------------------------------------------------
 	local tpTable = {}
+
 	-- Set the forceShield arg
 	local forceShield
 	-- if not equipped shield and item is shield then force on
@@ -311,12 +339,20 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	end
 	-- Get the tp table
 	TP:GetSourceData(tpTable, TP_MELEE, forceShield)
+	
 	-- Build changes table
 	local changes = TPTips:BuildChanges({}, diffTable1)
+	
 	-- Alter tp table
+	--TP:Debug("Data before changes: "..TP:VarAsString(tpTable));
+	TP:Debug("TPTips.ProcessChanges(): Changes= "..TP:VarAsString(changes))
 	TP:AlterSourceData(tpTable, changes, forceShield)
+	--TP:Debug("Data after changes: "..TP:VarAsString(tpTable));	
+	
 	-- Calculate TankPoints from tpTable
 	TP:GetTankPoints(tpTable, TP_MELEE, forceShield)
+	--TP:Debug("Data with TankPoints calculations: "..TP:VarAsString(tpTable));	
+	
 	-- Calculate tp difference
 	local function rightFromDifference(before, after, diffp, totalp, diff_format, tot_format)
 		diff_format = diff_format or "%+d"

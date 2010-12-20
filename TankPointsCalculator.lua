@@ -91,6 +91,9 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	TPCCombatTableFrameTitle:SetText(L["Combat Table"])
 	TPCPlayerStatsFrameTitle:SetText(L["Player Stats"])
 	TPCMobStatsFrameTitle:SetText(L["Mob Stats"])
+
+--	TPCResults1.tooltip = "asdfasfsdf" --TankPoints is a measure of your theoretical\nmitigation (dodge, parry, etc) in proportion\nto your health."
+
 	-- Set label text
 	TPCalc.playerClass = select(2, UnitClass("player"))
 	TPCalc:SetLabels()
@@ -104,8 +107,8 @@ function TankPointsCalculatorFrame_OnLoad(self)
 
 	TPCPlayerStats5.tooltip =  L["Armor reduces physical damage taken"] --Armor (Items)
 	TPCPlayerStats6.tooltip =  L["Armor reduces physical damage taken"] --Armor
-	TPCPlayerStats7.tooltip =  L["(removed) Defense rating was removed from the game in patch 4.0.1."] --Defense rating
-	TPCPlayerStats8.tooltip =  L["(removed) Defense was removed from the game in patch 4.0.1."] --Defense
+	TPCPlayerStats7.tooltip =  L["TPCalc_PlayerStatsTooltip_MasteryRating"] --Mastery Rating
+	TPCPlayerStats8.tooltip =  L["TPCalc_PlayerStatsTooltip_Mastery"] --Mastery
 	TPCPlayerStats9.tooltip =  L["Dodge rating improves your chance to dodge. A dodged attack does no damage"] --Dodge rating
 	TPCPlayerStats10.tooltip = L["Your chance to dodge an attack. A dodged attack does no damage"] --Dodge rating
 	TPCPlayerStats11.tooltip = L["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] --Parry Rating
@@ -118,7 +121,7 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RESISTANCES")
 	self:RegisterEvent("UNIT_STATS")
-	self:RegisterEvent("UNIT_DEFENSE")
+	self:RegisterEvent("UNIT_MASTERY") --renamed from UNIT_DEFENSE; i have no idea if there even *is* a UNIT_MASTERY event
 	self:RegisterEvent("UNIT_MAXHEALTH")
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -196,14 +199,14 @@ TPCalc.LabelText = {
 		L["Hit"]..L["(%)"],
 	},
 	{-- TPCPlayerStats1
-		SPELL_STAT1_NAME, -- "Strength" (hidden Forceful Deflection ability gives 0.25 parry per strength)
+		SPELL_STAT1_NAME, -- "Strength" (Hidden ability "Forceful Deflection" gives 0.25 parry per strength)
 		SPELL_STAT2_NAME.." (n/a)", -- "Agility"
 		SPELL_STAT3_NAME, -- "Stamina"
 		L["Max Health"],
 		"["..ARMOR.." - "..L["Items"].."]",
 		"["..ARMOR.."]",
-		"["..COMBAT_RATING_NAME2.." (removed)]", -- "Defense Rating"
-		"["..DEFENSE.." (removed)]",
+		"["..ITEM_MOD_MASTERY_RATING_SHORT.."]", -- GlobalStrings.ITEM_MOD_MASTERY_RATING_SHORT "Mastery Rating"
+		"["..STAT_MASTERY..L["(%)"].."]", --GlobalStrings.STAT_MASTERY "Mastery"
 		"["..COMBAT_RATING_NAME3.."]", -- "Dodge Rating"
 		"["..DODGE..L["(%)"].."]",
 		"["..COMBAT_RATING_NAME4.."]", -- "Parry Rating"
@@ -211,7 +214,7 @@ TPCalc.LabelText = {
 		"["..COMBAT_RATING_NAME5.."]", -- "Block Rating"
 		"["..BLOCK..L["(%)"].."]",
 		L["Block Value"],
-		COMBAT_RATING_NAME15.. "(removed)", -- "Resilience"
+		COMBAT_RATING_NAME15, -- "Resilience"
 	},
 	{-- TPCMobStats1
 		L["Mob Level"],
@@ -223,7 +226,7 @@ TPCalc.LabelText = {
 --[[ 
 	Set label text
 	
-	LabelText is an array that contains all the text to show in the calculator.
+	LabelText is a member variable that contains all the text to show in the calculator.
 	This function copies all the strings into TankPointsCalculatorFrame
 	
 	20101213: Where are the labels set!?
@@ -282,6 +285,7 @@ local round = function(n,decimal_places)
 end
 
 
+
 --[[
 	This function is the one responsible for filling in all the values on the calculator screen.
 	- start with the sourceDT
@@ -294,7 +298,7 @@ function TPCalc:UpdateResults()
 	-- Update base data
 	TankPoints:GetSourceData(self.sourceDT) --sourceDT holds our initial real stats
 
-	--TankPoints:Debug(table.tostring(self.sourceDT))
+	--TankPoints:Debug("TPCalc:UpdateResults() - inital values: "..TankPoints:VarAsString(self.sourceDT))
 	--TankPoints:Debug("1. sourceDT.mobMissChance = "..self.sourceDT.mobMissChance);
 	
 	copyTable(self.resultsDT, self.sourceDT) --perform TankPoints calculations on a resultsDT table (we want a copy because it applies modifiers to things like stamina and health)
@@ -352,12 +356,14 @@ function TPCalc:UpdateResults()
 	-- Armor
 	changes.armor = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
-	-- Defense Rating
-	changes.defenseRating = _G[prefix..i..inputEditBox]:GetNumber()
+
+	-- Mastery Rating
+	changes.masteryRating = _G[prefix..i..inputEditBox]:GetNumber();
 	i = i + 1
-	-- Defense
-	changes.defense = _G[prefix..i..inputEditBox]:GetNumber()
+	-- Mastery
+	changes.mastery = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
+	
 	-- Dodge Rating
 	changes.dodgeChance = 0
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
@@ -699,9 +705,17 @@ function TPCalc:UpdateResults()
 		_G[prefix..i..newStatText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	end
 	
-	-- Defense Rating
+	--[[
+		Mastery 14.20 (8.00+6.20)
+		Mastery Rating 645 (+6.20 mastery)
+		
+		GetCombatRating(CR_MASTERY) = 645
+		GetCombatRatingBonus(CR_MASTERY) = 6.2027794493839
+		GetMastery() = 14.202779769897
+	--]]
+	-- Mastery Rating
 	i = i + 1
-	current = GetCombatRating(CR_DEFENSE_SKILL)
+	current = GetCombatRating(CR_MASTERY)
 	new = floor(current + _G[prefix..i..inputEditBox]:GetNumber())
 	_G[prefix..i..originalStatText]:SetText(current)
 	_G[prefix..i..newStatText]:SetText(new)
@@ -713,12 +727,12 @@ function TPCalc:UpdateResults()
 		_G[prefix..i..newStatText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	end
 	
-	-- Defense
+	-- Mastery
 	i = i + 1
-	current = self.resultsDT.defense
-	new = floor(newDT.defense)
-	_G[prefix..i..originalStatText]:SetText(current)
-	_G[prefix..i..newStatText]:SetText(new)
+	current = floor(self.resultsDT.mastery * 100) / 100 --round to two decimal places, and show as a percentage
+	new = floor(newDT.mastery * 100) / 100
+	_G[prefix..i..originalStatText]:SetText(format("%.2f", current))
+	_G[prefix..i..newStatText]:SetText(format("%.2f", new))
 	if (new > current) then
 		_G[prefix..i..newStatText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 	elseif (new < current) then
@@ -814,8 +828,8 @@ function TPCalc:UpdateResults()
 	
 	-- Block Value
 	i = i + 1
-	current = self.resultsDT.blockValue
-	new = floor(newDT.blockValue)
+	current = 0 --self.resultsDT.blockValue
+	new = 0; --floor(newDT.blockValue)
 	_G[prefix..i..originalStatText]:SetText(current)
 	_G[prefix..i..newStatText]:SetText(new)
 	if (new > current) then
@@ -860,8 +874,8 @@ function TPCalc:UpdateResults()
 	
 	-- mobDamage
 	i = i + 1
-	current = floor(TankPoints:GetMobDamage(self.resultsDT.mobLevel))
-	new = floor(TankPoints:GetMobDamage(newDT.mobLevel) + _G[prefix..i..inputEditBox]:GetNumber())
+	current = 0; --floor(TankPoints:GetMobDamage(self.resultsDT.mobLevel))
+	new = floor(current + _G[prefix..i..inputEditBox]:GetNumber())
 	_G[prefix..i..originalStatText]:SetText(current)
 	_G[prefix..i..newStatText]:SetText(new)
 	if (new > current) then
