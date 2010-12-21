@@ -1921,7 +1921,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 
 		self:Debug("Ardent Defender points = "..r)
 
-		local forceArdentDefender = true
+		local forceArdentDefender = false
 		if (r > 0) or (forceArdentDefender) then
 			--local inc = 0.35 / (1 - ArdentDefenderRankEffect[r]) - 0.35 -- 8.75% @ rank3    20101017: Old model, when ardent defender was passive
 			local inc = round(TP_Table.playerHealth * ARDENT_DEFENDER_DAMAGE_REDUCTION * (10/180)); --20% increase for some fraction of the time
