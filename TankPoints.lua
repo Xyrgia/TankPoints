@@ -1460,10 +1460,7 @@ end
 -- 5. Read the results from TP_Table
 function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	
-	--self:Debug("AlterSourceData(): changes="..self:VarAsString(changes));
-
-
-	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
+	self:Debug("AlterSourceData(): changes="..self:VarAsString(changes));
 
 	if changes.str and changes.str ~= 0 then
 		------- Formulas -------
@@ -1472,7 +1469,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- StatLogic:GetStatMod("MOD_STR")
 		-- ADD_PARRY_RATING_MOD_STR (formerly ADD_CR_PARRY_MOD_STR)
 		------------------------
-		local totalStr, _, bonusStr = UnitStat("player", 1)
+		local totalStr, _, bonusStr = UnitStat("player", 1) --1=Strength
 		local strMod = StatLogic:GetStatMod("MOD_STR")
 		-- WoW floors numbers after being multiplied by stat mods, so to obtain the original value, you need to ceil it after dividing it with the stat mods
 		changes.str = max(0, floor((ceil(bonusStr / strMod) + changes.str) * strMod)) - bonusStr
@@ -1482,8 +1479,13 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		
 			local parryRatingIncrease = floor((bonusStr + changes.str) * addParryRatingModStr) - floor(bonusStr * addParryRatingModStr)
 			
-			local parry = StatLogic:GetEffectFromRating(parryRatingIncrease, CR_PARRY, tpTable.playerLevel)
-			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", parry) * 0.01
+			local parry = StatLogic:GetEffectFromRating(parryRatingIncrease, CR_PARRY, tpTable.playerLevel); --GetEffectFromRating returns as percentage rather than fraction
+			parry = StatLogic:GetAvoidanceGainAfterDR("PARRY", parry) * 0.01; --apply diminishing returns, and convert percentage to fraction
+			
+			self:Debug(string.format("   Adding %.4f%% Parry (%d Parry Rating from %d Strength) to existing %.4f%% Parry",
+					parry*100, parryRatingIncrease, changes.str, tpTable.parryChance*100));
+			
+			tpTable.parryChance = tpTable.parryChance + parry;
 		end
 	end
 	
@@ -1584,7 +1586,14 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
 		--self:Debug("AlterSourceData()[modify stamina] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 
-		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.sta * 10) * healthMod) + 0.5)
+	
+		local playerHealthWithoutModifiers = round(tpTable.playerHealth / healthMod);
+		local healthFromStaminaWithoutModifiers = changes.sta * 10; --We will later reapply the MOD_HEALTH
+		
+		self:Debug(string.format("   Adding %.2f Health from %.2f Stamina (%d before health modifier of %.4f%%) to existing %d Health",
+				healthFromStaminaWithoutModifiers*healthMod, changes.sta, healthFromStaminaWithoutModifiers, healthMod*100, tpTable.playerHealth));
+		
+		tpTable.playerHealth = round((playerHealthWithoutModifiers + healthFromStaminaWithoutModifiers) * healthMod)
 --		self:Print("changes.sta = "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 		--self:Debug("AlterSourceData()[modify stamina] Changing stamina by "..(changes.sta or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
@@ -1605,7 +1614,10 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
 		--self:Debug("AlterSourceData()[modify health] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 		
-		tpTable.playerHealth = floor(((floor((tpTable.playerHealth / healthMod) + 0.5) + changes.playerHealth) * healthMod) + 0.5)
+		self:Debug(string.format("   Adding %.2f Health (%.2f before health modifier of %.4f%%) to existing %d Health",
+				changes.playerHealth*healthMod, changes.playerHealth, healthMod*100, tpTable.playerHealth));
+		
+		tpTable.playerHealth = round((round(tpTable.playerHealth / healthMod) + changes.playerHealth) * healthMod)
 
 		--self:Debug("changes.playerHealth = "..(changes.playerHealth or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
@@ -1640,9 +1652,14 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		--local armorFromItem = floor(((tpTable.armor - agility * 2 - pos + neg) / armorMod) + 0.5)
 		--tpTable.armor = floor(((armorFromItem + changes.armor) * armorMod) + 0.5) + agility * 2 + pos - neg
 		--(floor((ceil(stamina / staMod) + changes.sta) * staMod) - stamina)
-		tpTable.armor = floor(((floor(((tpTable.armor - agility * 2 - pos + neg) / armorMod) + 0.5) + changes.armorFromItems) * armorMod) + 0.5) + agility * 2 + pos - neg + changes.armor
+		tpTable.armor = 
+				round(
+					( round((tpTable.armor - agility * 2 - pos + neg) / armorMod) + changes.armorFromItems )*armorMod
+				) + agility*2 + pos - neg + changes.armor
 		--self:Print(tpTable.armor.." = floor(((floor((("..tpTable.armor.." - "..agility.." * 2 - "..pos.." + "..neg..") / "..armorMod..") + 0.5) + "..changes.armor..") * "..armorMod..") + 0.5) + "..agility.." * 2 + "..pos.." - "..neg)
 	end
+	
+	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
 	
 	--[[20101018: Defense removed from game
 	if changes.defense and changes.defense ~= 0 then
@@ -1692,24 +1709,25 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			changes.mastery = 0;
 		end;
 
-		--GetEffectFromRating returns a percentage, divide by 100 to convert to fraction
-		local masteryFromRating = StatLogic:GetEffectFromRating(changes.masteryRating, "MASTERY_RATING", tpTable.playerLevel) * 0.01;
-		
-		
-		self:Debug("Adding %i Mastery Rating (%.2f%% Mastery) to existing %.2f%% Mastery", changes.masteryRating, masteryFromRating, tpTable.mastery);
+		--GetEffectFromRating returns a percentage
+		local masteryFromRating = StatLogic:GetEffectFromRating(changes.masteryRating, "MASTERY_RATING", tpTable.playerLevel); --leave Mastery as a percentage (e.g. 1.32 = 1.32%)
+				
+		self:Debug("   Adding %.2f%% Mastery (from %d Mastery Rating) to existing %.2f%% Mastery", masteryFromRating, changes.masteryRating, tpTable.mastery);
 			
-		changes.mastery = changes.mastery + masteryFromRating / 100;
+		changes.mastery = changes.mastery + masteryFromRating;
 	end
 	
 	if (changes.mastery and changes.mastery ~= 0) then
 		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 3) then
-			self:Debug("Adding %.2f Mastery for warrior to blockChance");
+			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)*0.01;
+			self:Debug(string.format("   Adding %.4f%% Block Chance through warrior mastery to existing %.2f%% Block Chance", blockChanceFromMastery*100, tpTable.blockChance*100));
 			
-			tpTable.blockChance = tpTable.blockChance + StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)
+			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
         elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 2) then
-			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)
+			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)*0.01
 
-			self:Debug(string.format("Applying %.2f Mastery to paladin block chance (%.2f block chance)", changes.mastery*100, blockChanceFromMastery*100));
+			self:Debug(string.format("   Adding %.4f%% Block Chance from mastery to existing %.4f%% Block Chance)", 
+					blockChanceFromMastery*100, tpTable.blockChance*100));
 			
 			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
         end	
@@ -1919,7 +1937,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--]]
 		local _, _, _, _, r = GetTalentInfo(2, 20) --page 2, talent 20
 
-		self:Debug("Ardent Defender points = "..r)
+		--self:Debug("Ardent Defender points = "..r)
 
 		local forceArdentDefender = false
 		if (r > 0) or (forceArdentDefender) then
@@ -1933,7 +1951,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	end
 	
 	-- Resilience Mod
-	TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, COMBAT_RATING_RESILIENCE_CRIT_TAKEN, TP_Table.playerLevel) * 0.01
+	TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, COMBAT_RATING_RESILIENCE_CRIT_TAKEN, TP_Table.playerLevel) * 0.01;  --GetEffectFromRating returns as percentage rather than fraction (GRRRRRRRR!)
 	if (not school) or school == TP_MELEE then
 		-- Armor Reduction
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
@@ -2249,7 +2267,7 @@ function TankPoints:DumpTable(tpTable)
 	end;
 	
 	local function PercentToStr(value)
-		return string.format("%.2f%%", value*100)
+		return string.format("%.4f%%", value*100)
 	end;
 	
 	self:Print("TankPoints table:");
@@ -2261,6 +2279,7 @@ function TankPoints:DumpTable(tpTable)
 	self:Print("   dodgeChance: "..PercentToStr(tpTable.dodgeChance));
 	self:Print("   parryChance: "..PercentToStr(tpTable.parryChance));
 	self:Print("   blockChance: "..PercentToStr(tpTable.blockChance));
+	self:Print("   mastery: "..PercentToStr(tpTable.mastery)*0.01); --Mastery is stored as true percentage, divide by 100 to convert to fraction before printing
 	self:Print("   mobCritChance: "..PercentToStr(tpTable.mobCritChance));
 	self:Print("   mobCritBonus: "..PercentToStr(tpTable.mobCritBonus));
 	self:Print("   mobCritDamageMod: "..PercentToStr(tpTable.mobCritDamageMod));
