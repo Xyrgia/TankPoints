@@ -168,7 +168,7 @@ end
 ----------
 -- Build changes table for TP:AlterSourceData from StatLogic:GetDiff table
 function TPTips:BuildChanges(reserved, table)
-	TP:Debug("TPTips:BuildChanges()  StatLogic changes table="..TP:VarAsString(table))
+	--TP:Debug("TPTips:BuildChanges()  StatLogic changes table="..TP:VarAsString(table))
 
 	local changes = {}
 	changes.str = table.STR
