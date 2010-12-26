@@ -35,6 +35,7 @@ Locales\Locales.xml
 # Core #
 ########
 TankPoints.lua
+options.lua
 
 ##############
 # Calculator #
