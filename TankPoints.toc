@@ -25,11 +25,14 @@ UTF8\utf8.lua
 # Ace Libraries #
 #################
 embeds.xml
+#the downside of using xml include files is that if the file has an error, WoW will eat it, and the file will silently not be loaded. GRRRRRRR
 
 ######################
 # Localization Files #
 ######################
 Locales\Locales.xml
+#the downside of using xml include files is that if the file has an error, WoW will eat it, and the file will silently not be loaded. GRRRRRRR
+#Locales\enUS.lua
 
 ########
 # Core #

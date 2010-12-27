@@ -12,8 +12,7 @@ LastUpdate: $Date$
 -- Libraries --
 ---------------
 local StatLogic = LibStub:GetLibrary("LibStatLogic-1.2")
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
-
+local L = LibStub("AceLocale-3.0"):GetLocale("TankPoints") --Get the localization for our addon
 
 --------------------
 -- Initialization --

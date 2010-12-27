@@ -1,10 +1,20 @@
--- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
+﻿-- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
 --[[
 	Name: TankPoints enUS locale
 	Revision: $Revision: 113 $
 Translated by: 
 - Whitetooth@Cenarius (hotdogee@bahamut.twbbs.org)
 ]]
+
+local debug = false
+--[===[@debug@
+--debug = true
+--@end-debug@]===]
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "enUS", true, debug) --true=this is the default locale
+
+-- To translate AceLocale strings, replace true with the translation string
+-- Before: ["Show Item ID"] = true,
+-- After:  ["Show Item ID"] = "顯示物品編號",
 
 -- Global Strings that don't need translations
 --[[
@@ -59,268 +69,260 @@ TP_BLOCK = 9
 TP_BLOCKVALUE = 10
 TP_RESILIENCE = 11
 
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
-
--- To translate AceLocale strings, replace true with the translation string
--- Before: ["Show Item ID"] = true,
--- After:  ["Show Item ID"] = "顯示物品編號",
-L:RegisterTranslations("enUS", function() return {
 -------------
 -- General --
 -------------
-	["TankPoints"] = true,
-	["EH"] = true, -- "Effective Health" is a long phrase
-	["EHB"] = true, -- "Effective Health with Block" is a very long phrase
-	["Block Value"] = true,
+	L["TankPoints"] = true
+	L["EH"] = true -- "Effective Health" is a long phrase
+	L["EHB"] = true -- "Effective Health with Block" is a very long phrase
+	L["Block Value"] = true
 
 --------------------
 -- Character Info --
 --------------------
 -- Stats
-	["EH Block"] = true,
-	[" EH"] = true,
-	[" TP"] = true, -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
-	[" DR"] = true, -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
+	L["EH Block"] = true
+	L[" EH"] = true
+	L[" TP"] = true -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
+	L[" DR"] = true -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
 
 -- TankPoints Stat Tooltip
-	["In "] = true, -- concatenated before stance name, ex: "In Battle Stance"
-	["Mob Stats"] = true,
-	["Mob Level"] = true,
-	["Mob Damage"] = true,
-	["Mob Crit"] = true,
-	["Mob Miss"] = true,
-	["Per StatValue"] = true,
-	["Per Stat"] = true,
-	["Click: show Per StatValue TankPoints"] = true,
-	["Click: show Per Stat TankPoints"] = true,
+	L["In "] = true -- concatenated before stance name, ex: "In Battle Stance"
+	L["Mob Stats"] = true
+	L["Mob Level"] = true
+	L["Mob Damage"] = true
+	L["Mob Crit"] = true
+	L["Mob Miss"] = true
+	L["Per StatValue"] = true
+	L["Per Stat"] = true
+	L["Click: show Per StatValue TankPoints"] = true
+	L["Click: show Per Stat TankPoints"] = true
 
 -- Melee Reduction Tooltip
-	[" Damage Reduction"] = true, -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
-	["Player Level"] = true,
-	["Combat Table"] = true,
-	["Crit"] = true,
-	["Crushing"] = true,
-	["Hit"] = true,
-	["Avoidance Diminishing Returns"] = true,
-	["Only includes Dodge, Parry, and Missed"] = true,
+	L[" Damage Reduction"] = true -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
+	L["Player Level"] = true
+	L["Combat Table"] = true
+	L["Crit"] = true
+	L["Crushing"] = true
+	L["Hit"] = true
+	L["Avoidance Diminishing Returns"] = true
+	L["Only includes Dodge, Parry, and Missed"] = true
 
 -- Block Value Tooltip
-	["Mob Damage before DR"] = true,
-	["Mob Damage after DR"] = true,
-	["Blocked Percentage"] = true,
-	["Equivalent Block Mitigation"] = true,
-	["Shield Block Up Time"] = true,
+	L["Mob Damage before DR"] = true
+	L["Mob Damage after DR"] = true
+	L["Blocked Percentage"] = true
+	L["Equivalent Block Mitigation"] = true
+	L["Shield Block Up Time"] = true
 
 -- Spell TankPoints Tooltip
-	["Melee/Spell Damage Ratio"] = true,
-	["Left click: Show next school"] = true,
-	["Right click: Show strongest school"] = true,
-	[" resist "] = true,
+	L["Melee/Spell Damage Ratio"] = true
+	L["Left click: Show next school"] = true
+	L["Right click: Show strongest school"] = true
+	L[" resist "] = true
 
 -- Spell Reduction Tooltip
 -- Toggle Calculator
-	["Open Calculator"] = true,
-	["Close Calculator"] = true,
+	L["Open Calculator"] = true
+	L["Close Calculator"] = true
 
 -- talent names
-	["imp. Shield Block"] = true, -- short for Improved Shield Block
+	L["imp. Shield Block"] = true -- short for Improved Shield Block
 
 -- Effective Health stuff
-	["Effective Health"] = true,
-	["Effective Health vs %s %s"] = true, -- Melee/Nature/Fire followed by EH
-	["Effective Health (with Block) vs Melee "] = true, -- followed by EHB
-	["Effective Health with Block"] = "Effective Health w/ Block",
-	["Effective Health - All Schools"] = true, -- heading for the all schools of damage tooltip
-	["Health"] = true, -- player health
-	["Armor Reduction"] = true, -- how much armor reduces damage
-	["Resistance Reduction"] = true, -- reduction due to elemental resist (nature, etc)
-	["Talent/Buff/Stance Reductions"] = true, -- things like stances, talents
-	["Your Reductions"] = true, -- section header
-	["Guaranteed Reduction"] = true, -- how much damage you're guaranteed to mitigate
-	["Mob attacks can critically hit"] = true,
-	["Mob attacks cannot critically hit"] = true,
-	["Mob attacks will crush"] = true,
-	["Mob attacks should not crush"] = true,
+	L["Effective Health"] = true
+	L["Effective Health vs %s %s"] = true -- Melee/Nature/Fire followed by EH
+	L["Effective Health (with Block) vs Melee "] = true -- followed by EHB
+	L["Effective Health with Block"] = "Effective Health w/ Block"
+	L["Effective Health - All Schools"] = true -- heading for the all schools of damage tooltip
+	L["Health"] = true -- player health
+	L["Armor Reduction"] = true -- how much armor reduces damage
+	L["Resistance Reduction"] = true -- reduction due to elemental resist (nature, etc)
+	L["Talent/Buff/Stance Reductions"] = true -- things like stances, talents
+	L["Your Reductions"] = true -- section header
+	L["Guaranteed Reduction"] = true -- how much damage you're guaranteed to mitigate
+	L["Mob attacks can critically hit"] = true
+	L["Mob attacks cannot critically hit"] = true
+	L["Mob attacks will crush"] = true
+	L["Mob attacks should not crush"] = true
 
 -- an array with lines to be put at the bottom of the Effective Health Tooltip
 -- saying what EH is
-	["TP_EXPLANATION"] = {"TankPoints is a measure of your theoretical", "mitigation (dodge, parry, etc) in proportion", "to your health."},
-	["EH_EXPLANATION"] = {"Effective Health is how much raw", "damage you can take without", "a miss/block/dodge/parry."},
-	["EHB_EXPLANATION"] = {"Effective Health with Block is how much raw", "damage you can take without a miss/dodge/parry", "and only guaranteed blocks. Dependant", "on mob stats and you being able to block."},
-	["See /tp optionswin to turn on tooltip."] = true,
+	L["TP_EXPLANATION"] = {"TankPoints is a measure of your theoretical", "mitigation (dodge, parry, etc) in proportion", "to your health."}
+	L["EH_EXPLANATION"] = {"Effective Health is how much raw", "damage you can take without", "a miss/block/dodge/parry."}
+	L["EHB_EXPLANATION"] = {"Effective Health with Block is how much raw", "damage you can take without a miss/dodge/parry", "and only guaranteed blocks. Dependant", "on mob stats and you being able to block."}
+	L["See /tp optionswin to turn on tooltip."] = true
         
 ---------------------------
 -- Slash Command Options --
 ---------------------------
 -- /tp optionswin
-	["Options Window"] = true,
-	["Shows the Options Window"] = true,
+	L["Options Window"] = true
+	L["Shows the Options Window"] = true
 -- /tp calc
-	["TankPoints Calculator"] = true,
-	["Shows the TankPoints Calculator"] = true,
+	L["TankPoints Calculator"] = true
+	L["Shows the TankPoints Calculator"] = true
 -- /tp tooltip
-	["Tooltip Options"] = true,
-	["TankPoints tooltip options"] = true,
+	L["Tooltip Options"] = true
+	L["TankPoints tooltip options"] = true
 -- /tp tooltip diff
-	["Show TankPoints Difference"] = true,
-	["Show TankPoints difference in item tooltips"] = true,
+	L["Show TankPoints Difference"] = true
+	L["Show TankPoints difference in item tooltips"] = true
 -- /tp tooltip total
-	["Show TankPoints Total"] = true,
-	["Show TankPoints total in item tooltips"] = true,
+	L["Show TankPoints Total"] = true
+	L["Show TankPoints total in item tooltips"] = true
 -- /tp tooltip drdiff
-	["Show Melee DR Difference"] = true,
-	["Show Melee Damage Reduction difference in item tooltips"] = true,
+	L["Show Melee DR Difference"] = true
+	L["Show Melee Damage Reduction difference in item tooltips"] = true
 -- /tp tooltip drtotal
-	["Show Melee DR Total"] = true,
-	["Show Melee Damage Reduction total in item tooltips"] = true,
+	L["Show Melee DR Total"] = true
+	L["Show Melee Damage Reduction total in item tooltips"] = true
 -- /tp tooltip ehdiff
-	["Show Effective Health Difference"] = true,
-	["Show Effective Health difference in item tooltips"] = true,
+	L["Show Effective Health Difference"] = true
+	L["Show Effective Health difference in item tooltips"] = true
 -- /tp tooltip ehtotal
-	["Show Effective Health Total"] = true,
-	["Show Effective Health total in item tooltips"] = true,
+	L["Show Effective Health Total"] = true
+	L["Show Effective Health total in item tooltips"] = true
 -- /tp tooltip ehbdiff
-	["Show Effective Health (with Block) Difference"] = true,
-	["Show Effective Health (with Block) difference in item tooltips"] = true,
+	L["Show Effective Health (with Block) Difference"] = true
+	L["Show Effective Health (with Block) difference in item tooltips"] = true
 -- /tp tooltip ehbtotal
-	["Show Effective Health (with Block) Total"] = true,
-	["Show Effective Health (with Block) total in item tooltips"] = true,
+	L["Show Effective Health (with Block) Total"] = true
+	L["Show Effective Health (with Block) total in item tooltips"] = true
 -- /tp player
-	["Player Stats"] = true,
-	["Change default player stats"] = true,
+	L["Player Stats"] = true
+	L["Change default player stats"] = true
 -- /tp player sbfreq
-	["Shield Block Key Press Delay"] = true,
-	["Sets the time in seconds after Shield Block finishes cooldown"] = true,
+	L["Shield Block Key Press Delay"] = true
+	L["Sets the time in seconds after Shield Block finishes cooldown"] = true
 -- /tp mob
-	["Mob Stats"] = true,
-	["Change default mob stats"] = true,
+	L["Mob Stats"] = true
+	L["Change default mob stats"] = true
 -- /tp mob level
-	["Mob Level"] = true,
-	["Sets the level difference between the mob and you"] = true,
+	L["Mob Level"] = true
+	L["Sets the level difference between the mob and you"] = true
 -- /tp mob damage
 -- /tp mob drdamage
-	["Mob Damage"] = true,
-	["Sets mob's damage before damage reduction"] = true,
-	["Sets mob's damage after melee damage reduction"] = true,
+	L["Mob Damage"] = true
+	L["Sets mob's damage before damage reduction"] = true
+	L["Sets mob's damage after melee damage reduction"] = true
 -- /tp mob speed
-	["Mob Attack Speed"] = true,
-	["Sets mob's attack speed"] = true,
+	L["Mob Attack Speed"] = true
+	L["Sets mob's attack speed"] = true
 -- /tp mob default
-	["Restore Default"] = true,
-	["Restores default mob stats"] = true,
-	["Restored Mob Stats Defaults"] = true, -- command feedback
+	L["Restore Default"] = true
+	L["Restores default mob stats"] = true
+	L["Restored Mob Stats Defaults"] = true -- command feedback
 -- /tp mob advanced
-	["Mob Stats Advanced Settings"] = true,
-	["Change advanced mob stats"] = true,
+	L["Mob Stats Advanced Settings"] = true
+	L["Change advanced mob stats"] = true
 -- /tp mob advanced crit
-	["Mob Melee Crit"] = true,
-	["Sets mob's melee crit chance"] = true,
+	L["Mob Melee Crit"] = true
+	L["Sets mob's melee crit chance"] = true
 -- /tp mob advanced critbonus
-	["Mob Melee Crit Bonus"] = true,
-	["Sets mob's melee crit bonus"] = true,
+	L["Mob Melee Crit Bonus"] = true
+	L["Sets mob's melee crit bonus"] = true
 -- /tp mob advanced miss
-	["Mob Melee Miss"] = true,
-	["Sets mob's melee miss chance"] = true,
+	L["Mob Melee Miss"] = true
+	L["Sets mob's melee miss chance"] = true
 -- /tp mob advanced spellcrit
-	["Mob Spell Crit"] = true,
-	["Sets mob's spell crit chance"] = true,
+	L["Mob Spell Crit"] = true
+	L["Sets mob's spell crit chance"] = true
 -- /tp mob advanced spellcritbonus
-	["Mob Spell Crit Bonus"] = true,
-	["Sets mob's spell crit bonus"] = true,
+	L["Mob Spell Crit Bonus"] = true
+	L["Sets mob's spell crit bonus"] = true
 -- /tp mob advanced spellmiss
-	["Mob Spell Miss"] = true,
-	["Sets mob's spell miss chance"] = true,
+	L["Mob Spell Miss"] = true
+	L["Sets mob's spell miss chance"] = true
 
 ----------------------
 -- GetDodgePerAgi() --
 ----------------------
-	["Cat Form"] = true,
+	L["Cat Form"] = true
 
 ---------------------------
 -- GetTalantBuffEffect() --
 ---------------------------
-	["Soul Link"] = true,
-	["Voidwalker"] = true,
-	["Righteous Fury"] = true,
-	["Pain Suppression"] = true,
-	["Shield Wall"] = true,
-	["Death Wish"] = true,
-	["Recklessness"] = true,
-	["Cloak of Shadows"] = true,
+	L["Soul Link"] = true
+	L["Voidwalker"] = true
+	L["Righteous Fury"] = true
+	L["Pain Suppression"] = true
+	L["Shield Wall"] = true
+	L["Death Wish"] = true
+	L["Recklessness"] = true
+	L["Cloak of Shadows"] = true
 
 ----------------------
 -- AlterSourceData() --
 ----------------------
-	["Bear Form"] = true,
-	["Dire Bear Form"] = true,
-	["Moonkin Form"] = true,
+	L["Bear Form"] = true
+	L["Dire Bear Form"] = true
+	L["Moonkin Form"] = true
 
 -----------------------
 -- PlayerHasShield() --
 -----------------------
-	["Shields"] = true,
+	L["Shields"] = true
 
 ---------------------
 -- GetBlockValue() --
 ---------------------
-	["^(%d+) Block$"] = true,
+	L["^(%d+) Block$"] = true
 
 ------------------------
 -- Item Scan Patterns --
 ------------------------
-["ItemScan"] = {
+L["ItemScan"] = {
 	[TP_BLOCKVALUE] = {
 			{"Increases the block value of your shield by (%d+)"},
 			{"%+(%d+) Block Value"},
 		}
-	},
+	}
 
 ---------------------------
 -- TankPoints Calculator --
 ---------------------------
 -- Title
-	["TankPoints Calculator"] = true,
-	["Left click to drag\nRight click to reset position"] = true,
+	L["TankPoints Calculator"] = true
+	L["Left click to drag\nRight click to reset position"] = true
 
 -- Buttons
-	["Reset"] = true,
-	["Close"] = true,
+	L["Reset"] = true
+	L["Close"] = true
 
 -- Option frame box title
-	["Results"] = true,
-	["Player Stats"] = true,
-	["Total Reduction"] = true,
-	["(%)"] = true,
-	["Max Health"] = true,
-	["Items"] = true,
+	L["Results"] = true
+	L["Player Stats"] = true
+	L["Total Reduction"] = true
+	L["(%)"] = true
+	L["Max Health"] = true
+	L["Items"] = true
 
 -------------------------
 -- TankPoints Tooltips --
 -------------------------
-	[" (Top/Bottom):"] = true,
-	[" (Main/Off):"] = true,
-	[" (Main+Off):"] = true,
-	["Gems"] = true,
+	L[" (Top/Bottom):"] = true
+	L[" (Main/Off):"] = true
+	L[" (Main+Off):"] = true
+	L["Gems"] = true
 
 ---------------
 -- Waterfall --
 ---------------
-	["TankPoints Options"] = true,	
+	L["TankPoints Options"] = true
 
 -------------------------
 -- Calculator tooltips --
 -------------------------
-	["Armor reduces physical damage taken"] = true,
-	["Armor reduces physical damage taken"] = true,
-	["TPCalc_PlayerStatsTooltip_MasteryRating"] = "Mastery Rating increases your Mastery.\nMastery increases your chance to block an attack.",
-	["TPCalc_PlayerStatsTooltip_Mastery"] = "Mastery increases your chance to block an attack.",
+	L["Armor reduces physical damage taken"] = true
+	L["TPCalc_PlayerStatsTooltip_MasteryRating"] = "Mastery Rating increases your Mastery.\nMastery increases your chance to block an attack."
+	L["TPCalc_PlayerStatsTooltip_Mastery"] = "Mastery increases your chance to block an attack."
 
-	["Dodge rating improves your chance to dodge. A dodged attack does no damage"] = "Dodge rating improves your chance to dodge.\nA dodged attack does no damage",
-	["Your chance to dodge an attack. A dodged attack does no damage"] = "Your chance to dodge an attack.\nA dodged attack does no damage",
-	["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "Parry rating improves your chance to parry.\nWhen you parry an attack it, and the next attack,\nwill each hit for 50% less damage",
-	["Your chance to parry an attack. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "Your chance to parry an attack.\nWhen you parry an attack, it and the next attack,\nwill each hit for 50% less damage",
-	["Block rating improves your chance to block. Blocked attacks hit for 30% less damage"] = "Block rating improves your chance to block.\nBlocked attacks hit for 30% less damage",
-	["Your chance to block an attack. Blocked attacks hit for 30% less damage."] = "Your chance to block an attack.\nBlocked attacks hit for 30% less damage.",
-	["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] = "Blocked attacks hit for 30% less damage",
+	L["Dodge rating improves your chance to dodge. A dodged attack does no damage"] = "Dodge rating improves your chance to dodge.\nA dodged attack does no damage"
+	L["Your chance to dodge an attack. A dodged attack does no damage"] = "Your chance to dodge an attack.\nA dodged attack does no damage"
+	L["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "Parry rating improves your chance to parry.\nWhen you parry an attack it, and the next attack,\nwill each hit for 50% less damage"
+	L["Your chance to parry an attack. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "Your chance to parry an attack.\nWhen you parry an attack, it and the next attack,\nwill each hit for 50% less damage"
+	L["Block rating improves your chance to block. Blocked attacks hit for 30% less damage"] = "Block rating improves your chance to block.\nBlocked attacks hit for 30% less damage"
+	L["Your chance to block an attack. Blocked attacks hit for 30% less damage."] = "Your chance to block an attack.\nBlocked attacks hit for 30% less damage."
+	L["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] = "Blocked attacks hit for 30% less damage"
 
-} end)
