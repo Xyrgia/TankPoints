@@ -23,7 +23,7 @@ local StatLogic = LibStub:GetLibrary("LibStatLogic-1.2")
 TankPoints = AceLibrary("AceAddon-2.0"):new("AceDB-2.0", "AceConsole-2.0", "AceEvent-2.0", "AceDebug-2.0", "AceHook-2.1") --, "StatFrameLib-1.0")
 
 TankPoints.title = "TankPoints"
-TankPoints.version = "2.8.6 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
+TankPoints.version = "2.9.0 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
 TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
 
 local TankPoints = TankPoints
