@@ -5,6 +5,10 @@ Revision: $Revision: 50 $
 Translated by: 
 - AbbedieD
 ]]
+
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "deDE")
+
+
 -- Global Strings that don't need translations
 --[[
 PLAYERSTAT_MELEE_COMBAT = "Melee"
@@ -53,143 +57,149 @@ TP_BLOCK = 9
 TP_BLOCKVALUE = 10
 TP_RESILIENCE = 11
 
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
-L:RegisterTranslations("deDE", function() return {
-	-------------
-	-- General --
-	-------------
-	--["TankPoints"] = true,
-	["Block Value"] = "Blockwert",
-	--------------------
-	-- Character Info --
-	--------------------
-	-- Stats
-	--[" TP"] = true, -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
-	[" DR"] = " SR", -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
-	-- TankPoints Stat Tooltip
-	--["In "] = true, -- concatenated before stance name, ex: "In Battle Stance"
-	--["Mob Stats"] = true,
-	--["Mob Level"] = true,
-	["Mob Damage"] = "Mob Schaden",
-	["Mob Crit"] = "Mob kritisch",
-	["Mob Miss"] = "Mob verfehlt",
-	--["Per StatValue"] = true,
-	--["Per Stat"] = true,
-        --["Click: show Per StatValue TankPoints"] = true,
-        --["Click: show Per Stat TankPoints"] = true,
+-------------
+-- General --
+-------------
+--["TankPoints"] = true,
+	L["Block Value"] = "Blockwert"
 
-	-- Melee Reduction Tooltip
-	[" Damage Reduction"] = " Schadensreduzierung", -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
-	["Player Level"] = "Spieler Level",
-	["Combat Table"] = "Kampftabelle",
-	["Crit"] = "Kritisch",
-	["Crushing"] = "Schmetternd",
-	["Hit"] = "Treffer",
-	-- Block Value Tooltip
-	["Mob Damage before DR"] = "Mob Schaden vor SR",
-	["Mob Damage after DR"] = "Mob Schaden nach SR",
-	["Blocked Percentage"] = "Prozentual geblockt",
-	--["Equivalent Block Mitigation"] = true,
-	-- Spell TankPoints Tooltip
-	["Melee/Spell Damage Ratio"] = "Nahkampf-/Zauberschadensverhältnis",
-	["Left click: Show next school"] = "Linksklick: Zeige nächste Magieschule",
-	["Right click: Show strongest school"] = "Rechtsklick: Zeige stärkste Magieschule",
-	-- Spell Reduction Tooltip
-	-- Toggle Calculator
-	["Open Calculator"] = "\195\150ffne Rechner",
-	["Close Calculator"] = "Schliesse Rechner",
-	---------------------------
-	-- Slash Command Options --
-	---------------------------
-	-- /tp calc
-	["TankPoints Calculator"] = "TankPoints Rechner",
-	["Shows the TankPoints Calculator"] = "Zeigt den TankPoints Rechner an",
-	-- /tp mob
+--------------------
+-- Character Info --
+--------------------
+-- Stats
+	--[" TP"] = true -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
+	L[" DR"] = " SR" -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
+-- TankPoints Stat Tooltip
+	--["In "] = true -- concatenated before stance name, ex: "In Battle Stance"
 	--["Mob Stats"] = true,
-	["Change default mob stats"] = "\195\132ndern der Standard Mob Stats",
-	-- /tp mob level
 	--["Mob Level"] = true,
-	["Sets the level difference between the mob and you"] = "Setzt den Levelunterschied zwischen dem Mob und dir",
-	-- /tp mob damage
-	["Mob Damage"] = "Mob Schaden",
-	["Sets mob's damage before damage reduction"] = "Schaden des Mobs vor der Schadensreduzierung \195\164ndern",
-	-- /tp mob default
-	["Restore Default"] = "Standard wiederherstellen",
-	["Restores default mob stats"] = "Stellt die Standard Mob Stats wieder her",
-	["Restored Mob Stats Defaults"] = "Mob Standard Stats wiederhergestellt", -- command feedback
-	-- /tp mob advanced
-	["Mob Stats Advanced Settings"] = "Erweiterte Mobs Stats Einstellungen",
-	["Change advanced mob stats"] = "\195\132ndern der erweiterten Mob Stats",
-	-- /tp mob advanced crit
-	["Mob Melee Crit"] = "Mob Nahkampf Kritisch",
-	["Sets mob's melee crit chance"] = "\195\132ndern der Mob Nahkampf Krit Chance",
-	-- /tp mob advanced critbonus
-	["Mob Melee Crit Bonus"] = "Mob Nahkampf Krit Bonus",
-	["Sets mob's melee crit bonus"] = "\195\132ndern des Mob Nahkampf Krit Bonus",
-	-- /tp mob advanced miss
-	["Mob Melee Miss"] = "Mob Nahkampf Verfehlt",
-	["Sets mob's melee miss chance"] = "\195\132ndern der Mob Nahkampf Verfehl Chance",
-	-- /tp mob advanced spellcrit
-	["Mob Spell Crit"] = "Mob Zauber Kritsch",
-	["Sets mob's spell crit chance"] = "\195\132ndern der Mob Zauber Krit Chance",
-	-- /tp mob advanced spellcritbonus
-	["Mob Spell Crit Bonus"] = "Mob Zauber Krit Bonus",
-	["Sets mob's spell crit bonus"] = "\195\132ndern des Mob Zauber Krit Bonus",
-	-- /tp mob advanced spellmiss
-	["Mob Spell Miss"] = "Mob Zauber Verfehlt",
-	["Sets mob's spell miss chance"] = "\195\132ndern der Mob Zauber Verfehl Chance",
+	L["Mob Damage"] = "Mob Schaden"
+	L["Mob Crit"] = "Mob kritisch"
+	L["Mob Miss"] = "Mob verfehlt"
+	--L["Per StatValue"] = true
+	--L["Per Stat"] = true
+    --L["Click: show Per StatValue TankPoints"] = true
+    --L["Click: show Per Stat TankPoints"] = true
+
+-- Melee Reduction Tooltip
+	L[" Damage Reduction"] = " Schadensreduzierung" -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
+	L["Player Level"] = "Spieler Level"
+	L["Combat Table"] = "Kampftabelle"
+	L["Crit"] = "Kritisch"
+	L["Crushing"] = "Schmetternd"
+	L["Hit"] = "Treffer"
+-- Block Value Tooltip
+	L["Mob Damage before DR"] = "Mob Schaden vor SR"
+	L["Mob Damage after DR"] = "Mob Schaden nach SR"
+	L["Blocked Percentage"] = "Prozentual geblockt"
+	--L["Equivalent Block Mitigation"] = true
+-- Spell TankPoints Tooltip
+	L["Melee/Spell Damage Ratio"] = "Nahkampf-/Zauberschadensverhältnis"
+	L["Left click: Show next school"] = "Linksklick: Zeige nächste Magieschule"
+	L["Right click: Show strongest school"] = "Rechtsklick: Zeige stärkste Magieschule"
+-- Spell Reduction Tooltip
+-- Toggle Calculator
+	L["Open Calculator"] = "\195\150ffne Rechner"
+	L["Close Calculator"] = "Schliesse Rechner"
+
+---------------------------
+-- Slash Command Options --
+---------------------------
+-- /tp calc
+	L["TankPoints Calculator"] = "TankPoints Rechner"
+	L["Shows the TankPoints Calculator"] = "Zeigt den TankPoints Rechner an"
+-- /tp mob
+	--L["Mob Stats"] = true
+	L["Change default mob stats"] = "\195\132ndern der Standard Mob Stats"
+-- /tp mob level
+	--L["Mob Level"] = true
+	L["Sets the level difference between the mob and you"] = "Setzt den Levelunterschied zwischen dem Mob und dir"
+-- /tp mob damage
+	L["Mob Damage"] = "Mob Schaden"
+	L["Sets mob's damage before damage reduction"] = "Schaden des Mobs vor der Schadensreduzierung \195\164ndern"
+-- /tp mob default
+	L["Restore Default"] = "Standard wiederherstellen"
+	L["Restores default mob stats"] = "Stellt die Standard Mob Stats wieder her"
+	L["Restored Mob Stats Defaults"] = "Mob Standard Stats wiederhergestellt" -- command feedback
+-- /tp mob advanced
+	L["Mob Stats Advanced Settings"] = "Erweiterte Mobs Stats Einstellungen"
+	L["Change advanced mob stats"] = "\195\132ndern der erweiterten Mob Stats"
+-- /tp mob advanced crit
+	L["Mob Melee Crit"] = "Mob Nahkampf Kritisch"
+	L["Sets mob's melee crit chance"] = "\195\132ndern der Mob Nahkampf Krit Chance"
+-- /tp mob advanced critbonus
+	L["Mob Melee Crit Bonus"] = "Mob Nahkampf Krit Bonus"
+	L["Sets mob's melee crit bonus"] = "\195\132ndern des Mob Nahkampf Krit Bonus"
+-- /tp mob advanced miss
+	L["Mob Melee Miss"] = "Mob Nahkampf Verfehlt"
+	L["Sets mob's melee miss chance"] = "\195\132ndern der Mob Nahkampf Verfehl Chance"
+-- /tp mob advanced spellcrit
+	L["Mob Spell Crit"] = "Mob Zauber Kritsch"
+	L["Sets mob's spell crit chance"] = "\195\132ndern der Mob Zauber Krit Chance"
+-- /tp mob advanced spellcritbonus
+	L["Mob Spell Crit Bonus"] = "Mob Zauber Krit Bonus"
+	L["Sets mob's spell crit bonus"] = "\195\132ndern des Mob Zauber Krit Bonus"
+-- /tp mob advanced spellmiss
+	L["Mob Spell Miss"] = "Mob Zauber Verfehlt"
+	L["Sets mob's spell miss chance"] = "\195\132ndern der Mob Zauber Verfehl Chance"
+
 	----------------------
-	-- GetDodgePerAgi() --
-	----------------------
-	["Cat Form"] = "Katzengestalt",
-	---------------------------
-	-- GetTalantBuffEffect() --
-	---------------------------
-	["Soul Link"] = "Seelenverbindung",
-	["Voidwalker"] = "Leerwandler",
-	["Righteous Fury"] = "Zorn der Gerechtigkeit",
-	["Pain Suppression"] = "Schmerzunterdrückung",
-	["Shield Wall"] = "Schildwall",
-	["Death Wish"] = "Todeswunsch",
-	["Recklessness"] = "Tollkühnheit",
-	["Cloak of Shadows"] = "Mantel der Schatten",
-	-----------------------
-	-- AlterDataTable() --
-	-----------------------
-	["Bear Form"] = "Bärengestalt",
-	["Dire Bear Form"] = "Terrorbärengestalt",
-	["Moonkin Form"] = "Moonkingestalt",
-	-----------------------
-	-- PlayerHasShield() --
-	-----------------------
-	["Shields"] = "Schilde",
-	---------------------
-	-- GetBlockValue() --
-	---------------------
-	["^(%d+) Block$"] = "^(%d+) Blocken",
-	------------------------
-	-- Item Scan Patterns --
-	------------------------
-	["ItemScan"] = {
+-- GetDodgePerAgi() --
+----------------------
+	L["Cat Form"] = "Katzengestalt"
+
+---------------------------
+-- GetTalantBuffEffect() --
+---------------------------
+	L["Soul Link"] = "Seelenverbindung"
+	L["Voidwalker"] = "Leerwandler"
+	L["Righteous Fury"] = "Zorn der Gerechtigkeit"
+	L["Pain Suppression"] = "Schmerzunterdrückung"
+	L["Shield Wall"] = "Schildwall"
+	L["Death Wish"] = "Todeswunsch"
+	L["Recklessness"] = "Tollkühnheit"
+	L["Cloak of Shadows"] = "Mantel der Schatten"
+
+-----------------------
+-- AlterDataTable() --
+-----------------------
+	L["Bear Form"] = "Bärengestalt"
+	L["Dire Bear Form"] = "Terrorbärengestalt"
+	L["Moonkin Form"] = "Moonkingestalt"
+
+-----------------------
+-- PlayerHasShield() --
+-----------------------
+	L["Shields"] = "Schilde"
+	
+---------------------
+-- GetBlockValue() --
+---------------------
+	L["^(%d+) Block$"] = "^(%d+) Blocken"
+
+------------------------
+-- Item Scan Patterns --
+------------------------
+	L["ItemScan"] = {
 		[TP_BLOCKVALUE] = {
 			{"Erh\195\182ht den Blockwert Eures Schildes um (%d+)"},
 			{"Erh\195\182ht den Blockwert Eures Schilds um (%d+)"},
 			{"Blockwert %+(%d+)"},
 		}
-	},
-	---------------------------
-	-- TankPoints Calculator --
-	---------------------------
-	-- Title
-	["TankPoints Calculator"] = "TankPoints Rechner",
-	["Left click to drag\nRight click to reset position"] = "Links klick zum ziehen\nRechtsklick um die Position zur\195\188ckzusetzen",
-	-- Buttons
-	--["Reset"] = true,
-	["Close"] = "Schliessen",
-	-- Option frame box title
-	["Results"] = "Ergebnis",
-	["Player Stats"] = "Spieler Stats",
-	["Total Reduction"] = "Endg\195\188ltige Reduzierung",
-	--["(%)"] = true,
-	["Max Health"] = "Max Leben",
-} end)
+	}
+
+---------------------------
+-- TankPoints Calculator --
+---------------------------
+-- Title
+	L["TankPoints Calculator"] = "TankPoints Rechner"
+	L["Left click to drag\nRight click to reset position"] = "Links klick zum ziehen\nRechtsklick um die Position zur\195\188ckzusetzen"
+-- Buttons
+	--L["Reset"] = true
+	L["Close"] = "Schliessen"
+-- Option frame box title
+	L["Results"] = "Ergebnis"
+	L["Player Stats"] = "Spieler Stats"
+	L["Total Reduction"] = "Endg\195\188ltige Reduzierung"
+	--L["(%)"] = true
+	L["Max Health"] = "Max Leben"

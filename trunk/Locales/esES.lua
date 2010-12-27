@@ -5,6 +5,10 @@ Revision: $Revision: 105 $
 Translated by: 
 - shiftos
 ]]
+
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "esES")
+
+
 -- Global Strings that don't need translations
 --[[
 PLAYERSTAT_MELEE_COMBAT = "Melee"
@@ -58,146 +62,145 @@ TP_BLOCK = 9
 TP_BLOCKVALUE = 10
 TP_RESILIENCE = 11
 
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints")
 -- To translate AceLocale strings, replace true with the translation string
 -- Before: ["Show Item ID"] = true,
--- After:  ["Show Item ID"] = "顯示物品編號",
-local esES = {
+-- After:  ["Show Item ID"] = "顯示物品編號" 
+
 	-------------
 	-- General --
 	-------------
-	["TankPoints"] = "Puntos de Tanque",
-	["Block Value"] = "Valor de Bloqueo",
+	L["TankPoints"] = "Puntos de Tanque"
+	L["Block Value"] = "Valor de Bloqueo"
 	--------------------
 	-- Character Info --
 	--------------------
 	-- Stats
-	[" TP"] = " PdT", -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
-	[" DR"] = " RaD", -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
+	L[" TP"] = " PdT" -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
+	L[" DR"] = " RaD" -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
 	-- TankPoints Stat Tooltip
-	["In "] = "En ", -- concatenated before stance name, ex: "In Battle Stance"
-	["Mob Stats"] = "Estadísticas del Enemigo",
-	["Mob Level"] = "Nivel del Enemigo",
-	["Mob Damage"] = "Daño del Enemigo",
-	["Mob Crit"] = "Crítico del Enemigo",
-	["Mob Miss"] = "Fallo del Enemigo",
-	["Per StatValue"] = "Por Valor de Estadística",
-	["Per Stat"] = "Por Estadística",
-        -- ["Click: show Per StatValue TankPoints"] = "",
-        -- ["Click: show Per Stat TankPoints"] = "",
+	L["In "] = "En "  -- concatenated before stance name, ex: "In Battle Stance"
+	L["Mob Stats"] = "Estadísticas del Enemigo" 
+	L["Mob Level"] = "Nivel del Enemigo" 
+	L["Mob Damage"] = "Daño del Enemigo" 
+	L["Mob Crit"] = "Crítico del Enemigo" 
+	L["Mob Miss"] = "Fallo del Enemigo" 
+	L["Per StatValue"] = "Por Valor de Estadística" 
+	L["Per Stat"] = "Por Estadística" 
+        -- ["Click: show Per StatValue TankPoints"] = "" 
+        -- ["Click: show Per Stat TankPoints"] = "" 
 
 	-- Melee Reduction Tooltip
-	[" Damage Reduction"] = " (Reducción a Daño)", -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
-	["Player Level"] = "Nivel del Jugador",
-	["Combat Table"] = "Tabla de Combate",
-	["Crit"] = "Crítico",
-	["Crushing"] = "Aplastamiento",
-	["Hit"] = "Golpear",
+	L[" Damage Reduction"] = " (Reducción a Daño)"  -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
+	L["Player Level"] = "Nivel del Jugador" 
+	L["Combat Table"] = "Tabla de Combate" 
+	L["Crit"] = "Crítico" 
+	L["Crushing"] = "Aplastamiento" 
+	L["Hit"] = "Golpear" 
 	-- Block Value Tooltip
-	["Mob Damage before DR"] = "Daño del Enemigo antes de RaD",
-	["Mob Damage after DR"] = "Daño del Enemigo después de RaD",
-	["Blocked Percentage"] = "Porcentaje Bloqueado",
-	["Equivalent Block Mitigation"] = "Mitigación de Bloqueo Equivalente",
-	["Shield Block Up Time"] = "Tiempo de Bloqueo con Escudo",
+	L["Mob Damage before DR"] = "Daño del Enemigo antes de RaD" 
+	L["Mob Damage after DR"] = "Daño del Enemigo después de RaD" 
+	L["Blocked Percentage"] = "Porcentaje Bloqueado" 
+	L["Equivalent Block Mitigation"] = "Mitigación de Bloqueo Equivalente" 
+	L["Shield Block Up Time"] = "Tiempo de Bloqueo con Escudo" 
 	-- Spell TankPoints Tooltip
-	["Melee/Spell Damage Ratio"] = "Proporción de Daño Cuerpo a Cuerpo/Hechizo",
-	["Left click: Show next school"] = "Clic Izquierdo: Mostrar escuela siguiente",
-	["Right click: Show strongest school"] = "Clic Derecho: Mostrar escuela más fuerte",
+	L["Melee/Spell Damage Ratio"] = "Proporción de Daño Cuerpo a Cuerpo/Hechizo" 
+	L["Left click: Show next school"] = "Clic Izquierdo: Mostrar escuela siguiente" 
+	L["Right click: Show strongest school"] = "Clic Derecho: Mostrar escuela más fuerte" 
 	-- Spell Reduction Tooltip
 	-- Toggle Calculator
-	["Open Calculator"] = "Abrir Calculadora",
-	["Close Calculator"] = "Cerrar Calculadora",
+	L["Open Calculator"] = "Abrir Calculadora" 
+	L["Close Calculator"] = "Cerrar Calculadora" 
 	---------------------------
 	-- Slash Command Options --
 	---------------------------
 	-- /tp calc
-	["TankPoints Calculator"] = "Calculadora de Puntos de Tanque",
-	["Shows the TankPoints Calculator"] = "Muestra la Calculadora de Puntos de Tanque",
+	L["TankPoints Calculator"] = "Calculadora de Puntos de Tanque" 
+	L["Shows the TankPoints Calculator"] = "Muestra la Calculadora de Puntos de Tanque" 
 	-- /tp tooltip
-	["Tooltip Options"] = "Opciones de Tooltip",
-	["TankPoints tooltip options"] = "Opciones para el tooltip de Tankpoints",
+	L["Tooltip Options"] = "Opciones de Tooltip" 
+	L["TankPoints tooltip options"] = "Opciones para el tooltip de Tankpoints" 
 	-- /tp tooltip diff
-	["Show TankPoints Difference"] = "Mostrar Diferencia en Tooltips",
-	["Show TankPoints difference in item tooltips"] = "Muestra la diferencia de Puntos de Tanque en los tooltip de objeto",
+	L["Show TankPoints Difference"] = "Mostrar Diferencia en Tooltips" 
+	L["Show TankPoints difference in item tooltips"] = "Muestra la diferencia de Puntos de Tanque en los tooltip de objeto" 
 	-- /tp tooltip total
-	["Show TankPoints Total"] = "Mostrar Total en Tooltip",
-	["Show TankPoints total in item tooltips"] = "Muestra el total de Puntos de Tanque en los tooltip de objeto",
+	L["Show TankPoints Total"] = "Mostrar Total en Tooltip" 
+	L["Show TankPoints total in item tooltips"] = "Muestra el total de Puntos de Tanque en los tooltip de objeto" 
 	-- /tp player
-	["Player Stats"] = "Estadísticas del Jugador",
-	["Change default player stats"] = "Cambia las estadísticas del jugador por defecto",
+	L["Player Stats"] = "Estadísticas del Jugador" 
+	L["Change default player stats"] = "Cambia las estadísticas del jugador por defecto" 
 	-- /tp player sbfreq
-	--["Shield Block Key Press Delay"] = "Frecuencia de pulsación de tecla de Bloqueo con Escudo",
-	--["Sets the time in seconds after Shield Block finishes cooldown"] = "Establece el tiempo, en segundos, entre cada presión de tecla de Bloqueo con Escudo",
+	--["Shield Block Key Press Delay"] = "Frecuencia de pulsación de tecla de Bloqueo con Escudo" 
+	--["Sets the time in seconds after Shield Block finishes cooldown"] = "Establece el tiempo, en segundos, entre cada presión de tecla de Bloqueo con Escudo" 
 	-- /tp mob
-	["Mob Stats"] = "Estadísticas del Enemigo",
-	["Change default mob stats"] = "Cambia las estadísticas del enemigo por defecto",
+	L["Mob Stats"] = "Estadísticas del Enemigo" 
+	L["Change default mob stats"] = "Cambia las estadísticas del enemigo por defecto" 
 	-- /tp mob level
-	["Mob Level"] = "Nivel del Enemigo",
-	["Sets the level difference between the mob and you"] = "Establece la diferencia de nivel entre el enemigo y tu",
+	L["Mob Level"] = "Nivel del Enemigo" 
+	L["Sets the level difference between the mob and you"] = "Establece la diferencia de nivel entre el enemigo y tu" 
 	-- /tp mob damage
-	["Mob Damage"] = "Daño del Enemigo",
-	["Sets mob's damage before damage reduction"] = "Establece el daño del enemigo antes de la reducción del daño",
+	L["Mob Damage"] = "Daño del Enemigo" 
+	L["Sets mob's damage before damage reduction"] = "Establece el daño del enemigo antes de la reducción del daño" 
 	-- /tp mob speed
-	["Mob Attack Speed"] = "Vel. Ataque Enemigo",
-	["Sets mob's attack speed"] = "Establece la velocidad de ataque del enemigo",
+	L["Mob Attack Speed"] = "Vel. Ataque Enemigo" 
+	L["Sets mob's attack speed"] = "Establece la velocidad de ataque del enemigo" 
 	-- /tp mob default
-	["Restore Default"] = "Reestablecer valores por defecto",
-	["Restores default mob stats"] = "Reestablece las estadísticas por defecto del enemigo",
-	["Restored Mob Stats Defaults"] = "Los valores por defecto para las estadísticas del enemigo han sido reestablecidos", -- command feedback
+	L["Restore Default"] = "Reestablecer valores por defecto" 
+	L["Restores default mob stats"] = "Reestablece las estadísticas por defecto del enemigo" 
+	L["Restored Mob Stats Defaults"] = "Los valores por defecto para las estadísticas del enemigo han sido reestablecidos"  -- command feedback
 	-- /tp mob advanced
-	["Mob Stats Advanced Settings"] = "Ajustes Avanzados de Estadísticas del Enemigo",
-	["Change advanced mob stats"] = "Cambia las estadísticas avanzadas del enemigo",
+	L["Mob Stats Advanced Settings"] = "Ajustes Avanzados de Estadísticas del Enemigo" 
+	L["Change advanced mob stats"] = "Cambia las estadísticas avanzadas del enemigo" 
 	-- /tp mob advanced crit
-	["Mob Melee Crit"] = "Crítico Cuerpo a Cuerpo del Enemigo",
-	["Sets mob's melee crit chance"] = "Establece las posibilidades de conseguir un crítico cuerpo a cuerpo del enemigo",
+	L["Mob Melee Crit"] = "Crítico Cuerpo a Cuerpo del Enemigo" 
+	L["Sets mob's melee crit chance"] = "Establece las posibilidades de conseguir un crítico cuerpo a cuerpo del enemigo" 
 	-- /tp mob advanced critbonus
-	["Mob Melee Crit Bonus"] = "Bonificación a Crítico Cuerpo a Cuerpo del Enemigo",
-	["Sets mob's melee crit bonus"] = "Establece la bonificación a crítico cuerpo a cuerpo del enemigo",
+	L["Mob Melee Crit Bonus"] = "Bonificación a Crítico Cuerpo a Cuerpo del Enemigo" 
+	L["Sets mob's melee crit bonus"] = "Establece la bonificación a crítico cuerpo a cuerpo del enemigo" 
 	-- /tp mob advanced miss
-	["Mob Melee Miss"] = "Fallo Cuerpo a Cuerpo del Enemigo",
-	["Sets mob's melee miss chance"] = "Establece las posibilidades de fallo cuerpo a cuerpo del enemigo",
+	L["Mob Melee Miss"] = "Fallo Cuerpo a Cuerpo del Enemigo" 
+	L["Sets mob's melee miss chance"] = "Establece las posibilidades de fallo cuerpo a cuerpo del enemigo" 
 	-- /tp mob advanced spellcrit
-	["Mob Spell Crit"] = "Crítico con Hechizos del Enemigo",
-	["Sets mob's spell crit chance"] = "Establece la posibilidad de conseguir un crítico con hechizos del enemigo",
+	L["Mob Spell Crit"] = "Crítico con Hechizos del Enemigo" 
+	L["Sets mob's spell crit chance"] = "Establece la posibilidad de conseguir un crítico con hechizos del enemigo" 
 	-- /tp mob advanced spellcritbonus
-	["Mob Spell Crit Bonus"] = "Bonificación a Crítico con Hechizos del Enemigo",
-	["Sets mob's spell crit bonus"] = "Establece la bonificación a crítico con hechizos del enemigo",
+	L["Mob Spell Crit Bonus"] = "Bonificación a Crítico con Hechizos del Enemigo" 
+	L["Sets mob's spell crit bonus"] = "Establece la bonificación a crítico con hechizos del enemigo" 
 	-- /tp mob advanced spellmiss
-	["Mob Spell Miss"] = "Fallo con Hechizos del Enemigo",
-	["Sets mob's spell miss chance"] = "Establece las posibilidades de fallo con hechizos del enemigo",
+	L["Mob Spell Miss"] = "Fallo con Hechizos del Enemigo" 
+	L["Sets mob's spell miss chance"] = "Establece las posibilidades de fallo con hechizos del enemigo" 
 	----------------------
 	-- GetDodgePerAgi() --
 	----------------------
-	["Cat Form"] = "Forma de gato",
+	L["Cat Form"] = "Forma de gato" 
 	---------------------------
 	-- GetTalantBuffEffect() --
 	---------------------------
-	["Soul Link"] = "Enlace de alma",
-	["Voidwalker"] = "Abisario",
-	["Righteous Fury"] = "Furia justa",
-	["Pain Suppression"] = "Supresión de dolor",
-	["Shield Wall"] = "Muro de escudo",
-	["Death Wish"] = "Deseo de la Muerte",
-	["Recklessness"] = "Temeridad",
-	["Cloak of Shadows"] = "Capa de las Sombras",
+	L["Soul Link"] = "Enlace de alma" 
+	L["Voidwalker"] = "Abisario" 
+	L["Righteous Fury"] = "Furia justa" 
+	L["Pain Suppression"] = "Supresión de dolor" 
+	L["Shield Wall"] = "Muro de escudo" 
+	L["Death Wish"] = "Deseo de la Muerte" 
+	L["Recklessness"] = "Temeridad" 
+	L["Cloak of Shadows"] = "Capa de las Sombras" 
 	----------------------
 	-- AlterSourceData() --
 	----------------------
-	["Bear Form"] = "Forma de oso",
-	["Dire Bear Form"] = "Forma de oso temible",
-	["Moonkin Form"] = "Forma de lechúcico lunar",
+	L["Bear Form"] = "Forma de oso" 
+	L["Dire Bear Form"] = "Forma de oso temible" 
+	L["Moonkin Form"] = "Forma de lechúcico lunar" 
 	-----------------------
 	-- PlayerHasShield() --
 	-----------------------
-	["Shields"] = "Escudos",
+	L["Shields"] = "Escudos" 
 	---------------------
 	-- GetBlockValue() --
 	---------------------
-	["^(%d+) Block$"] = "^(%d+) bloqueo$",
+	L["^(%d+) Block$"] = "^(%d+) bloqueo$" 
 	------------------------
 	-- Item Scan Patterns --
 	------------------------
-	["ItemScan"] = {
+	L["ItemScan"] = {
 		[TP_BLOCKVALUE] = {
 			{"Aumenta el valor de bloqueo de tu escudo en (%d+)"},
 			{"%+(%d+) valor de bloqueo"},        -- check  - índice /valor
@@ -207,25 +210,25 @@ local esES = {
 	-- TankPoints Calculator --
 	---------------------------
 	-- Title
-	["TankPoints Calculator"] = "Calculadora de Puntos de Tanque",
-	["Left click to drag\nRight click to reset position"] = "Clic Izquierdo para arrastrar\nClic Derecho para reestablecer la posición",
+	L["TankPoints Calculator"] = "Calculadora de Puntos de Tanque" 
+	L["Left click to drag\nRight click to reset position"] = "Clic Izquierdo para arrastrar\nClic Derecho para reestablecer la posición" 
 	-- Buttons
-	["Reset"] = "Reestablecer",
-	["Close"] = "Cerrar",
+	L["Reset"] = "Reestablecer" 
+	L["Close"] = "Cerrar" 
 	-- Option frame box title
-	["Results"] = "Resultados",
-	["Player Stats"] = "Estadísticas del Jugador",
-	["Total Reduction"] = "Reducción Total",
-	["(%)"] = "(%)",
-	["Max Health"] = "Salud Máxima",
-	["Items"] = "Objetos",
+	L["Results"] = "Resultados" 
+	L["Player Stats"] = "Estadísticas del Jugador" 
+	L["Total Reduction"] = "Reducción Total" 
+	L["(%)"] = "(%)" 
+	L["Max Health"] = "Salud Máxima" 
+	L["Items"] = "Objetos" 
 	-------------------------
 	-- TankPoints Tooltips --
 	-------------------------
-	[" (Top/Bottom):"] = " (Arriba/Abajo):",
-	[" (Main/Off):"] = " (Derecha/Izquierda):",
-	[" (Main+Off):"] = " (Derecha+Izquierda):",
-	["Gems"] = "Gemas",
+	L[" (Top/Bottom):"] = " (Arriba/Abajo):" 
+	L[" (Main/Off):"] = " (Derecha/Izquierda):" 
+	L[" (Main+Off):"] = " (Derecha+Izquierda):" 
+	L["Gems"] = "Gemas" 
 }
-L:RegisterTranslations("esES", function() return esES end)
-L:RegisterTranslations("esMX", function() return esES end)
+L:RegisterTranslations("esES"  function() return esES end)
+L:RegisterTranslations("esMX"  function() return esES end)

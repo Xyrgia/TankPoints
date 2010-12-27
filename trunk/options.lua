@@ -1,5 +1,5 @@
 local addon = TankPoints
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints") --Create a localization lookup for our addon using AceLibrary --20101017
+local L = LibStub("AceLocale-3.0"):GetLocale("TankPoints") --Get the localization for our addon
 
 local profileDB --TankPoints.db.profile, set during :SetupOptions()
 

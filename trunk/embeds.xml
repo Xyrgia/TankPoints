@@ -1,20 +1,24 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation="http://www.blizzard.com/wow/ui/
 ..\FrameXML\UI.xsd">
-
-<Script file="libs\LibStub\LibStub.lua"/>
-<Include file="libs\LibStatLogic-1.2\lib.xml"/>
-<Include file="libs\LibTipHooker-1.1\lib.xml"/>
+<Script file="Libs\LibStub\LibStub.lua"/>
+<Include file="Libs\CallbackHandler-1.0\CallbackHandler-1.0.xml"/>
+<Include file="libs\AceGUI-3.0\AceGUI-3.0.xml"/>
 <Include file="libs\AceConfig-3.0\AceConfig-3.0.xml"/>
-<Include file="libs\CallbackHandler-1.0\CallbackHandler-1.0.xml" /><!--AceConfigRegistry depends on CallbackHandler, but doesn't document it-->
-<Script file="libs\AceLibrary\AceLibrary.lua"/>
-<Script file="libs\AceLocale-2.2\AceLocale-2.2.lua"/>
-<Script file="libs\AceOO-2.0\AceOO-2.0.lua"/>
-<Script file="libs\AceConsole-2.0\AceConsole-2.0.lua"/>
-<Script file="libs\AceEvent-2.0\AceEvent-2.0.lua"/>
-<Script file="libs\AceDebug-2.0\AceDebug-2.0.lua"/>
-<Script file="libs\AceDB-2.0\AceDB-2.0.lua"/>
-<Script file="libs\AceAddon-2.0\AceAddon-2.0.lua"/>
-<Script file="libs\AceHook-2.1\AceHook-2.1.lua"/>
+<Include file="Libs\AceConsole-3.0\AceConsole-3.0.xml"/>
+<Include file="Libs\AceLocale-3.0\AceLocale-3.0.xml"/>
+
+<Script file="Libs\AceLibrary\AceLibrary.lua"/>
+<Script file="Libs\AceOO-2.0\AceOO-2.0.lua"/>
+<Script file="Libs\AceConsole-2.0\AceConsole-2.0.lua"/>
+<Script file="Libs\AceEvent-2.0\AceEvent-2.0.lua"/>
+<Script file="Libs\AceDebug-2.0\AceDebug-2.0.lua"/>
+<Script file="Libs\AceDB-2.0\AceDB-2.0.lua"/>
+<Script file="Libs\AceAddon-2.0\AceAddon-2.0.lua"/>
+<Script file="Libs\AceHook-2.1\AceHook-2.1.lua"/>
+
+<Include file="Libs\LibStatLogic-1.2\lib.xml"/>
+<Include file="Libs\LibTipHooker-1.1\lib.xml"/>
 <Script file="libs\StatFrameLib-1.0\StatFrameLib-1.0.lua"/>
 
 </Ui>

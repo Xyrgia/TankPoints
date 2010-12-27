@@ -11,9 +11,8 @@ LastUpdate: $Date$
 ---------------
 -- Libraries --
 ---------------
-local TipHooker = LibStub:GetLibrary("LibTipHooker-1.1")
+local L = LibStub("AceLocale-3.0"):GetLocale("TankPoints") --Get the localization for our addon
 local StatLogic = LibStub:GetLibrary("LibStatLogic-1.2")
-local L = AceLibrary("AceLocale-2.2"):new("TankPoints") --Create a localization lookup for our addon using AceLibrary --20101017
 
 
 --------------------
@@ -449,7 +448,10 @@ function TankPoints:OnInitialize()
 	local _, race = UnitRace("player")
 	TankPoints.playerRace = race
 
-	self:SetupOptions(); --in options.lua
+	--Call SetupOptions if we've included the options file. (Not like there's any reason not to include it, its not like you can use the addon. But Ace3 is being a pain, so i'm stripping things out in pieces trying to find their issue)
+	if (self.SetupOptions) then
+		self:SetupOptions(); --in options.lua
+	end
 end
 
 -- OnEnable() called at PLAYER_LOGIN by WowAce
@@ -524,7 +526,9 @@ function TankPoints:UpdateDataTable()
 	copyTable(self.resultsTable, self.sourceTable) --destination, source
 	self:GetTankPoints(self.resultsTable)
 
-	TankPointsTooltips.ClearCache()
+	if (TankPointsTooltips) then
+		TankPointsTooltips.ClearCache();
+	end;
 	--print(self.resultsTable.tankPoints[TP_MELEE], StatLogic:GetStatMod("MOD_ARMOR"), self.sourceTable.armor, UnitArmor("player"))
 end
 
