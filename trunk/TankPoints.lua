@@ -202,7 +202,7 @@ ARDENT_DEFENDER_DAMAGE_REDUCTION  = 0.20 --Paladin Ardent Defender ability reduc
 -- Saved Variables --
 ---------------------
 -- Register DB
-TankPoints:RegisterDB("TankPointsDB") --matches the value of ##SavedVariables declared in the TOC file
+TankPoints:RegisterDB("TankPointsDB") --must match the value of ##SavedVariables declared in the TOC file
 
 -- Default values
 TankPoints.DBDefaults = {
@@ -430,6 +430,8 @@ PLAYER_LOGIN - Most information about the game world should now be available to 
 --]]
 -- OnInitialize(name) called at ADDON_LOADED by WowAce 
 function TankPoints:OnInitialize()
+	self:Debug("TankPoints:OnInitialize()");
+
 	-- Initialize profileDB
 	profileDB = TankPoints.db.profile
 	
@@ -446,12 +448,13 @@ function TankPoints:OnInitialize()
 	TankPoints.playerClass = class
 	local _, race = UnitRace("player")
 	TankPoints.playerRace = race
-	
+
 	self:SetupOptions(); --in options.lua
 end
 
 -- OnEnable() called at PLAYER_LOGIN by WowAce
 function TankPoints:OnEnable()
+	self:Debug("TankPoints:OnEnable()");
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("PLAYER_LEVEL_UP")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
@@ -515,6 +518,7 @@ end
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
 function TankPoints:UpdateDataTable()
+	--self:Print("TankPoints:UpdateDataTable()");
 	self:GetSourceData(self.sourceTable)
 
 	copyTable(self.resultsTable, self.sourceTable) --destination, source
@@ -1009,6 +1013,7 @@ TP_ARCANE = 7
 }
 -----------------------------------]]
 function TankPoints:GetSourceData(TP_Table, school, forceShield)
+	--self:Print("TankPoints:GetSourceData");
 
 	if not TP_Table then
 		-- Acquire temp table
@@ -1449,6 +1454,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 				--self:Print(msg)
 				result = nil
 			else
+				--self:Print("cmax("..var..")");
 				TP_Table[var] = max(maxi, TP_Table[var])
 			end
 		end
@@ -1844,7 +1850,7 @@ end
 
 function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 
-	--self:Debug("TankPoints:GetTankPoints - Entering");
+	--self:Debug("TankPoints:GetTankPoints(...)");
 
 	-----------------
 	-- Aquire Data --
@@ -1935,6 +1941,17 @@ function TankPoints:IntToStr(value)
 		return s
 	end
 end
+
+function TankPoints:DumpTableRaw(tpTable)
+
+	if not (tpTable) then
+		self:Print("TankPoints table is empty");
+		return;
+	end
+
+	self:Print(self:VarAsString(tpTable));
+end;
+
 
 function TankPoints:DumpTable(tpTable)
 
