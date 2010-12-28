@@ -177,8 +177,8 @@ TP_RESILIENCE = 11
 	L["Player Stats"] = "玩家属性" 
 	L["Change default player stats"] = "改变玩家默认属性" 
 	-- /tp player sbfreq
-	--["Shield Block Key Press Delay"] = "盾牌格挡按键频率" 
-	--["Sets the time in seconds after Shield Block finishes cooldown"] = "设定盾牌格挡技能按键的间隔时间" 
+	--L["Shield Block Key Press Delay"] = "盾牌格挡按键频率" 
+	--L["Sets the time in seconds after Shield Block finishes cooldown"] = "设定盾牌格挡技能按键的间隔时间" 
 	-- /tp mob
 	L["Mob Stats"] = "怪物属性" 
 	L["Change default mob stats"] = "改变怪物默认属性" 
@@ -283,4 +283,19 @@ TP_RESILIENCE = 11
 	-- Waterfall --
 	---------------
 	L["TankPoints Options"] = "坦点选项" 	
+	-------------------------
+	-- Calculator tooltips --
+	-------------------------
+	L["Armor reduces physical damage taken"] = "护甲降低的物理伤害"
+	L["TPCalc_PlayerStatsTooltip_MasteryRating"] = "精通等级会增加你的精通效果。\n精通将增加你格挡的机率。"
+	L["TPCalc_PlayerStatsTooltip_Mastery"] = "精通将增加你格挡的机率。"
+
+	L["Dodge rating improves your chance to dodge. A dodged attack does no damage"] = "闪躲等级提高你的闪躲机率。\n闪躲攻击不会受到伤害"
+	L["Your chance to dodge an attack. A dodged attack does no damage"] = "你闪躲攻击的机率。\n闪躲攻击不会受到伤害"
+	L["Parry rating improves your chance to parry. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "招架等级提高你招架的机率。\n当你招架一次攻击，他这次和下一次攻击，\n将减少50％的伤害"
+	L["Your chance to parry an attack. When you parry an attack, it and the next attack, will each hit for 50% less damage"] = "招架攻击的机率。\n当你招架一次攻击，他这次和下一次攻击，\n将减少50％的伤害"
+	L["Block rating improves your chance to block. Blocked attacks hit for 30% less damage"] = "格挡等级提高你的格挡机率。\n格挡攻击可减少命中的30%伤害"
+	L["Your chance to block an attack. Blocked attacks hit for 30% less damage."] = "你格挡攻击的机率。\n格挡攻击命中可减少的30%伤害。"
+	L["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] = "格挡攻击可减少命中的30%伤害"
+
 } end)
