@@ -2,12 +2,10 @@
 ..\FrameXML\UI.xsd">
 
 	<Script file="enUS.lua"/>
-
-	<!--i've only converted enUS over to Ace3. -->
-	<!--Script file="deDE.lua"/-->
-	<!--Script file="esES.lua"/-->
-	<!--Script file="frFR.lua"/-->
-	<!--Script file="koKR.lua"/-->
-	<!--Script file="zhCN.lua"/-->
+	<Script file="deDE.lua"/>
+	<Script file="esES.lua"/>
+	<Script file="frFR.lua"/>
+	<Script file="koKR.lua"/>
+	<Script file="zhCN.lua"/>
 	<Script file="zhTW.lua"/>
 </Ui>
