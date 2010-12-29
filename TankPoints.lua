@@ -1975,6 +1975,11 @@ function TankPoints:DumpTable(tpTable)
 	end;
 	
 	local function PercentToStr(value)
+		value = tonumber(value);
+		if (value == nil) then
+			value = 0;
+		end;
+			
 		return string.format("%.4f%%", value*100)
 	end;
 	
@@ -2052,6 +2057,21 @@ function TankPoints:PaintTankPoints(line1, line2, line3, line4, line5, line6)
 	end
 	self:StatBoxSet(line6, calc_label, "")
 end
+
+--[[
+	Toggle the TankPoints calculator, if it's available
+--]]
+function TankPoints:ToggleCalculator()
+	local tpc = TankPointsCalculatorFrame;
+	if (tpc) then
+		if(tpc:IsVisible()) then
+			tpc:Hide()
+		else
+			tpc:Show()
+		end
+		self:UpdateStats()
+	end
+end;								
 
 function TankPoints:PaintEffectiveHealth(line1, line2, line3, line4, line5, line6)
 	self:GetTankPointsIfNotFilled(self.resultsTable, nil)
