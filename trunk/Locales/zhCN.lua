@@ -6,10 +6,10 @@ Translated by:
 ]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "zhCN")
--- To translate AceLocale strings, replace true with the translation string
--- Before: ["Show Item ID"] = true,
--- After:  ["Show Item ID"] = "显示物品编号" 
 
+-- To translate AceLocale strings, replace true with the translation string
+-- Before: ["Show Item ID"] = true
+-- After:  ["Show Item ID"] = "显示物品编号"
 
 -- Global Strings that don't need translations
 --[[
@@ -64,22 +64,24 @@ TP_BLOCK = 9
 TP_BLOCKVALUE = 10
 TP_RESILIENCE = 11
 
-	-------------
-	-- General --
-	-------------
+-------------
+-- General --
+-------------
 	L["TankPoints"] = "坦点" 
 	L["EH"] = "实命"  -- "Effective Health" is a long phrase
 	L["EHB"] = "计挡实命"  -- "Effective Health with Block" is a very long phrase
 	L["Block Value"] = "格挡值" 
-	--------------------
-	-- Character Info --
-	--------------------
-	-- Stats
+
+--------------------
+-- Character Info --
+--------------------
+-- Stats
 	L["EH Block"] = "计挡实命" 
 	L[" EH"] = "实命" 
 	L[" TP"] = "坦点"  -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
 	L[" DR"] = "免伤"  -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
-	-- TankPoints Stat Tooltip
+
+-- TankPoints Stat Tooltip
 	L["In "] = "在"  -- concatenated before stance name, ex: "In Battle Stance"
 	L["Mob Stats"] = "怪物属性" 
 	L["Mob Level"] = "怪物等级" 
@@ -90,31 +92,37 @@ TP_RESILIENCE = 11
 	L["Per Stat"] = "每点属性坦点" 
         ["Click: show Per StatValue TankPoints"] = "点击：显示每等值属性坦点" 
         ["Click: show Per Stat TankPoints"] = "点击：显示每点属性坦点" 
-	-- Melee Reduction Tooltip
+
+-- Melee Reduction Tooltip
 	L[" Damage Reduction"] = "物免"  -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
 	L["Player Level"] = "玩家等级" 
 	L["Combat Table"] = "战斗数据表" 
 	L["Crit"] = "被爆" 
 	L["Crushing"] = "被碾" 
 	L["Hit"] = "被击中" 
-	-- Block Value Tooltip
+
+-- Block Value Tooltip
 	L["Mob Damage before DR"] = "物免前伤害" 
 	L["Mob Damage after DR"] = "物免后伤害" 
 	L["Blocked Percentage"] = "格档单次免伤" 
 	L["Equivalent Block Mitigation"] = "格档全程免伤" 
 	L["Shield Block Up Time"] = "盾牌格挡有效时间" 
-	-- Spell TankPoints Tooltip
+
+-- Spell TankPoints Tooltip
 	L["Melee/Spell Damage Ratio"] = "近战/法术伤害比" 
 	L["Left click: Show next school"] = "左键: 显示下一个属性" 
 	L["Right click: Show strongest school"] = "右键: 显示最强的属性" 
 	L[" resist "] = "抗性" 
-	-- Spell Reduction Tooltip
-	-- Toggle Calculator
+
+-- Spell Reduction Tooltip
+-- Toggle Calculator
 	L["Open Calculator"] = "开启计算器" 
 	L["Close Calculator"] = "关闭计算器" 
-	-- talent names
+
+-- talent names
 	L["imp. Shield Block"] = "强化盾挡"  -- short for Improved Shield Block
-	-- Effective Health stuff
+
+-- Effective Health stuff
 	L["Effective Health"] = "实命" 
 	L["Effective Health vs %s %s"] = "实命：%s %s"  -- Melee/Nature/Fire followed by EH
 	L["Effective Health (with Block) vs Melee "] = "实命(计格挡)：近战"  -- followed by EHB
@@ -130,101 +138,107 @@ TP_RESILIENCE = 11
 	L["Mob attacks cannot critically hit"] = "怪物不能爆击" 
 	L["Mob attacks will crush"] = "怪物能碾压" 
 	L["Mob attacks should not crush"] = "怪物不能碾压" 
-	-- an array with lines to be put at the bottom of the Effective Health Tooltip
-	-- saying what EH is
+
+-- an array with lines to be put at the bottom of the Effective Health Tooltip
+-- saying what EH is
 	L["TP_EXPLANATION"] = {"坦点是计算几率属性的生命值。"},
 	L["EH_EXPLANATION"] = {"实命是不计未命中/格档/躲闪/招架"  "时能承受的原始伤害。"},
 	L["EHB_EXPLANATION"] = {"计格挡的实命是不计未命中/躲闪/"  "招架时能承受的原始伤害，取决于"  "怪物类型并要求能格挡。"},
 	L["See /tp optionswin to turn on tooltip."] = "查看 /tp optionswin 打开提示" 
         
-	---------------------------
-	-- Slash Command Options --
-	---------------------------
-	-- /tp optionswin
+---------------------------
+-- Slash Command Options --
+---------------------------
+-- /tp config
 	L["Options Window"] = "选项窗口" 
 	L["Shows the Options Window"] = "显示选项窗口" 
-	-- /tp calc
+-- /tp calc
 	L["TankPoints Calculator"] = "坦点计算器" 
 	L["Shows the TankPoints Calculator"] = "显示坦点计算器" 
-	-- /tp tooltip
+-- /tp debug
+
+
+-- /tp tooltip
 	L["Tooltip Options"] = "提示框选项" 
 	L["TankPoints tooltip options"] = "坦点提示框选项" 
-	-- /tp tooltip diff
+-- /tp tooltip diff
 	L["Show TankPoints Difference"] = "显示坦点差值" 
 	L["Show TankPoints difference in item tooltips"] = "在物品提示框中显示坦点差值" 
-	-- /tp tooltip total
+-- /tp tooltip total
 	L["Show TankPoints Total"] = "显示坦点总值" 
 	L["Show TankPoints total in item tooltips"] = "在物品提示框中显示坦点总值" 
-	-- /tp tooltip drdiff
+-- /tp tooltip drdiff
 	L["Show Melee DR Difference"] = "显示近战物免差值" 
 	L["Show Melee Damage Reduction difference in item tooltips"] = "在物品提示框中显示近战物免差值" 
-	-- /tp tooltip drtotal
+-- /tp tooltip drtotal
 	L["Show Melee DR Total"] = "显示近战物免总值" 
 	L["Show Melee Damage Reduction total in item tooltips"] = "在物品提示框中显示近战物免总值" 
-	-- /tp tooltip ehdiff
+-- /tp tooltip ehdiff
 	L["Show Effective Health Difference"] = "显示实际生命差值" 
 	L["Show Effective Health difference in item tooltips"] = "在物品提市框中显示实际生命差值" 
-	-- /tp tooltip ehtotal
+-- /tp tooltip ehtotal
 	L["Show Effective Health Total"] = "显示实际生命总值" 
 	L["Show Effective Health total in item tooltips"] = "在物品提示框中显示实际生命总值" 
-	-- /tp tooltip ehbdiff
+-- /tp tooltip ehbdiff
 	L["Show Effective Health (with Block) Difference"] = "显示计算格挡的实际生命差值" 
 	L["Show Effective Health (with Block) difference in item tooltips"] = "在物品提示框中显示计算格挡的实际生命差值" 
-	-- /tp tooltip ehbtotal
+-- /tp tooltip ehbtotal
 	L["Show Effective Health (with Block) Total"] = "显示计算格挡的实际生命总值" 
 	L["Show Effective Health (with Block) total in item tooltips"] = "在物品提示框中显示计算格挡的实际生命总值" 
-	-- /tp player
+-- /tp player
 	L["Player Stats"] = "玩家属性" 
 	L["Change default player stats"] = "改变玩家默认属性" 
-	-- /tp player sbfreq
+-- /tp player sbfreq
 	--L["Shield Block Key Press Delay"] = "盾牌格挡按键频率" 
 	--L["Sets the time in seconds after Shield Block finishes cooldown"] = "设定盾牌格挡技能按键的间隔时间" 
-	-- /tp mob
+-- /tp mob
 	L["Mob Stats"] = "怪物属性" 
 	L["Change default mob stats"] = "改变怪物默认属性" 
-	-- /tp mob level
+-- /tp mob level
 	L["Mob Level"] = "怪物等级" 
 	L["Sets the level difference between the mob and you"] = "设定你和怪物的等级差距" 
-	-- /tp mob damage
-	-- /tp mob drdamage
+-- /tp mob damage
+-- /tp mob drdamage
 	L["Mob Damage"] = "怪物伤害" 
 	L["Sets mob's damage before damage reduction"] = "设定物免之前的怪物伤害" 
 	L["Sets mob's damage after melee damage reduction"] = "设定怪物物免之后的怪物伤害" 
-	-- /tp mob speed
+-- /tp mob speed
 	L["Mob Attack Speed"] = "怪物攻击速度" 
 	L["Sets mob's attack speed"] = "设定怪物的攻击速度" 
-	-- /tp mob default
+-- /tp mob default
 	L["Restore Default"] = "还原为默认值" 
 	L["Restores default mob stats"] = "还原默认怪物状态" 
 	L["Restored Mob Stats Defaults"] = "怪物状态已经还原为默认值"  -- command feedback
-	-- /tp mob advanced
+-- /tp mob advanced
 	L["Mob Stats Advanced Settings"] = "怪物状态高级设定" 
 	L["Change advanced mob stats"] = "更进一步更改怪物状态" 
-	-- /tp mob advanced crit
+-- /tp mob advanced crit
 	L["Mob Melee Crit"] = "怪物爆击" 
 	L["Sets mob's melee crit chance"] = "设定怪物的爆击几率" 
-	-- /tp mob advanced critbonus
+-- /tp mob advanced critbonus
 	L["Mob Melee Crit Bonus"] = "怪物爆击伤害加成" 
 	L["Sets mob's melee crit bonus"] = "设定怪物的爆击伤害加成" 
-	-- /tp mob advanced miss
+-- /tp mob advanced miss
 	L["Mob Melee Miss"] = "怪物未击中" 
 	L["Sets mob's melee miss chance"] = "设定怪物的未击中几率" 
-	-- /tp mob advanced spellcrit
+-- /tp mob advanced spellcrit
 	L["Mob Spell Crit"] = "怪物法爆" 
 	L["Sets mob's spell crit chance"] = "设定怪物法术的爆击几率" 
-	-- /tp mob advanced spellcritbonus
+-- /tp mob advanced spellcritbonus
 	L["Mob Spell Crit Bonus"] = "怪物法爆伤害奖励" 
 	L["Sets mob's spell crit bonus"] = "设定怪物法术的爆击伤害奖励" 
-	-- /tp mob advanced spellmiss
+-- /tp mob advanced spellmiss
 	L["Mob Spell Miss"] = "怪物法术未击中" 
 	L["Sets mob's spell miss chance"] = "设定怪物的法术未击中率" 
-	----------------------
-	-- GetDodgePerAgi() --
-	----------------------
+
+----------------------
+-- GetDodgePerAgi() --
+----------------------
 	L["Cat Form"] = "猎豹形态" 
-	---------------------------
-	-- GetTalantBuffEffect() --
-	---------------------------
+
+---------------------------
+-- GetTalantBuffEffect() --
+---------------------------
 	L["Soul Link"] = "灵魂联结" 
 	L["Voidwalker"] = "虚空行者" 
 	L["Righteous Fury"] = "正义之怒" 
@@ -233,59 +247,69 @@ TP_RESILIENCE = 11
 	L["Death Wish"] = "死亡之愿" 
 	L["Recklessness"] = "鲁莽" 
 	L["Cloak of Shadows"] = "暗影步" 
-	----------------------
-	-- AlterSourceData() --
-	----------------------
+
+----------------------
+-- AlterSourceData() --
+----------------------
 	L["Bear Form"] = "熊形态" 
 	L["Dire Bear Form"] = "巨熊形态" 
 	L["Moonkin Form"] = "枭兽形态" 
-	-----------------------
-	-- PlayerHasShield() --
-	-----------------------
+
+-----------------------
+-- PlayerHasShield() --
+-----------------------
 	L["Shields"] = "盾" 
-	---------------------
-	-- GetBlockValue() --
-	---------------------
+
+---------------------
+-- GetBlockValue() --
+---------------------
 	L["^(%d+) Block$"] = "^(%d+)格挡$" 
-	------------------------
-	-- Item Scan Patterns --
-	------------------------
+
+------------------------
+-- Item Scan Patterns --
+------------------------
 	L["ItemScan"] = {
 		[TP_BLOCKVALUE] = {
 			{"使你的盾牌格挡值提高(%d+)点。"},
 			{"%+(%d+) 格挡值"},
 		}
-	},
-	---------------------------
-	-- TankPoints Calculator --
-	---------------------------
-	-- Title
+	}
+
+---------------------------
+-- TankPoints Calculator --
+---------------------------
+-- Title
 	L["TankPoints Calculator"] = "坦点计算器" 
 	L["Left click to drag\nRight click to reset position"] = "左键点击以拖曳\n右键点击以重置位置" 
-	-- Buttons
+
+-- Buttons
 	L["Reset"] = "重置" 
 	L["Close"] = "关闭" 
-	-- Option frame box title
+
+-- Option frame box title
 	L["Results"] = "结果" 
 	L["Player Stats"] = "玩家属性" 
 	L["Total Reduction"] = "总物免" 
 	L["(%)"] = "(%)" 
 	L["Max Health"] = "生命值" 
 	L["Items"] = "物品" 
-	-------------------------
-	-- TankPoints Tooltips --
-	-------------------------
+
+-------------------------
+-- TankPoints Tooltips --
+-------------------------
 	L[" (Top/Bottom):"] = " (上/下):" 
 	L[" (Main/Off):"] = " (主/副):" 
 	L[" (Main+Off):"] = " (主+副):" 
 	L["Gems"] = "珠宝" 
-	---------------
-	-- Waterfall --
-	---------------
+
+---------------
+-- Waterfall --
+---------------
 	L["TankPoints Options"] = "坦点选项" 	
-	-------------------------
-	-- Calculator tooltips --
-	-------------------------
+
+-------------------------
+-- Calculator tooltips --
+-------------------------
 	L["Armor reduces physical damage taken"] = "护甲降低的物理伤害"
 	L["TPCalc_PlayerStatsTooltip_MasteryRating"] = "精通等级会增加你的精通效果。\n精通将增加你格挡的机率。"
 	L["TPCalc_PlayerStatsTooltip_Mastery"] = "精通将增加你格挡的机率。"
@@ -297,5 +321,3 @@ TP_RESILIENCE = 11
 	L["Block rating improves your chance to block. Blocked attacks hit for 30% less damage"] = "格挡等级提高你的格挡机率。\n格挡攻击可减少命中的30%伤害"
 	L["Your chance to block an attack. Blocked attacks hit for 30% less damage."] = "你格挡攻击的机率。\n格挡攻击命中可减少的30%伤害。"
 	L["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] = "格挡攻击可减少命中的30%伤害"
-
-} end)

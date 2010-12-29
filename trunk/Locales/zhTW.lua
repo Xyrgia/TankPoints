@@ -11,8 +11,8 @@ Translated by:
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "zhTW")
 
 -- To translate AceLocale strings, replace true with the translation string
--- Before: ["Show Item ID"] = true,
--- After:  ["Show Item ID"] = "顯示物品編號" 
+-- Before: ["Show Item ID"] = true
+-- After:  ["Show Item ID"] = "顯示物品編號"
 
 -- Global Strings that don't need translations
 --[[
@@ -154,12 +154,15 @@ TP_RESILIENCE = 11
 ---------------------------
 -- Slash Command Options --
 ---------------------------
--- /tp optionswin
+-- /tp config
 	L["Options Window"] = "選項視窗" 
 	L["Shows the Options Window"] = "顯示選項視窗" 
 -- /tp calc
 	L["TankPoints Calculator"] = "TankPoints坦克點計算機" 
 	L["Shows the TankPoints Calculator"] = "顯示坦克點計算機" 
+-- /tp debug
+
+
 -- /tp tooltip
 	L["Tooltip Options"] = "工具提示選項" 
 	L["TankPoints tooltip options"] = "坦克點工具提示選項" 

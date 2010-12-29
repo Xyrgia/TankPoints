@@ -1,13 +1,16 @@
 -- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
 --[[
-Name: TankPoints deDE locale
-Revision: $Revision: 50 $
+	Name: TankPoints deDE locale
+	Revision: $Revision: 50 $
 Translated by: 
 - AbbedieD
 ]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "deDE")
 
+-- To translate AceLocale strings, replace true with the translation string
+-- Before: ["Show Item ID"] = true
+-- After:  ["Show Item ID"] = "顯示物品編號"
 
 -- Global Strings that don't need translations
 --[[
@@ -60,26 +63,31 @@ TP_RESILIENCE = 11
 -------------
 -- General --
 -------------
---["TankPoints"] = true,
+
+
+
 	L["Block Value"] = "Blockwert"
 
 --------------------
 -- Character Info --
 --------------------
 -- Stats
-	--[" TP"] = true -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
+
+
+
 	L[" DR"] = " SR" -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
+
 -- TankPoints Stat Tooltip
-	--["In "] = true -- concatenated before stance name, ex: "In Battle Stance"
-	--["Mob Stats"] = true,
-	--["Mob Level"] = true,
+
+
+
 	L["Mob Damage"] = "Mob Schaden"
 	L["Mob Crit"] = "Mob kritisch"
 	L["Mob Miss"] = "Mob verfehlt"
-	--L["Per StatValue"] = true
-	--L["Per Stat"] = true
-    --L["Click: show Per StatValue TankPoints"] = true
-    --L["Click: show Per Stat TankPoints"] = true
+
+
+
+
 
 -- Melee Reduction Tooltip
 	L[" Damage Reduction"] = " Schadensreduzierung" -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
@@ -88,6 +96,9 @@ TP_RESILIENCE = 11
 	L["Crit"] = "Kritisch"
 	L["Crushing"] = "Schmetternd"
 	L["Hit"] = "Treffer"
+
+
+
 -- Block Value Tooltip
 	L["Mob Damage before DR"] = "Mob Schaden vor SR"
 	L["Mob Damage after DR"] = "Mob Schaden nach SR"
@@ -97,17 +108,34 @@ TP_RESILIENCE = 11
 	L["Melee/Spell Damage Ratio"] = "Nahkampf-/Zauberschadensverhältnis"
 	L["Left click: Show next school"] = "Linksklick: Zeige nächste Magieschule"
 	L["Right click: Show strongest school"] = "Rechtsklick: Zeige stärkste Magieschule"
+
+
 -- Spell Reduction Tooltip
 -- Toggle Calculator
 	L["Open Calculator"] = "\195\150ffne Rechner"
 	L["Close Calculator"] = "Schliesse Rechner"
 
+-- talent names
+
 ---------------------------
 -- Slash Command Options --
 ---------------------------
+-- /tp config
 -- /tp calc
 	L["TankPoints Calculator"] = "TankPoints Rechner"
 	L["Shows the TankPoints Calculator"] = "Zeigt den TankPoints Rechner an"
+-- /tp debug
+-- /tp tooltip
+-- /tp tooltip diff
+-- /tp tooltip total
+-- /tp tooltip drdiff
+-- /tp tooltip drtotal
+-- /tp tooltip ehdiff
+-- /tp tooltip ehtotal
+-- /tp tooltip ehbdiff
+-- /tp tooltip ehbtotal
+-- /tp player
+-- /tp player sbfreq
 -- /tp mob
 	--L["Mob Stats"] = true
 	L["Change default mob stats"] = "\195\132ndern der Standard Mob Stats"
@@ -115,8 +143,10 @@ TP_RESILIENCE = 11
 	--L["Mob Level"] = true
 	L["Sets the level difference between the mob and you"] = "Setzt den Levelunterschied zwischen dem Mob und dir"
 -- /tp mob damage
+-- /tp mob drdamage
 	L["Mob Damage"] = "Mob Schaden"
 	L["Sets mob's damage before damage reduction"] = "Schaden des Mobs vor der Schadensreduzierung \195\164ndern"
+-- /tp mob speed
 -- /tp mob default
 	L["Restore Default"] = "Standard wiederherstellen"
 	L["Restores default mob stats"] = "Stellt die Standard Mob Stats wieder her"
@@ -143,7 +173,7 @@ TP_RESILIENCE = 11
 	L["Mob Spell Miss"] = "Mob Zauber Verfehlt"
 	L["Sets mob's spell miss chance"] = "\195\132ndern der Mob Zauber Verfehl Chance"
 
-	----------------------
+----------------------
 -- GetDodgePerAgi() --
 ----------------------
 	L["Cat Form"] = "Katzengestalt"
@@ -161,7 +191,7 @@ TP_RESILIENCE = 11
 	L["Cloak of Shadows"] = "Mantel der Schatten"
 
 -----------------------
--- AlterDataTable() --
+-- AlterSourceData() --
 -----------------------
 	L["Bear Form"] = "Bärengestalt"
 	L["Dire Bear Form"] = "Terrorbärengestalt"
@@ -171,7 +201,7 @@ TP_RESILIENCE = 11
 -- PlayerHasShield() --
 -----------------------
 	L["Shields"] = "Schilde"
-	
+
 ---------------------
 -- GetBlockValue() --
 ---------------------
@@ -194,12 +224,26 @@ TP_RESILIENCE = 11
 -- Title
 	L["TankPoints Calculator"] = "TankPoints Rechner"
 	L["Left click to drag\nRight click to reset position"] = "Links klick zum ziehen\nRechtsklick um die Position zur\195\188ckzusetzen"
+
 -- Buttons
 	--L["Reset"] = true
 	L["Close"] = "Schliessen"
+
 -- Option frame box title
 	L["Results"] = "Ergebnis"
 	L["Player Stats"] = "Spieler Stats"
 	L["Total Reduction"] = "Endg\195\188ltige Reduzierung"
 	--L["(%)"] = true
 	L["Max Health"] = "Max Leben"
+
+-------------------------
+-- TankPoints Tooltips --
+-------------------------
+
+---------------
+-- Waterfall --
+---------------
+
+-------------------------
+-- Calculator tooltips --
+-------------------------
