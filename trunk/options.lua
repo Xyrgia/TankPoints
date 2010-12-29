@@ -158,6 +158,17 @@ local function getOptions()
 								addon:ShowConfig()
 							end,
 						}, --config
+						debug = {
+							type = 'toggle',
+							name = L["Enable Debugging"],
+							desc = L["Toggle the display of debug messages"],
+							order = 60,
+							get = function(info) return addon:IsDebugging() end,
+							set = function(info, value)
+								addon:SetDebugging(value);
+							end,
+						},
+
 					}, --general group entries
 				}, --general group
 				player = {

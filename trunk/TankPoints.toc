@@ -4,10 +4,11 @@
 ## Notes-zhTW: 計算並顯示你的坦克點。
 ## Notes-zhCN: 在角色窗口中计算并显示你的坦克点数
 ## Notes-esES: Calcula y muestra tus Puntos de Tanque en la ventana de personaje
-## Author: Whitetooth
-## X-eMail: hotdogee [at] gmail [dot] com
-## SavedVariables: TankPointsDB
 ## OptionalDeps: Ace2, LibStatLogic-1.1, LibTipHooker-1.1, StatFrameLib, UTF8, Waterfall-1.0
+## SavedVariables: TankPointsDB
+## Author: Whitetooth
+## Version: 2.9.0
+## X-eMail: hotdogee [at] gmail [dot] com
 ## X-Embeds: Ace2, LibStatLogic-1.1, LibTipHooker-1.1, StatFrameLib, UTF8, Waterfall-1.0
 ## X-Category: Interface Enhancements
 ## X-RelSite-WoWI: 6419
