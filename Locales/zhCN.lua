@@ -5,7 +5,7 @@ Translated by:
 - 自由之名@白银之手
 ]]
 
-local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "zhCN")
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "zhCN")
 if not L then return end
 
 -- To translate AceLocale strings, replace true with the translation string
@@ -91,8 +91,8 @@ TP_RESILIENCE = 11
 	L["Mob Miss"] = "怪物未击中" 
 	L["Per StatValue"] = "每等值属性坦点" 
 	L["Per Stat"] = "每点属性坦点" 
-        ["Click: show Per StatValue TankPoints"] = "点击：显示每等值属性坦点" 
-        ["Click: show Per Stat TankPoints"] = "点击：显示每点属性坦点" 
+	L["Click: show Per StatValue TankPoints"] = "点击：显示每等值属性坦点" 
+	L["Click: show Per Stat TankPoints"] = "点击：显示每点属性坦点" 
 
 -- Melee Reduction Tooltip
 	L[" Damage Reduction"] = "物免"  -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
@@ -142,9 +142,9 @@ TP_RESILIENCE = 11
 
 -- an array with lines to be put at the bottom of the Effective Health Tooltip
 -- saying what EH is
-	L["TP_EXPLANATION"] = {"坦点是计算几率属性的生命值。"},
-	L["EH_EXPLANATION"] = {"实命是不计未命中/格档/躲闪/招架"  "时能承受的原始伤害。"},
-	L["EHB_EXPLANATION"] = {"计格挡的实命是不计未命中/躲闪/"  "招架时能承受的原始伤害，取决于"  "怪物类型并要求能格挡。"},
+	L["TP_EXPLANATION"] = {"坦点是计算几率属性的生命值。"}
+	L["EH_EXPLANATION"] = {"实命是不计未命中/格档/躲闪/招架", "时能承受的原始伤害。"}
+	L["EHB_EXPLANATION"] = {"计格挡的实命是不计未命中/躲闪/", "招架时能承受的原始伤害，取决于", "怪物类型并要求能格挡。"}
 	L["See /tp optionswin to turn on tooltip."] = "查看 /tp optionswin 打开提示" 
         
 ---------------------------
