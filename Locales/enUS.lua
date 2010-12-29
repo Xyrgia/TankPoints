@@ -13,8 +13,8 @@ local debug = false
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "enUS", true, debug) --true=this is the default locale
 
 -- To translate AceLocale strings, replace true with the translation string
--- Before: ["Show Item ID"] = true,
--- After:  ["Show Item ID"] = "顯示物品編號",
+-- Before: ["Show Item ID"] = true
+-- After:  ["Show Item ID"] = "顯示物品編號"
 
 -- Global Strings that don't need translations
 --[[
@@ -156,12 +156,15 @@ TP_RESILIENCE = 11
 ---------------------------
 -- Slash Command Options --
 ---------------------------
--- /tp optionswin
+-- /tp config
 	L["Options Window"] = true
 	L["Shows the Options Window"] = true
 -- /tp calc
 	L["TankPoints Calculator"] = true
 	L["Shows the TankPoints Calculator"] = true
+-- /tp debug
+	L["Enable Debugging"] = true
+	L["Toggle the display of debug messages"] = true
 -- /tp tooltip
 	L["Tooltip Options"] = true
 	L["TankPoints tooltip options"] = true
@@ -272,8 +275,8 @@ TP_RESILIENCE = 11
 ------------------------
 -- Item Scan Patterns --
 ------------------------
-L["ItemScan"] = {
-	[TP_BLOCKVALUE] = {
+	L["ItemScan"] = {
+		[TP_BLOCKVALUE] = {
 			{"Increases the block value of your shield by (%d+)"},
 			{"%+(%d+) Block Value"},
 		}

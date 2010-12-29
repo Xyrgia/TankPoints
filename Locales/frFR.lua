@@ -1,15 +1,16 @@
 -- -*- indent-tabs-mode: t; tab-width: 4; lua-indent-level: 4 -*-
 --[[
-Name: TankPoints frFR locale
-Revision: $Revision: 58 $
+	Name: TankPoints frFR locale
+	Revision: $Revision: 58 $
 Translated by: 
 - Tixu@Curse
 ]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "frFR")
+
 -- To translate AceLocale strings, replace true with the translation string
--- Before: ["Show Item ID"] = true,
--- After: ["Show Item ID"] = "顯示物品編號" 
+-- Before: ["Show Item ID"] = true
+-- After: ["Show Item ID"] = "顯示物品編號"
 
 -- Global Strings that don't need translations
 --[[
@@ -64,19 +65,24 @@ TP_BLOCK = 9
 TP_BLOCKVALUE = 10
 TP_RESILIENCE = 11
 
+-------------
+-- General --
+-------------
 
-	-------------
-	-- General --
-	-------------
-	-- ["TankPoints"] = true,
+
+
 	L["Block Value"] = "blocage" 
-	--------------------
-	-- Character Info --
-	--------------------
-	-- Stats
+
+--------------------
+-- Character Info --
+--------------------
+-- Stats
+
+
 	L[" TP"] = " TP"  -- concatenated after a school name for Spell TankPoints, ex: "Nature TP"
 	L[" DR"] = "-"  -- concatenated after a school name for Damage Reductions, ex: "Nature DR"
-	-- TankPoints Stat Tooltip
+
+-- TankPoints Stat Tooltip
 	L["In "] = "En "  -- concatenated before stance name, ex: "In Battle Stance"
 	L["Mob Stats"] = "Stats opposant" 
 	L["Mob Level"] = "Niveau opposant" 
@@ -88,82 +94,103 @@ TP_RESILIENCE = 11
         --["Click: show Per StatValue TankPoints"] = "" 
         --["Click: show Per Stat TankPoints"] = "" 
 
-	-- Melee Reduction Tooltip
+-- Melee Reduction Tooltip
 	L[" Damage Reduction"] = ": r\195\169duction des dommages"  -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
 	L["Player Level"] = "Niveau du joueur" 
 	L["Combat Table"] = "Stats de combat" 
 	L["Crit"] = "Critique" 
 	L["Crushing"] = "D\195\169vastateur (\195\169crase)" 
 	L["Hit"] = "Toucher" 
-	-- Block Value Tooltip
+
+
+
+-- Block Value Tooltip
 	L["Mob Damage before DR"] = "Dommages entrants avant r\195\169duction" 
 	L["Mob Damage after DR"] = "Dommages par\195\168s r\195\169duction" 
 	L["Blocked Percentage"] = "Pourcentage bloqu\195\169s" 
 	L["Equivalent Block Mitigation"] = "Equivalence de r\195\169duction" 
-	-- Spell TankPoints Tooltip
+
+
+-- Spell TankPoints Tooltip
 	L["Melee/Spell Damage Ratio"] = "Ratio m\195\169l\195\169e/sort" 
 	L["Left click: Show next school"] = "Click gauche: afficher l'\195\169cole suivante" 
 	L["Right click: Show strongest school"] = "Click droit: afficher la meilleure \195\169cole " 
-	-- Spell Reduction Tooltip
-	-- Toggle Calculator
+
+
+-- Spell Reduction Tooltip
+-- Toggle Calculator
 	L["Open Calculator"] = "Ouvrir Calculatrice" 
 	L["Close Calculator"] = "Fermer Calculatrice" 
-	---------------------------
-	-- Slash Command Options --
-	---------------------------
-	-- /tp calc
+
+-- talent names
+
+-- Effective Health stuff
+
+-- an array with lines to be put at the bottom of the Effective Health Tooltip
+-- saying what EH is
+        
+---------------------------
+-- Slash Command Options --
+---------------------------
+-- /tp config
+-- /tp calc
 	-- ["TankPoints Calculator"] = true,
 	L["Shows the TankPoints Calculator"] = "Ouvre le calculateur de TankPoints" 
-	-- /tp tooltip
+-- /tp debug
+-- /tp tooltip
 	L["Tooltip Options"] = "Option Infobulle" 
 	L["TankPoints tooltip options"] = "Options pour les infobulles" 
-	-- /tp tooltip diff
+-- /tp tooltip diff
 	L["Show TankPoints Difference"] = "Afficher les diff\195\169rences" 
 	L["Show TankPoints difference in item tooltips"] = "Afficher les diff\195\169rences entre objets dans les infobulles" 
-	-- /tp tooltip total
+-- /tp tooltip total
 	L["Show TankPoints Total"] = "Afficher total" 
 	L["Show TankPoints total in item tooltips"] = "Afficher le TankPoint total des objets dans les infobulles" 
-	-- /tp mob
+-- /tp mob
 	-- ["Mob Stats"] = true,
 	L["Change default mob stats"] = "Changer les statistiques de votre opposant" 
-	-- /tp mob level
+-- /tp mob level
 	-- ["Mob Level"] = true,
 	L["Sets the level difference between the mob and you"] = "D\195\169finir la diff\195\169rence de niveau entre vous et votre opposant" 
-	-- /tp mob damage
+-- /tp mob damage
+-- /tp mob drdamage
 	-- ["Mob Damage"] = true,
 	L["Sets mob's damage before damage reduction"] = "D\195\169finir les dommages moyens de votre opposant" 
-	-- /tp mob default
+-- /tp mob speed
+-- /tp mob default
 	L["Restore Default"] = "R\195\169initialiser" 
 	L["Restores default mob stats"] = "R\195\169initialiser les statistiques de votre opposant" 
 	L["Restored Mob Stats Defaults"] = "Statistiques de votre opposant r\195\169initilis\195\169es"  -- command feedback
-	-- /tp mob advanced
+-- /tp mob advanced
 	-- ["Mob Stats Advanced Settings"] = true,
 	L["Change advanced mob stats"] = "Modifier les statistiques avanc\195\169es pour l'opposant" 
-	-- /tp mob advanced crit
+-- /tp mob advanced crit
 	-- ["Mob Melee Crit"] = true,
 	L["Sets mob's melee crit chance"] = "D\195\169finir les chances de coup critique en m\195\169l\195\169e de l'opposant" 
-	-- /tp mob advanced critbonus
+-- /tp mob advanced critbonus
 	-- ["Mob Melee Crit Bonus"] = true,
 	L["Sets mob's melee crit bonus"] = "D\195\169finir le bonus de coup critique en m\195\169l\195\169e de l'opposant" 
-	-- /tp mob advanced miss
+-- /tp mob advanced miss
 	-- ["Mob Melee Miss"] = true,
 	L["Sets mob's melee miss chance"] = "D\195\169finir les chances de rat\195\169 en m\195\169l\195\169e de l'opposant" 
-	-- /tp mob advanced spellcrit
+-- /tp mob advanced spellcrit
 	-- ["Mob Spell Crit"] = true,
 	L["Sets mob's spell crit chance"] = "D\195\169finir les chances de critique des sorts de l'opposant" 
-	-- /tp mob advanced spellcritbonus
+-- /tp mob advanced spellcritbonus
 	-- ["Mob Spell Crit Bonus"] = true,
 	L["Sets mob's spell crit bonus"] = "D\195\169finir le bonus de critique des sorts de l'opposant" 
-	-- /tp mob advanced spellmiss
+-- /tp mob advanced spellmiss
 	-- ["Mob Spell Miss"] = true,
 	L["Sets mob's spell miss chance"] = "D\195\169finir les chances de l'opposant de rater son sort" 
-	----------------------
-	-- GetDodgePerAgi() --
-	----------------------
+
+----------------------
+-- GetDodgePerAgi() --
+----------------------
 	L["Cat Form"] = "Forme de félin" 
-	---------------------------
-	-- GetTalantBuffEffect() --
-	---------------------------
+
+---------------------------
+-- GetTalantBuffEffect() --
+---------------------------
 	L["Soul Link"] = "Lien spirituel" 
 	L["Voidwalker"] = "Marcheur du Vide" 
 	L["Righteous Fury"] = "Fureur vertueuse" 
@@ -172,51 +199,66 @@ TP_RESILIENCE = 11
 	L["Death Wish"] = "Souhait mortel" 
 	L["Recklessness"] = "Témérité" 
 	L["Cloak of Shadows"] = "Cape d'ombre" 
-	-----------------------
-	-- AlterDataTable() --
-	-----------------------
+
+-----------------------
+-- AlterSourceData() --
+-----------------------
 	L["Bear Form"] = "Forme d’ours" 
 	L["Dire Bear Form"] = "Forme d’ours redoutable" 
 	L["Moonkin Form"] = "Forme de sélénien" 
-	-----------------------
-	-- PlayerHasShield() --
-	-----------------------
+
+-----------------------
+-- PlayerHasShield() --
+-----------------------
 	L["Shields"] = "Boucliers" 
-	---------------------
-	-- GetBlockValue() --
-	---------------------
+
+---------------------
+-- GetBlockValue() --
+---------------------
 	L["^(%d+) Block$"] = "Bloquer.- (%d+)" 
-	------------------------
-	-- Item Scan Patterns --
-	------------------------
+
+------------------------
+-- Item Scan Patterns --
+------------------------
 	L["ItemScan"] = {
 		[TP_BLOCKVALUE] = {
 			{"Augmente la valeur de blocage de votre bouclier de (%d+)"},
 			{"+(%d+) Valeur de blocage"},
 			{"+(%d+) \195\160 la valeur de blocage"},
 		}
-	},
-	---------------------------
-	-- TankPoints Calculator --
-	---------------------------
-	-- Title
+	}
+
+---------------------------
+-- TankPoints Calculator --
+---------------------------
+-- Title
 	L["TankPoints Calculator"] = "Calculatrice TankPoint" 
 	L["Left click to drag\nRight click to reset position"] = "Click-gauche pour d\195\169placer\nClick-droit pour initialiser la position" 
-	-- Buttons
+
+-- Buttons
 	L["Reset"] = "R\195\169initialiser" 
 	L["Close"] = "Fermer" 
-	-- Option frame box title
+
+-- Option frame box title
 	L["Results"] = "R\195\169sultats" 
 	L["Player Stats"] = "Statistiques du joueur" 
 	L["Total Reduction"] = "R\195\169duction totale" 
 	--["(%)"] = true,
 	L["Max Health"] = "Vie max" 
 	L["Items"] = "Objets" 
-	-------------------------
-	-- TankPoints Tooltips --
-	-------------------------
+
+-------------------------
+-- TankPoints Tooltips --
+-------------------------
 	L[" (Top/Bottom):"] = " (Haut/Bas):" 
 	L[" (Main/Off):"] = " (Main droite/gauche):" 
 	L[" (Main+Off):"] = " (Main droite+gauche):" 
 	L["Gems"] = "Gemmes" 
-} end)
+
+---------------
+-- Waterfall --
+---------------
+
+-------------------------
+-- Calculator tooltips --
+-------------------------
