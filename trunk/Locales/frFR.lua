@@ -6,7 +6,7 @@ Translated by:
 - Tixu@Curse
 ]]
 
-local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "frFR")
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "frFR")
 if not L then return end
 
 -- To translate AceLocale strings, replace true with the translation string

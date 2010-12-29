@@ -6,7 +6,7 @@ Translated by:
 - fenlis(jungseop.park@gmail.com)
 ]]
 
-local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "koKR")
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "koKR")
 if not L then return end
 
 -- To translate AceLocale strings, replace true with the translation string
@@ -81,8 +81,8 @@ BLOCK = "Block"
 	L["Mob Miss"] = "몹 회피" 
 	L["Per StatValue"] = "능력치값 당" 
 	L["Per Stat"] = "능력치 당" 
-        ["Click: show Per StatValue TankPoints"] = "클릭: 능력치당 탱킹점수 표시" 
-        ["Click: show Per Stat TankPoints"] = "클릭: 능력당 탱킹점수 표시" 
+	L["Click: show Per StatValue TankPoints"] = "클릭: 능력치당 탱킹점수 표시" 
+	L["Click: show Per Stat TankPoints"] = "클릭: 능력당 탱킹점수 표시" 
 
 -- Melee Reduction Tooltip
 	L[" Damage Reduction"] = " 피해 감소량"  -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
@@ -132,9 +132,9 @@ BLOCK = "Block"
 
 -- an array with lines to be put at the bottom of the Effective Health Tooltip
 -- saying what EH is
-	L["TP_EXPLANATION"] = {"TankPoints is a measure of your theoretical"  "mitigation (dodge, parry, etc) in proportion"  "to your health."},
-	L["EH_EXPLANATION"] = {"Effective Health is how much raw"  "damage you can take without"  "a miss/block/dodge/parry."},
-	L["EHB_EXPLANATION"] = {"Effective Health with Block is how much raw"  "damage you can take without a miss/dodge/parry"  "and only guaranteed blocks. Dependant"  "on mob stats and you being able to block."},
+	L["TP_EXPLANATION"] = {"TankPoints is a measure of your theoretical", "mitigation (dodge, parry, etc) in proportion", "to your health."}
+	L["EH_EXPLANATION"] = {"Effective Health is how much raw", "damage you can take without", "a miss/block/dodge/parry."}
+	L["EHB_EXPLANATION"] = {"Effective Health with Block is how much raw", "damage you can take without a miss/dodge/parry", "and only guaranteed blocks. Dependant", "on mob stats and you being able to block."}
 	L["See /tp optionswin to turn on tooltip."] = "See /tp optionswin to turn on tooltip." 
         
 ---------------------------

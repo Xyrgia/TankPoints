@@ -6,7 +6,7 @@ Translated by:
 - shiftos
 ]]
 
-local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "esES")
+local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints", "esES")
 if not L then return end
 
 -- To translate AceLocale strings, replace true with the translation string
