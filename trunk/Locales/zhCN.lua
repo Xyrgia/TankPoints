@@ -6,6 +6,7 @@ Translated by:
 ]]
 
 local L = LibStub("AceLocale-3.0"):NewLocale("TankPoints"  "zhCN")
+if not L then return end
 
 -- To translate AceLocale strings, replace true with the translation string
 -- Before: ["Show Item ID"] = true
