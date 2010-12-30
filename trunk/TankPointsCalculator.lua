@@ -13,6 +13,7 @@ LastUpdate: $Date$
 ---------------
 local StatLogic = LibStub:GetLibrary("LibStatLogic-1.2")
 local L = LibStub("AceLocale-3.0"):GetLocale("TankPoints") --Get the localization for our addon
+local TankPoints = TankPoints
 
 --------------------
 -- Initialization --
@@ -199,7 +200,7 @@ TPCalc.LabelText = {
 	},
 	{-- TPCPlayerStats1
 		SPELL_STAT1_NAME, -- "Strength" (Hidden ability "Forceful Deflection" gives 0.25 parry per strength)
-		SPELL_STAT2_NAME.." (n/a)", -- "Agility"
+		SPELL_STAT2_NAME, -- "Agility"
 		SPELL_STAT3_NAME, -- "Stamina"
 		L["Max Health"],
 		"["..ARMOR.." - "..L["Items"].."]",
