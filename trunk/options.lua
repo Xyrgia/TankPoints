@@ -215,19 +215,23 @@ local function getOptions()
 								min = -20,
 								max = 20,
 								step = 1,
+								order = 1,
 							},
 							default = {
 								type = "execute",
 								name = L["Restore Default"],
 								desc = L["Restores default mob stats"],
 								func = function()
-										addon:SetDefaultMobStats();
-									end;
+									addon:SetDefaultMobStats()
+								end,
+								order = 2,
 							},
 							advanced = {
 								type = "group",
 								name = L["Mob Stats Advanced Settings"],
 								desc = L["Change advanced mob stats"],
+								inline = true,
+								order = 10,
 								args = {
 									crit = {
 										type = "range",

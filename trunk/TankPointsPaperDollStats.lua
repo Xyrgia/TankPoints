@@ -219,13 +219,13 @@ end
 function TankPoints.SpellTankPointsFrame_OnMouseUp(frame, button)
 	TankPoints.SpellFrame_OnMouseUp(frame, button)
 	local spellTankPoints = commaValue(floor(TankPoints.resultsTable.tankPoints[TankPoints.currentSchool]))
-	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
+	PaperDollFrame_SetLabelAndText(frame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
 end
 
 function TankPoints.SpellReductionFrame_OnMouseUp(frame, button)
 	TankPoints.SpellFrame_OnMouseUp(frame, button)
 	local spellReduction = TankPoints.resultsTable.totalReduction[TankPoints.currentSchool] * 100        
-	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction)
+	PaperDollFrame_SetLabelAndText(frame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction)
 end
 
 -- Cycle through schools OnClick left, Reset to strongest school OnClick right
@@ -355,7 +355,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	local textL, textR
 	-------------
 	-- Title Line
-	textL = L["TankPoints"].." "..format("%d", resultsDT.tankPoints[TP_MELEE])
+	textL = format("%s %d", L["TankPoints"], resultsDT.tankPoints[TP_MELEE])
 	GameTooltip:SetText(textL, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	---------
 	-- Stance
@@ -444,7 +444,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	newDT.armor = newDT.armor + 2
 	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()) * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])..L[" TP"]
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	-------------
 	-- Stamina --
@@ -453,14 +453,13 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	copyTable(newDT, sourceDT) -- load default data
 	if per_stat then
 		textL = "1 "..SPELL_STAT3_NAME.." = "
-
 		newDT.playerHealth = newDT.playerHealth + 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	else
 		textL = "1.5 "..SPELL_STAT3_NAME.." = "
 		newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])..L[" TP"]
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	-----------
 	-- Armor --
@@ -475,7 +474,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		newDT.armor = newDT.armor + 10 * armorMod
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])..L[" TP"]
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	------------------
 	-- Dodge Rating --
@@ -489,7 +488,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DODGE, newDT.playerLevel)) * 0.01
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	------------------
 	-- Parry Rating --
@@ -503,7 +502,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_PARRY, newDT.playerLevel)) * 0.01
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	------------------
 	-- Block Rating --
@@ -517,7 +516,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		newDT.blockChance = newDT.blockChance + StatLogic:GetEffectFromRating(1, CR_BLOCK, newDT.playerLevel) * 0.01
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
+	textR = format("%.1f %s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 	-----------------
 	-- Block Value --
@@ -527,11 +526,11 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		textL = "1 "..L["Block Value"].." = "
 		newDT.blockValue = (newDT.blockValue or 0) + StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	else
-		textL = format("%.2f", 2/0.65).." "..L["Block Value"].." = "
+		textL = format("%.2f %s = ", 2/0.65, L["Block Value"])
 		newDT.blockValue = (newDT.blockValue or 0) + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f"..L[" TP"], newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
 	------------------------------------
@@ -676,7 +675,7 @@ function TankPoints.BlockValueFrame_OnEnter(statFrame)
 	local textL, textR
 	-------------
 	-- Title Line
-	textL = L["Block Value"].." "..format("%d", resultsDT.blockValue or 0)
+	textL = format("%s %d", L["Block Value"], resultsDT.blockValue or 0)
 	GameTooltip:SetText(textL, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 
 	-----------------------
@@ -859,7 +858,7 @@ end
 ------------------------------------------------------
 -- Effective Health StatGroup
 
---udaters
+--updaters
 local function EH_SetEffectiveHealth(statFrame, unit)
 	TankPoints:GetTankPointsIfNotFilled(TankPoints.resultsTable, nil)
 	local value = commaValue(floor(TankPoints.resultsTable.effectiveHealth[TP_MELEE]))
@@ -1037,21 +1036,21 @@ function TankPoints.EffectiveHealth_EffectiveHealthTooltip(statFrame)
 	newDT.armor = newDT.armor + 2
 	--newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi() * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1 "..SPELL_STAT2_NAME.." = ", format("%.1f", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE]).." EH")
+	addline(GameTooltip, "1 "..SPELL_STAT2_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
 	-------------
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + floor(1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")) --20101213: found exampe where wow is doing ceil on statmod
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE]).." EH")
+	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
 	-----------
 	-- Armor --
 	-----------
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE]).." EH")
+	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
 
 	for _,line in ipairs(L["EH_EXPLANATION"]) do
 		GameTooltip:AddLine(line, GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b)
@@ -1115,28 +1114,28 @@ function TankPoints.EffectiveHealth_EffectiveHealthWithBlockTooltip(statFrame)
 	newDT.armor = newDT.armor + 2
 	--newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi() * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1 "..SPELL_STAT2_NAME.." = ", format("%.1f", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE]).." EH")
+	addline(GameTooltip, "1 "..SPELL_STAT2_NAME.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	-------------
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE]).." EH")
+	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	-----------
 	-- Armor --
 	-----------
 	copyTable(newDT, sourceDT)
 	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE]).." EH")
+	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	-----------------
 	-- Block Value --
 	-----------------
 	copyTable(newDT, sourceDT) -- load default data
 	newDT.blockValue = 0; --newDT.blockValue + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, format("%.2f", 2/0.65).." "..L["Block Value"].." = ", format("%.1f", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE]).." EH")
+	addline(GameTooltip, format("%.2f", 2/0.65).." "..L["Block Value"].." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	--[[
 	if TankPoints.playerClass == "WARRIOR" and not hasImprovedShieldBlock() then
 		-----------------------
@@ -1197,14 +1196,14 @@ function TankPoints.EffectiveHealth_SpellEffectiveHealthTooltip(statFrame)
 	copyTable(newDT, sourceDT)
 	newDT.resistance[s] = newDT.resistance[s] + 3
 	TankPoints:GetTankPoints(newDT, s)
-	addline(GameTooltip, "3 "..TankPoints.SchoolName[s]..L[" resist "].." = ", format("%.1f", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s]).." EH")
+	addline(GameTooltip, "3 "..TankPoints.SchoolName[s]..L[" resist "].." = ", format("%.1f%s", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s], L[" EH"]))
 	-------------
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
 	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	TankPoints:GetTankPoints(newDT, s)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s]).." EH")
+	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s], L[" EH"]))
 	
 	GameTooltip:Show()
 end
@@ -1223,7 +1222,7 @@ function TankPoints.EffectiveHealth_AllSchoolsEffectiveHealthTooltip(statFrame)
 		return resultDT.effectiveHealth[a] > resultDT.effectiveHealth[b]
 	end)
 	for _,s in ipairs(schools) do
-		GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..s],commaValue(floor(resultDT.effectiveHealth[s])))
+		GameTooltip:AddDoubleLine(_G["DAMAGE_SCHOOL"..s], commaValue(floor(resultDT.effectiveHealth[s])))
 		GameTooltip:AddTexture("Interface\\PaperDollInfoFrame\\SpellSchoolIcon"..s)
 	end
 	
