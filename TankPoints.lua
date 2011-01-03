@@ -1007,7 +1007,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		--]]
 		
 		-- Mastery
-		TP_Table.mastery = GetMastery(); 
+		TP_Table.mastery = GetMastery(); --Mastery is a value, e.g. 14.16. (i.e. It isn't a percentage or a fraction)
 		TP_Table.masteryRating = GetCombatRating(CR_MASTERY);
 
 		-- Dodge, Parry
@@ -1152,27 +1152,27 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local _, _, agility = UnitStat("player", 2)
 		local agiMod = StatLogic:GetStatMod("MOD_AGI")
 		
-		changes.agi = max(0, floor((ceil(agility / agiMod) + changes.agi) * agiMod)) - agility
-		
-		--self:Debug("TankPoints.AlterSourceData: changes.agi = "..changes.agi)
+		if (agiMod ~= 1.0) then
+			changes.agi = max(0, floor((ceil(agility / agiMod) + changes.agi) * agiMod)) - agility
+			self:Debug(string.format("   Adjusting agility change to %d because of MOD_AGI %.2f", changes.agi, agiMod));
+		end
 		
 		-- Calculate dodge chance
-		--self:Debug("DodgePerAgi = "..StatLogic:GetDodgePerAgi())
-		local dodgeThoughAgility = StatLogic:GetDodgePerAgi() * changes.agi;
-		--self:Debug("DodgeThoughAgility = "..dodgeThoughAgility)
-		
-		--[[todo: deal with diminishing returns's new knee
---		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", changes.agi * StatLogic:GetDodgePerAgi()) * 0.01
-		--dodgeThoughAgility = StatLogic:GetAvoidanceGainAfterDR("DODGE", dodgeThoughAgility)
-		--self:Debug("DodgeThoughAgility after DR = "..dodgeThoughAgility)
-		--]]
+		local dodgeThroughAgility = StatLogic:GetDodgePerAgi() * changes.agi; --could also use StatLogic:GetDodgeFromAgi(changes.agi)
 
+		--Adjust dodge percentage for diminishing returns
+		dodgeThroughAgility = StatLogic:GetAvoidanceGainAfterDR("DODGE", dodgeThroughAgility);
+		--self:Debug("dodgeThroughAgility after DR = "..dodgeThroughAgility)
+
+		self:Debug(string.format("   Adding %.4f%% dodge (from %d Agility) to existing %.4f%% Dodge", dodgeThroughAgility, changes.agi, tpTable.dodgeChance*100));
+		
 		--self:Debug("tpTable.dodgeChance = "..tpTable.dodgeChance)
-		tpTable.dodgeChance = tpTable.dodgeChance + (dodgeThoughAgility * 0.01)
+		tpTable.dodgeChance = tpTable.dodgeChance + (dodgeThroughAgility * 0.01)
 		--self:Debug("tpTable.dodgeChance after = "..tpTable.dodgeChance)
 		
 		-- Armor mods don't effect armor from agi
-		tpTable.armor = tpTable.armor + changes.agi * 2
+		--20110103: Agility no longer affects armor (at least it doesn't affect mine)
+		--tpTable.armor = tpTable.armor + changes.agi * 2
 	end
 	
 	if (changes.sta and changes.sta ~= 0) then
@@ -1224,7 +1224,10 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 				Assume 15% applies to item: 228 * 1.15 = 262.2
 				
 		--]]
-		changes.sta = max(0, round((ceil(bonusSta / staMod) + changes.sta) * staMod)) - bonusSta --20101213 Changed to ceil, from round, to make example i found work
+		if (staMod ~= 1.0) then
+			changes.sta = max(0, round((ceil(bonusSta / staMod) + changes.sta) * staMod)) - bonusSta --20101213 Changed to ceil, from round, to make example i found work
+			self:Debug(string.format("   Adjusting Stamina change to %d because of MOD_STA %.4f", changes.sta, staMod));
+		end
 
 		-- Calculate player health
 		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
@@ -1304,7 +1307,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	
 	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
-	
+
 	--[[20101018: Defense removed from game
 	if changes.defense and changes.defense ~= 0 then
 		tpTable.defense = tpTable.defense + changes.defense
@@ -1353,10 +1356,9 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			changes.mastery = 0;
 		end;
 
-		--GetEffectFromRating returns a percentage
-		local masteryFromRating = StatLogic:GetEffectFromRating(changes.masteryRating, "MASTERY_RATING", tpTable.playerLevel); --leave Mastery as a percentage (e.g. 1.32 = 1.32%)
+		local masteryFromRating = StatLogic:GetEffectFromRating(changes.masteryRating, "MASTERY_RATING", tpTable.playerLevel); --Mastery is not a percentage, or a fraction; it's a number, e.g. 1159 Mastery Rating grants +6.46 Mastery.
 				
-		self:Debug("   Adding %.2f%% Mastery (from %d Mastery Rating) to existing %.2f%% Mastery", masteryFromRating, changes.masteryRating, tpTable.mastery);
+		self:Debug("   Adding %.4f Mastery (from %d Mastery Rating) to existing %.4f Mastery", masteryFromRating, changes.masteryRating, tpTable.mastery);
 			
 		changes.mastery = changes.mastery + masteryFromRating;
 	end
@@ -1364,14 +1366,14 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	if (changes.mastery and changes.mastery ~= 0) then
 		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 3) then
 			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)*0.01;
-			self:Debug(string.format("   Adding %.4f%% Block Chance through warrior mastery to existing %.2f%% Block Chance", blockChanceFromMastery*100, tpTable.blockChance*100));
+			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f warrior Mastery) to existing %.4f%% Block Chance", blockChanceFromMastery*100, changes.mastery, tpTable.blockChance*100));
 			
 			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
         elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 2) then
 			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)*0.01
 
-			self:Debug(string.format("   Adding %.4f%% Block Chance from mastery to existing %.4f%% Block Chance)", 
-					blockChanceFromMastery*100, tpTable.blockChance*100));
+			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f paladin Mastery) to existing %.4f%% Block Chance)", 
+					blockChanceFromMastery*100, changes.mastery, tpTable.blockChance*100));
 			
 			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
         end	
@@ -1940,7 +1942,7 @@ function TankPoints:DumpTable(tpTable)
 	self:Print("   dodgeChance: "..PercentToStr(tpTable.dodgeChance));
 	self:Print("   parryChance: "..PercentToStr(tpTable.parryChance));
 	self:Print("   blockChance: "..PercentToStr(tpTable.blockChance));
-	self:Print("   mastery: "..PercentToStr(tpTable.mastery)*0.01); --Mastery is stored as true percentage, divide by 100 to convert to fraction before printing
+	self:Print(string.format("   mastery: %.2f", tpTable.mastery)); --Mastery isn't a percentage, it's a real number, e.g. 14.46
 	self:Print("   mobCritChance: "..PercentToStr(tpTable.mobCritChance));
 	self:Print("   mobCritBonus: "..PercentToStr(tpTable.mobCritBonus));
 	self:Print("   mobCritDamageMod: "..PercentToStr(tpTable.mobCritDamageMod));
