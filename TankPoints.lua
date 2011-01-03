@@ -21,8 +21,13 @@ local StatLogic = LibStub("LibStatLogic-1.2")
 TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceEvent-3.0")
 local TankPoints = TankPoints
 
-TankPoints.version = "2.9.0 (r"..gsub("$Revision$", "(%d+)", "%1")..")"
+TankPoints.version = "2.9.0 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1")..")"
+--Append "a" (alpha) to revision if it's alpha. The wowace packager will convert alpha..end-alpha into a block level comment
+--@alpha@
+TankPoints.version = "2.9.0 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1").."a)"
+--@end-alpha@
 TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1")
+
 
 --[[
 	The TankPoints has 3 main methods that do the bulk of the work
@@ -1058,13 +1063,11 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 end
 
 --[[
-	AlterSourceData
+	AlterSourceData(source, changes, [forceShield])
 	
 	Arguments
-		tpTable		
-			A data table that contains the values to be modified
-
-		changes		
+	@param source A data table that contains the values to be modified
+	@param changes
 			A data table that contains the changes to be applied to tpTable
 			The changes that can be applied are the following members:					
 				changes = {
@@ -1082,6 +1085,8 @@ end
 					resilience = ,
 					-- mob stats
 					mobLevel = ,
+					mastery = ,
+					masteryRating = ,
 				}
 		
 		forceShield
