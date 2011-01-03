@@ -26,6 +26,7 @@ UTF8\utf8.lua
 # Ace Libraries #
 #################
 embeds.xml
+Libs\AceDebug-3.0\AceDebug-3.0.xml
 
 ######################
 # Localization Files #
