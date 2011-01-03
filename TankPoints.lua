@@ -421,7 +421,7 @@ function TankPoints:OnInitialize()
 	TankPoints.playerClass = select(2, UnitClass("player"))
 	TankPoints.playerRace = select(2, UnitRace("player"))
 
-	--Call SetupOptions if we've included the options file. (Not like there's any reason not to include it, its not like you can use the addon. But Ace3 is being a pain, so i'm stripping things out in pieces trying to find their issue)
+	--Call SetupOptions if we've included the options file. (Not like there's any reason not to include it, its not like you can use the addon. But it's modular, helps with testing)
 	if (self.SetupOptions) then
 		self:SetupOptions() --in options.lua
 	end

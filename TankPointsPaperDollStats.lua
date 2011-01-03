@@ -346,9 +346,11 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	-----------------------
 	-- Initialize Tables --
 	-----------------------
-	local sourceDT = TankPoints.sourceTable
-	local resultsDT = TankPoints.resultsTable
-	local newDT = {}
+	local sourceDT = TankPoints.sourceTable; --the player's current stats
+	local resultsDT = TankPoints.resultsTable; --the player's current TankPoints
+	local changesDT = {}; --the changes we wish to apply
+	local newDT = {}; --the players updated TankPoints after the changes are applied
+	
 	------------------------
 	-- Initialize Tooltip --
 	------------------------
@@ -417,22 +419,20 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	textR = L["TankPoints"]
 	GameTooltip:AddDoubleLine(textL, textR, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b, HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 
---[[
-	20101017: Patch 4.0.1 strength no longer affects blocked amount. Blocked attacks are reduced by 30%
-		Note: There *might* be talents that affect this number (i.e. the % amount blocked)
+
+	--20101017: Patch 4.0.1 strength no longer affects blocked amount. Blocked attacks are reduced by 30%
+--		Note: There *might* be talents that affect this number (i.e. the % amount blocked)
+--	20110103: Can't remove strength entirely, it still increases the chance to Parry (although the tooltip doesn't say so?)
 	--------------
 	-- Strength --
 	--------------
-	-- 1 Str = 0.5 Block Value
-	-- DK: 1 Str = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") Parry%
+	-- 1 Str = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") Parry%
 	copyTable(newDT, sourceDT) -- load default data
 	textL = "1 "..SPELL_STAT1_NAME.." = "
-	newDT.blockValue = newDT.blockValue + 0.5
 	newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR"), CR_PARRY, newDT.playerLevel)) * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])..L[" TP"]
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
---]]
 
 	-------------
 	-- Agility --
@@ -518,6 +518,10 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f %s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+
+--[[
+	Patch 4.0.0 Changed block to be a flat 30% reduction (40% with some talents)
+			So there is no such thing as block value.
 	-----------------
 	-- Block Value --
 	-----------------
@@ -529,6 +533,24 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		textL = format("%.2f %s = ", 2/0.65, L["Block Value"])
 		newDT.blockValue = (newDT.blockValue or 0) + 2/0.65 * StatLogic:GetStatMod("MOD_BLOCK_VALUE")
 	end
+	TankPoints:GetTankPoints(newDT, TP_MELEE)
+	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
+	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+--]]
+
+	--------------------
+	-- Mastery Rating --
+	--------------------
+	copyTable(newDT, sourceDT) -- load default data
+	changesDT = {} --clear out the changes table
+	if per_stat then
+		textL = "1% "..STAT_MASTERY.." = " --FrameXML\GlobalStrings.lua\STAT_MASTERY = "Mastery";
+		changesDT.mastery = 1
+	else
+		textL = "1 "..ITEM_MOD_MASTERY_RATING_SHORT.." = " --FrameXML\GlobalStrings.lua\ITEM_MOD_MASTERY_RATING_SHORT = "Mastery Rating";
+		changesDT.masteryRating = 1
+	end
+	TankPoints:AlterSourceData(newDT, changesDT)
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
