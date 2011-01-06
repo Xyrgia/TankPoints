@@ -146,7 +146,7 @@ local function TP_SetSpellReduction(statFrame, unit)
 	end
 	-- Line5: SpellReduction
 	local spellReduction = TankPoints.resultsTable.totalReduction[TankPoints.currentSchool] * 100        
-	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction)
+	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction, true)
 	
 	statFrame:SetScript("OnEnter", TankPoints.SpellTankPointsFrame_OnEnter)
 	statFrame:SetScript("OnMouseUp", TankPoints.SpellReductionFrame_OnMouseUp)
@@ -225,7 +225,7 @@ end
 function TankPoints.SpellReductionFrame_OnMouseUp(frame, button)
 	TankPoints.SpellFrame_OnMouseUp(frame, button)
 	local spellReduction = TankPoints.resultsTable.totalReduction[TankPoints.currentSchool] * 100        
-	PaperDollFrame_SetLabelAndText(frame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction)
+	PaperDollFrame_SetLabelAndText(frame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction, true)
 end
 
 -- Cycle through schools OnClick left, Reset to strongest school OnClick right
