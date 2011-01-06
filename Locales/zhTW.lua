@@ -162,8 +162,8 @@ TP_RESILIENCE = 11
 	L["TankPoints Calculator"] = "TankPoints坦克點計算機" 
 	L["Shows the TankPoints Calculator"] = "顯示坦克點計算機" 
 -- /tp debug
-
-
+	L["Enable Debugging"] = "啟用偵錯"
+	L["Toggle the display of debug messages"] = "切換顯示偵錯訊息"
 -- /tp tooltip
 	L["Tooltip Options"] = "工具提示選項" 
 	L["TankPoints tooltip options"] = "坦克點工具提示選項" 
