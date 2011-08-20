@@ -405,6 +405,9 @@ local defaults = {
 		mobSpellCritBonus = 0.5,
 		mobSpellMissChance = 0,
 		shieldBlockDelay = 2,
+		ignoreGemsInTooltipDiff = false,
+		ignoreEnchantsInTooltipDiff = false,
+		ignorePrismaticInTooltipDiff = false,
 	},
 }
 
