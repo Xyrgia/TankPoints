@@ -265,8 +265,16 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	-- Check if item is equippable, bags will still pass through
 	if not (IsEquippableItem(link) or (TPTips:GetItemSubType(link) == L["Gems"])) then return end
 	
+	local suppressEnchants;
+	if IsAltKeyDown() then
+		suppressEnchants = true
+	else
+		suppressEnchants = false;
+	end;
+	
 	-- Get data from cache if available
-	if exist_cache_entry(link) then
+	-- We can't be checking the cache if they're asking for a temporary alternate form (suppressEnchants)
+	if (not suppressEnchants) and exist_cache_entry(link) then
 		local tpleft,tpright, ehleft,ehright, ehbleft,ehbright,drleft,drright = get_cache(link)
 		if tpleft then
 			tooltip:AddDoubleLine(tpleft,tpright)
@@ -284,12 +292,41 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 		return
 	end
 	
+	--[[
+	if (suppressEnchants) then
+		tooltip:AddDoubleLine("Suppressing enchants", suppressEnchants);	
+	end;
+
+	if (not suppressEnchants) then
+		tooltip:AddDoubleLine("Not suppressing enchants", suppressEnchants);	
+	end;
+	--]]
+
 	-- Get diff tables
 	local diffTable1, diffTable2
 	if TPTips:GetItemSubType(link) == L["Gems"] then
 		diffTable1 = StatLogic:GetSum(link)
 	else
-		diffTable1, diffTable2 = StatLogic:GetDiff(link)
+		local ignoreEnchants = profile.ignoreGemsInTooltipDiff;
+		local ignoreGems = profile.ignoreEnchantsInTooltipDiff;
+		local ignorePrismatic = profile.ignorePrismaticInTooltipDiff;
+		
+		if suppressEnchants then
+			if (not ignoreEnchants) or (not ignoreGems) or (not ignorePrismatic) then
+				ignoreEnchants = true;
+				ignoreGems = true;
+				ignorePrismatic = true;
+				tooltip:AddDoubleLine("Ignoring enchants", suppressEnchants);	
+			else
+				ignoreEnchants = false;
+				ignoreGems = false;
+				ignorePrismatic = false;
+				tooltip:AddDoubleLine("Including enchants", suppressEnchants);
+			end;
+		end;
+
+		
+		diffTable1, diffTable2 = StatLogic:GetDiff(link, nil, nil, ignoreEnchants, ignoreGems, nil, nil, nil, nil, ignorePrismatic)
 	end
 	
 	-- Check for bags
@@ -385,7 +422,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	end
 	
 	--------------------------------------------------------------
-	-- Calculate TP difference with 2ed equipped item if needed --
+	-- Calculate TP difference with 2nd equipped item if needed --
 	--------------------------------------------------------------
 	if diffTable2 then
 		local tpTable = {}
@@ -446,7 +483,11 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 			tooltip:AddDoubleLine(ehbLeft, ehbRight)
 		end
 		tooltip:Show()
-		set_cache(link,tpLeft,tpRight,ehLeft,ehRight,ehbLeft,ehbRight,drLeft,drRight)
+		
+		--If we're looking at a temporary variation (suppressEnchants) then it can't go into the cache
+		if (not suppressEnchants) then
+			set_cache(link,tpLeft,tpRight,ehLeft,ehRight,ehbLeft,ehbRight,drLeft,drRight)
+		end;
 	end
 	-- Cleanup
 	StatLogic.StatTable.del(diffTable1)

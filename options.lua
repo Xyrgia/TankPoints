@@ -337,6 +337,48 @@ local function getOptions()
 							}, --advanced
 						}, --mob Group Entries
 				}, --mob Group
+				tooltips = {
+					type = "group",
+					name = L["Tooltip options"],
+					desc = L["Change TankPoints tooltip options"],
+					args = {
+						ignoreGems = {
+							type = "toggle",
+							name = L["Ignore Gems"],
+							desc = L["Ignore gems when comparing items"],
+							order = 0,
+							get = function(info) return profileDB.ignoreGemsInTooltipDiff end,
+							set = function(info, value)
+								profileDB.ignoreGemsInTooltipDiff = value
+								TankPointsTooltips.ClearCache()
+							end,
+						},
+						ignoreEnchants = {
+							type = 'toggle',
+							name = L["Ignore Enchants"],
+							desc = L["Ignore enchants when comparing items"],
+							order = 1,
+							get = function(info) return profileDB.ignoreEnchantsInTooltipDiff end,
+							set = function(info, value)
+								profileDB.ignoreEnchantsInTooltipDiff = value
+								TankPointsTooltips.ClearCache()
+							end,
+						},
+						ignorePrismatic = {
+							type = 'toggle',
+							name = L["Ignore Prismatic"],
+							desc = L["Igmore prismatic sockets when comparing items"],
+							order = 2,
+							get = function(info) return profileDB.ignorePrismaticInTooltipDiff end,
+							set = function(info, value)
+								profileDB.ignorePrismaticInTooltipDiff = value
+								TankPointsTooltips.ClearCache()
+							end,
+						},
+					}, --tooltip group entries
+				
+				}, --tooltips Group
+				
 			}, --options group entries
 		} --options group
 	end;
@@ -365,9 +407,10 @@ function addon:SetupOptions()
 	addon.optionsFrames = {}
 	local aceConfigDialog = LibStub("AceConfigDialog-3.0");
 	local rootNodeName = L["TankPoints"]; --we need to use the same localized parent caption because children are placed under a parent node by caption
-	addon.optionsFrames.general = aceConfigDialog:AddToBlizOptions("TankPoints", rootNodeName,      nil,          "general") --options.args.general
-	addon.optionsFrames.mob =     aceConfigDialog:AddToBlizOptions("TankPoints", L["Mob Stats"],    rootNodeName, "mob") --options.args.mob
-	addon.optionsFrames.player =  aceConfigDialog:AddToBlizOptions("TankPoints", L["Player Stats"], rootNodeName, "player") --options.args.player
+	addon.optionsFrames.general =  aceConfigDialog:AddToBlizOptions("TankPoints", rootNodeName,         nil,          "general") --options.args.general
+	addon.optionsFrames.mob =      aceConfigDialog:AddToBlizOptions("TankPoints", L["Mob Stats"],       rootNodeName, "mob") --options.args.mob
+	addon.optionsFrames.player =   aceConfigDialog:AddToBlizOptions("TankPoints", L["Player Stats"],    rootNodeName, "player") --options.args.player
+	addon.optionsFrames.tooltips = aceConfigDialog:AddToBlizOptions("TankPoints", L["Tooltip Options"], rootNodeName, "tooltips") --options.args.tooltips
 	
 	addon.optionsFrames.general.default = function() addon:SetDefaultGeneralOptions() end;
 	addon.optionsFrames.mob.default = function() addon:SetDefaultMobStats() end;

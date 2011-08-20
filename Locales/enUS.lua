@@ -237,6 +237,16 @@ TP_RESILIENCE = 11
 -- /tp mob advanced spellmiss
 	L["Mob Spell Miss"] = true
 	L["Sets mob's spell miss chance"] = true
+	
+	--Tooltips Options group
+	L["Tooltip options"] = true
+	L["Change TankPoints tooltip options"] = true
+	L["Ignore Gems"] = true
+	L["Ignore gems when comparing items"] = true
+	L["Ignore Enchants"] = true
+	L["Ignore enchants when comparing items"] = true
+	L["Ignore Prismatic"] = true
+	L["Igmore prismatic sockets when comparing items"] = true
 
 ----------------------
 -- GetDodgePerAgi() --
