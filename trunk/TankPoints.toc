@@ -1,4 +1,4 @@
-﻿## Interface: 40000
+﻿## Interface: 40200
 ## Title: TankPoints
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。

@@ -397,7 +397,7 @@ local defaults = {
 		showTooltipEHBDiff = false,
 		showTooltipEHBTotal = false,
 		mobLevelDiff = 3,
-		mobDamage = 0,
+		mobDamage = 20000,
 		mobCritChance = 0.05,
 		mobCritBonus = 1,
 		mobMissChance = 0.05,
@@ -432,6 +432,11 @@ function TankPoints:OnInitialize()
 	if (self.SetupOptions) then
 		self:SetupOptions() --in options.lua
 	end
+	
+	--Register LibDataBroker objects if we've included the file. Modularity!
+	if (self.RegisterLDBDataObjects) then
+		self:RegisterLDBDataObjects(); --in TankPointsLibDataBroker
+	end;
 end
 
 -- OnEnable() called at PLAYER_LOGIN by WowAce
@@ -469,6 +474,11 @@ function TankPoints:UpdateStats()
 	
 --	self:Print("UpdateStats() - "..self.resultsTable.tankPoints[TP_MELEE]);
 --	self:Debug("UpdateStats() - "..self.resultsTable.tankPoints[TP_MELEE]);
+
+	--Synchronize the LibDataBroker dataObjects (if we've included that source file)
+	if (self.UpdateLDBDataObjects) then
+		self:UpdateLDBDataObjects();
+	end;
 end
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
@@ -602,7 +612,6 @@ end
 ------------------
 -- GetMobDamage --
 ------------------
---[[
 ------------------------------------
 -- mobDamage, for factoring in block
 -- I designed this formula with the goal to model the normal damage of a raid boss at your level
@@ -610,7 +619,7 @@ end
 -- at level 63 mobDamage is 4455, this is what Nefarian does before armor reduction
 -- at level 73 mobDamage is 6518, which matches TBC raid bosses
 -- at level 83 mobDamage is 10000 (todo: get a real Marrowgar number, 10/25/10H/25H)
--- at level 88 mobDamage is 14000 (todo: get a real number from something)
+-- at level 88 mobDamage is 20000 (todo: get a real number from something)
 function TankPoints:GetMobDamage(mobLevel)
 	--self:Debug("TankPoints:GetMobDamage(mobLevel="..(mobLevel or "nil")..")")
 
@@ -628,7 +637,6 @@ function TankPoints:GetMobDamage(mobLevel)
 	end
 	return levelMod * 55 -- this is the value before mitigation, which we will do in GetTankPoints
 end
-]]--
 
 ------------------------
 -- Shield Block Skill --
@@ -1289,6 +1297,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- Make sure armorFromItems and armor aren't nil
 		changes.armorFromItems = changes.armorFromItems or 0
 		changes.armor = changes.armor or 0
+		
 		local armorMod = StatLogic:GetStatMod("MOD_ARMOR")
 		local _, _, _, pos, neg = UnitArmor("player")
 		local _, agility = UnitStat("player", 2)
@@ -1299,11 +1308,17 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		--local armorFromItem = floor(((tpTable.armor - agility * 2 - pos + neg) / armorMod) + 0.5)
 		--tpTable.armor = floor(((armorFromItem + changes.armor) * armorMod) + 0.5) + agility * 2 + pos - neg
 		--(floor((ceil(stamina / staMod) + changes.sta) * staMod) - stamina)
+		local armorBefore = tpTable.armor or 0;
+		
 		tpTable.armor = 
 				round(
 					( round((tpTable.armor - agility * 2 - pos + neg) / armorMod) + changes.armorFromItems )*armorMod
 				) + agility*2 + pos - neg + changes.armor
 		--self:Print(tpTable.armor.." = floor(((floor((("..tpTable.armor.." - "..agility.." * 2 - "..pos.." + "..neg..") / "..armorMod..") + 0.5) + "..changes.armor..") * "..armorMod..") + 0.5) + "..agility.." * 2 + "..pos.." - "..neg)
+		
+		self:Debug(string.format("   Adding %d Armor, %d Armor From Items, to existing %d Armor, giving %d Armor",
+				changes.armor, changes.armorFromItems, armorBefore, tpTable.armor));
+
 	end
 	
 	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
@@ -1543,12 +1558,13 @@ function TankPoints:GetBlockedMod(forceShield)
 		result = result * critBlock
 	elseif (self.playerClass == "PALADIN") then
 		-- Paladin Talent: Holy Shield - 2,15
-		-- 	Shield blocks for an additional 10% for 20 sec.
+		--2011-08-19: Now 20% for 10 seconds, cooldown 30s. Old way: 10% for 20 seconds, cooldown 20s.
+		-- 	Shield blocks for an additional 20% for 10 sec. 30 second cooldown
 		local holyShieldTalentRank = select(5, GetTalentInfo(2, 15));
 
 		--self:Debug("GetBlockedMod: Paladin has "..holyShieldTalentRank.." points in Holy Shield");
 		if (holyShieldTalentRank > 0) then
-			result = 0.40
+			result = result + 0.20*10/30  --  So it blocks for an additional 20% 1/3 of the time. So lets call it can extra 6.66%
 		end;
 	end;
 	
@@ -1576,11 +1592,16 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--[[
 			Ardent Defender is on talent page 2, 20
 
+			4.1 (2011-08-19)
+				Paladin Talent: Ardent Defender - 2,20
+				Reduce damage taken by 20% for 10 seconds. 3 min cooldown
+
 			Pre-patch 4.0.1
 				Paladin Talent: Ardent Defender (Rank 3) - 2,18
 				Damage that takes you below 35% health is reduced by 7/13/20%
 
 				Note: Ardent Defender used to be page 2, talent 18 (i.e. GetTalentInfo(2,18))
+				
 		--]]
 		local _, _, _, _, r = GetTalentInfo(2, 20) --page 2, talent 20
 
@@ -1603,6 +1624,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- Armor Reduction
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
 		
+		--[[20110108: The game no longer has defense
 		-- Defense Mod (may return negative)
 		--self:Debug("TP_Table.defense = "..TP_Table.defense)
 		
@@ -1611,6 +1633,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		
 		--local drFreeDefense = TP_Table.defense - defenseFromDefenseRating - TP_Table.mobLevel * 5 -- negative for mobs higher level then player
 		--self:Debug("drFreeDefense = "..drFreeDefense)
+		--]]
 		local drFreeAvoidance = 0; --drFreeDefense * 0.0004
 		
 		-- Mob's Crit, Miss

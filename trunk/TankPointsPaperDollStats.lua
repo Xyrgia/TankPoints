@@ -313,7 +313,7 @@ mobCritChance, mobMissChance
 -- stat name, increase by statValue, increase by 1
 -- strength, 1, 1 -- no strength cause it only increases block value by 0.05
 agility, 1, 1
-stamina, 1.5, 1
+stamina, 1, 1
 armor, 10, 1
 resilience, 1, 1
 defenseRating, 1, 1
@@ -326,7 +326,7 @@ TankPoints.MeleePerStatTable = {
 	-- stat name, increase by statValue
 	-- {SPELL_STAT1_NAME, 1}, -- strength
 	{SPELL_STAT2_NAME, 1}, -- agility
-	{SPELL_STAT3_NAME, 1.5}, -- stamina
+	{SPELL_STAT3_NAME, 1}, -- stamina
 	{ARMOR, 10}, -- armor
 	{COMBAT_RATING_NAME15, 1}, -- resilience
 	{COMBAT_RATING_NAME2, 10}, -- defenseRating
@@ -383,7 +383,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	--[[
 	TankPoints Per StatValue
 	1 Agility =
-	1.5 Stamina =
+	1 Stamina =
 	10 Armor =
 	1 Resilience =
 	1 Defense Rating =
@@ -395,7 +395,7 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		-- stat name, increase by statValue
 		-- {SPELL_STAT1_NAME, 1}, -- strength
 		{SPELL_STAT2_NAME, 1}, -- agility
-		{SPELL_STAT3_NAME, 1.5}, -- stamina
+		{SPELL_STAT3_NAME, 1}, -- stamina
 		{ARMOR, 10}, -- armor
 		{COMBAT_RATING_NAME15, 1}, -- resilience
 		{COMBAT_RATING_NAME2, 1}, -- defenseRating
@@ -437,11 +437,11 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	-------------
 	-- Agility --
 	-------------
-	-- 1 Agi = 2 Armor
+	-- 1 Agi = 2 Armor         20110818 i don't see this happening anymore --Ian
 	-- 1 Agi = StatLogic:GetDodgePerAgi() Dodge%
 	copyTable(newDT, sourceDT) -- load default data
 	textL = "1 "..SPELL_STAT2_NAME.." = "
-	newDT.armor = newDT.armor + 2
+	--newDT.armor = newDT.armor + 2
 	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()) * 0.01
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
@@ -455,8 +455,8 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		textL = "1 "..SPELL_STAT3_NAME.." = "
 		newDT.playerHealth = newDT.playerHealth + 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	else
-		textL = "1.5 "..SPELL_STAT3_NAME.." = "
-		newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
+		textL = "1 "..SPELL_STAT3_NAME.." = "
+		newDT.playerHealth = newDT.playerHealth + 1 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
@@ -470,8 +470,8 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 		textL = "1 "..ARMOR.." = "
 		newDT.armor = newDT.armor + 1 * armorMod
 	else
-		textL = "10 "..ARMOR.." = "
-		newDT.armor = newDT.armor + 10 * armorMod
+		textL = "1 "..ARMOR.." = "
+		newDT.armor = newDT.armor + 1 * armorMod
 	end
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
@@ -1063,16 +1063,16 @@ function TankPoints.EffectiveHealth_EffectiveHealthTooltip(statFrame)
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
-	newDT.playerHealth = newDT.playerHealth + floor(1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")) --20101213: found exampe where wow is doing ceil on statmod
+	newDT.playerHealth = newDT.playerHealth + floor(1.0 * 10 * StatLogic:GetStatMod("MOD_HEALTH")) --20101213: found exampe where wow is doing ceil on statmod
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
+	addline(GameTooltip, "1 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
 	-----------
 	-- Armor --
 	-----------
 	copyTable(newDT, sourceDT)
-	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
+	newDT.armor = newDT.armor + 1 * StatLogic:GetStatMod("MOD_ARMOR")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
+	addline(GameTooltip, "1 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealth[TP_MELEE] - resultDT.effectiveHealth[TP_MELEE], L[" EH"]))
 
 	for _,line in ipairs(L["EH_EXPLANATION"]) do
 		GameTooltip:AddLine(line, GRAY_FONT_COLOR.r, GRAY_FONT_COLOR.g, GRAY_FONT_COLOR.b)
@@ -1141,16 +1141,16 @@ function TankPoints.EffectiveHealth_EffectiveHealthWithBlockTooltip(statFrame)
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
-	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
+	newDT.playerHealth = newDT.playerHealth + 1.0 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
+	addline(GameTooltip, "1 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	-----------
 	-- Armor --
 	-----------
 	copyTable(newDT, sourceDT)
-	newDT.armor = newDT.armor + 10 * StatLogic:GetStatMod("MOD_ARMOR")
+	newDT.armor = newDT.armor + 1 * StatLogic:GetStatMod("MOD_ARMOR")
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	addline(GameTooltip, "10 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
+	addline(GameTooltip, "1 "..ARMOR.." = ", format("%.1f%s", newDT.effectiveHealthWithBlock[TP_MELEE] - resultDT.effectiveHealthWithBlock[TP_MELEE], L[" EH"]))
 	-----------------
 	-- Block Value --
 	-----------------
@@ -1223,9 +1223,9 @@ function TankPoints.EffectiveHealth_SpellEffectiveHealthTooltip(statFrame)
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT)
-	newDT.playerHealth = newDT.playerHealth + 1.5 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
+	newDT.playerHealth = newDT.playerHealth + 1 * 10 * StatLogic:GetStatMod("MOD_HEALTH")
 	TankPoints:GetTankPoints(newDT, s)
-	addline(GameTooltip, "1.5 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s], L[" EH"]))
+	addline(GameTooltip, "1 "..SPELL_STAT3_NAME.." = ", format("%.1f%s", newDT.effectiveHealth[s] - resultDT.effectiveHealth[s], L[" EH"]))
 	
 	GameTooltip:Show()
 end
