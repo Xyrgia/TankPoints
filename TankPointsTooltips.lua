@@ -266,7 +266,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	if not (IsEquippableItem(link) or (TPTips:GetItemSubType(link) == L["Gems"])) then return end
 	
 	local suppressEnchants;
-	if IsAltKeyDown() then
+	if IsShiftKeyDown() then
 		suppressEnchants = true
 	else
 		suppressEnchants = false;
@@ -316,12 +316,12 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 				ignoreEnchants = true;
 				ignoreGems = true;
 				ignorePrismatic = true;
-				tooltip:AddDoubleLine("Ignoring enchants", suppressEnchants);	
+				--tooltip:AddDoubleLine("Ignoring enchants", suppressEnchants);	
 			else
 				ignoreEnchants = false;
 				ignoreGems = false;
 				ignorePrismatic = false;
-				tooltip:AddDoubleLine("Including enchants", suppressEnchants);
+				--tooltip:AddDoubleLine("Including enchants", suppressEnchants);
 			end;
 		end;
 
@@ -465,22 +465,28 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 		else
 			location = ":"
 		end
+		
+		local ignoreSuffix = "";
+		if (suppressEnchants) then
+			ignoreSuffix = "*"
+		end;
+		
 		-- Add double line
 		if tpRight then
 			tpLeft = L["TankPoints"]..location
-			tooltip:AddDoubleLine(tpLeft, tpRight)
+			tooltip:AddDoubleLine(tpLeft, tpRight..ignoreSuffix)
 		end
 		if drRight then
 			drLeft = TP.SchoolName[TP_MELEE]..L[" DR"]..location
-			tooltip:AddDoubleLine(drLeft, drRight)
+			tooltip:AddDoubleLine(drLeft, drRight..ignoreSuffix)
 		end
 		if ehRight then
 			ehLeft = L["EH"]..location
-			tooltip:AddDoubleLine(ehLeft, ehRight)
+			tooltip:AddDoubleLine(ehLeft, ehRight..ignoreSuffix)
 		end
 		if ehbRight then
 			ehbLeft = L["EHB"]..location
-			tooltip:AddDoubleLine(ehbLeft, ehbRight)
+			tooltip:AddDoubleLine(ehbLeft, ehbRight..ignoreSuffix)
 		end
 		tooltip:Show()
 		
