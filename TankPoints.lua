@@ -1639,9 +1639,32 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--]]
 		local drFreeAvoidance = 0; --drFreeDefense * 0.0004
 		
+
+		--[[
+		From http://maintankadin.failsafedesign.com/forum/viewtopic.php?f=4&t=25714
+		For each level above 85 the boss gains 0.2% in miss, dodge, parry, block
+			-0.2% chance to be missed
+			-0.2% chance to dodge
+			-0.2% chance to parry
+			-0.2% chance to block
+			+0.2% chance to be critted
+		
+		For a mob +3 levels above you
+			miss = 5% - 0.6% = 4.4%
+			dodge = dodge - 0.6%
+			parry = parry - 0.6%
+			block = block - 0.6%
+			crit = 5% + 0.6% = 5.6%
+		--]]
+		
+		local levelDiff = TP_Table.mobLevel - TP_Table.playerLevel;
+		local diffFromLevel = max(0, levelDiff * 0.002)
+
+		
 		-- Mob's Crit, Miss
 		--self:Debug("todo: figure out how levels affect a mob's crit chance")
 		--TP_Table.mobCritChance = max(0, TP_Table.mobCritChance - (TP_Table.defense - TP_Table.mobLevel * 5) * 0.0004 - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
+		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance + diffFromLevel); --
 		TP_Table.mobCritChance = max(0, TP_Table.mobCritChance + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "MELEE"))
 		
 		--local bonusDefense = TP_Table.defense - TP_Table.playerLevel * 5
@@ -1651,17 +1674,18 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		
 		--self:Debug("todo: figure out what affects a mob's miss chance")
 		--TP_Table.mobMissChance = max(0, TP_Table.mobMissChance + drFreeAvoidance + StatLogic:GetAvoidanceAfterDR("MELEE_HIT_AVOID", defenseFromDefenseRating * 0.04) * 0.01)
+		TP_Table.mobMissChance = max(0, TP_Table.mobMissChance - diffFromLevel);
 --		self:Debug("after miss chance calc. TP_Table.mobMissChance = "..TP_Table.mobMissChance)
 		
 		
 		-- Dodge, Parry, Block
-		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance + drFreeAvoidance)
-		TP_Table.parryChance = max(0, TP_Table.parryChance + drFreeAvoidance)
+		TP_Table.dodgeChance = max(0, TP_Table.dodgeChance - diffFromLevel)
+		TP_Table.parryChance = max(0, TP_Table.parryChance - diffFromLevel)
 		
 		-- Block Chance, Block Value
 		-- Check if player has shield or forceShield is set to true
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
-			TP_Table.blockChance = max(0, TP_Table.blockChance + drFreeAvoidance)
+			TP_Table.blockChance = max(0, TP_Table.blockChance - diffFromLevel)
 		else
 			TP_Table.blockChance = 0
 		end
@@ -1705,6 +1729,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		total = total + TP_Table.mobCrushChance
 		tinsert(combatTable, total)
 		-- check caps
+		
 		if combatTable[1] > 1 then
 			TP_Table.mobMissChance = 1
 		end
@@ -1724,6 +1749,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 			TP_Table.mobCrushChance = max(0, 1 - combatTable[5])
 		end
 		-- Regular Hit Chance (non-crush, non-crit)
+		
 		TP_Table.mobHitChance = 1 - (TP_Table.mobCrushChance + TP_Table.mobCritChance + TP_Table.blockChance + TP_Table.parryChance + TP_Table.dodgeChance + TP_Table.mobMissChance)
 		-- Chance mob will make contact with you that is not blocked/dodged/parried
 		TP_Table.mobContactChance = TP_Table.mobHitChance + TP_Table.mobCrushChance + TP_Table.mobCritChance
