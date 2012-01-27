@@ -8,6 +8,44 @@ local AceDebug, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceDebug then return end
 
+--[[
+	function Debug(...)
+		Does something
+	
+	function SetDebugging(debugging)
+		Set whether debugging is enabled
+				true to enable debugging
+				
+
+	function IsDebugging()
+		Gets whether debugging is enabled
+		
+	function SetDebugLevel(level)
+		Set the current debugging level
+				level 1: Critical messages that every user should receive
+				level 2: Should be used for local debugging (function calls, etc)
+				level 3: Very verbose debugging, will dump everything and anything
+				nil: receive no debug information
+
+	function GetDebugLevel()				
+		Gets the current debug level
+				nil: receive no debug information
+				level 1: Critical messages that every user should receive
+				level 2: Should be used for local debugging (function calls, etc)
+				level 3: Very verbose debugging, will dump everything and anything
+
+	function LevelDebug(level, ...)
+		Writes a debug message that is for a specific debug level
+				level 1: Critical messages that every user should receive
+				level 2: Should be used for local debugging (function calls, etc)
+				level 3: Very verbose debugging, will dump everything and anything
+				
+	function CustomDebug(r, g, b, frame, delay, a1, ...)
+		Does something
+
+
+--]]
+
 -- Lua APIs
 local pairs = pairs
 
@@ -121,6 +159,35 @@ function AceDebug:SetDebugLevel(level)
 	end
 	self.debuglevel = level
 end
+
+-- Taken from LibStatLogic, which took it from AceLibrary
+function AceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
+	if type(num) ~= "number" then
+		return error(self, "Bad argument #3 to `argCheck' (number expected, got %s)", type(num))
+	elseif type(kind) ~= "string" then
+		return error(self, "Bad argument #4 to `argCheck' (string expected, got %s)", type(kind))
+	end
+	arg = type(arg)
+	if arg ~= kind and arg ~= kind2 and arg ~= kind3 and arg ~= kind4 and arg ~= kind5 then
+		local stack = debugstack()
+		local func = stack:match("`argCheck'.-([`<].-['>])")
+		if not func then
+			func = stack:match("([`<].-['>])")
+		end
+		if kind5 then
+			return error(self, "Bad argument #%s to %s (%s, %s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, kind5, arg)
+		elseif kind4 then
+			return error(self, "Bad argument #%s to %s (%s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, arg)
+		elseif kind3 then
+			return error(self, "Bad argument #%s to %s (%s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, arg)
+		elseif kind2 then
+			return error(self, "Bad argument #%s to %s (%s or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, arg)
+		else
+			return error(self, "Bad argument #%s to %s (%s expected, got %s)", tonumber(num) or 0/0, func, kind, arg)
+		end
+	end
+end
+
 
 function AceDebug:GetDebugPrefix()
 	return ("|cff7fff7f(DEBUG) %s:[%s.%3d]|r"):format( tostring(self), date("%H:%M:%S"), (GetTime() % 1) * 1000)
