@@ -1958,6 +1958,13 @@ function TankPoints:DumpTableRaw(tpTable)
 	self:Print(self:VarAsString(tpTable));
 end;
 
+--[[
+Returns true if the user is pressing the configured "Suppress all the things!" key
+--]]
+function TankPoints:IsSuppressKeyPressed()
+	return IsControlKeyDown();
+end;
+
 
 function TankPoints:DumpTable(tpTable)
 

@@ -504,20 +504,21 @@ function TankPoints.TankPointsFrame_OnEnter(statFrame)
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	textR = format("%.1f%s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
 	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	
 	------------------
-	-- Block Rating --
+	-- Block Rating -- was removed in patch 4.0.1
 	------------------
-	copyTable(newDT, sourceDT) -- load default data
-	if per_stat then
-		textL = "1% "..BLOCK.." = "
-		newDT.blockChance = newDT.blockChance + 0.01
-	else
-		textL = "1 "..COMBAT_RATING_NAME5.." = "
-		newDT.blockChance = newDT.blockChance + StatLogic:GetEffectFromRating(1, CR_BLOCK, newDT.playerLevel) * 0.01
-	end
-	TankPoints:GetTankPoints(newDT, TP_MELEE)
-	textR = format("%.1f %s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
-	GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
+	--copyTable(newDT, sourceDT) -- load default data
+	--if per_stat then
+--		textL = "1% "..BLOCK.." = "
+		--newDT.blockChance = newDT.blockChance + 0.01
+	--else
+--		textL = "1 "..COMBAT_RATING_NAME5.." = "
+		--newDT.blockChance = newDT.blockChance + StatLogic:GetEffectFromRating(1, CR_BLOCK, newDT.playerLevel) * 0.01
+	--end
+	--TankPoints:GetTankPoints(newDT, TP_MELEE)
+	--textR = format("%.1f %s", newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE], L[" TP"])
+	--GameTooltip:AddDoubleLine(textL, textR, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b, NORMAL_FONT_COLOR.r, NORMAL_FONT_COLOR.g, NORMAL_FONT_COLOR.b)
 
 --[[
 	Patch 4.0.0 Changed block to be a flat 30% reduction (40% with some talents)
