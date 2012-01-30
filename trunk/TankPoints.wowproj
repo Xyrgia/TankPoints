@@ -7,6 +7,8 @@
     <Name>TankPoints</Name>
     <AssemblyName>TankPoints2</AssemblyName>
     <RootNamespace>TankPoints2</RootNamespace>
+    <WowPath>D:\Games\World of Warcraft\</WowPath>
+    <AddonTitle>TankPoints</AddonTitle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
     <OutputPath>.</OutputPath>
@@ -18,6 +20,9 @@
     </Content>
     <Content Include="AceDebug-3.0\AceDebug-3.0.xml">
       <SubType>Frame</SubType>
+    </Content>
+    <Content Include="TankPoints_Calculator.lua">
+      <SubType>Code</SubType>
     </Content>
     <Content Include="embeds.xml">
       <SubType>Frame</SubType>
@@ -206,7 +211,6 @@
     <Content Include="TankPoints.toc">
       <SubType>TableOfContents</SubType>
     </Content>
-    <Content Include="TankPoints2.toc" />
     <Content Include="TankPointsCalculator.lua">
       <SubType>Code</SubType>
     </Content>

@@ -266,7 +266,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	if not (IsEquippableItem(link) or (TPTips:GetItemSubType(link) == L["Gems"])) then return end
 	
 	local suppressEnchants;
-	if IsControlKeyDown() then
+	if TP:IsSuppressKeyPressed() then
 		suppressEnchants = true
 	else
 		suppressEnchants = false;

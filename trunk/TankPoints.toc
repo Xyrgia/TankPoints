@@ -37,6 +37,7 @@ Locales\Locales.xml
 # Core #
 ########
 TankPoints.lua
+TankPoints_Calculator.lua
 options.lua
 
 ##############
@@ -54,3 +55,8 @@ TankPointsTooltips.lua
 # Stat Groups #
 ###############
 TankPointsPaperDollStats.lua
+
+##########################
+# Lib Data Broker Plugin #
+##########################
+TankPointsLibDataBroker.lua
