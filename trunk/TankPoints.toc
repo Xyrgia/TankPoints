@@ -21,6 +21,7 @@
 #####################
 UTF8\utf8data.lua
 UTF8\utf8.lua
+Toolkit-1.0.lua
 
 #################
 # Ace Libraries #

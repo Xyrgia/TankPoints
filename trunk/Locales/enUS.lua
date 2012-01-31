@@ -97,6 +97,7 @@ TP_RESILIENCE = 11
 	L["Per Stat"] = true
 	L["Click: show Per StatValue TankPoints"] = true
 	L["Click: show Per Stat TankPoints"] = true
+	L["Relative Stat Values"] = true
 
 -- Melee Reduction Tooltip
 	L[" Damage Reduction"] = true -- concatenated after a school name for Damage Reductions, ex: "Nature Damage Reduction"
