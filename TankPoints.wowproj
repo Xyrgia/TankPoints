@@ -226,6 +226,9 @@
     <Content Include="TankPointsTooltips.lua">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="Toolkit-1.0.lua">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="UTF8\utf8.lua">
       <SubType>Code</SubType>
     </Content>

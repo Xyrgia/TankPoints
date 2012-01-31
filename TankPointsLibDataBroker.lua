@@ -94,8 +94,6 @@ function dataObject:OnTooltipShow()
 	self:AddDoubleLine("Total Reduction (%):", HIGHLIGHT_FONT_COLOR_CODE..format("%.2f%%", totalReduction)..FONT_COLOR_CODE_CLOSE);
 	self:AddDoubleLine("Guaranteed Reduction (%):", HIGHLIGHT_FONT_COLOR_CODE..format("%.2f%%", guaranteedReduction)..FONT_COLOR_CODE_CLOSE);
 
-	self:AddLine(" ");
-
 	local str, agi, sta, ar, dodge, parry, _, mastery = TankPointsCalculator:ComputeTankPointsDelta(nil);
 
 	local minRel = math.min(str, agi, sta, ar, dodge, parry, mastery);
@@ -120,16 +118,21 @@ function dataObject:OnTooltipShow()
 		return s;
 	end;
 
+	self:AddLine(" ");
+	self:AddDoubleLine(L["Relative Stat Values"], L["TankPoints"], 
+		HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b,
+		HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+
 	self:AddDoubleLine("1.00 Strength"..":",       getStatText(str)); 
 	self:AddDoubleLine("1.00 Agility"..":",        getStatText(agi)); 
 	self:AddDoubleLine("1.00 Stamina"..":",        getStatText(sta)); 
 	self:AddDoubleLine("1.00 Armor"..":",          getStatText(ar)); 
 	self:AddDoubleLine("1.00 Dodge Rating"..":",   getStatText(dodge)); 
 	self:AddDoubleLine("1.00 Parry Rating"..":",   getStatText(parry)); 
-	--self:AddDoubleLine("1.00 Block Rating"..":",   getStatText(block)); 
+	--self:AddDoubleLine("1.00 Block Rating"..":",   getStatText(block)); block rating was removed in 4.0.1
 	self:AddDoubleLine("1.00 Mastery Rating"..":", getStatText(mastery)); 
 
-
+	self:AddLine(" ");
 	self:AddLine(GREEN_FONT_COLOR_CODE.."Hint: Left-click to show the TankPoints calculator"..FONT_COLOR_CODE_CLOSE);
 	--self:AddLine(GREEN_FONT_COLOR_CODE..L["Right-click to open the options menu"]..FONT_COLOR_CODE_CLOSE)
 end;
