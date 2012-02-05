@@ -392,6 +392,8 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	
 	-- Calculate tp difference
 	local function rightFromDifference(before, after, diffp, totalp, diff_format, tot_format)
+		local suffix = "";
+
 		diff_format = diff_format or "%+d"
 		tot_format = tot_format or "%d"
 		local diff = before - after
@@ -410,7 +412,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 			end
 		end
 		if suffix and str then
-			str = str..suffix
+			str = str..suffix;
 		end
 		return str
 	end
