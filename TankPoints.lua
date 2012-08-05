@@ -737,14 +737,9 @@ function TankPoints:GetEffectiveHealthWithBlock(TP_Table, mobDamage)
 	end
 	local mobContactChance = TP_Table.mobContactChance
 	local sbCoolDown, sbDuration, sbDuration
-
 	-- Check for guaranteed block
 	if self.playerClass == "PALADIN" then
-		--5.0.4: Removed Paladin Holy Shield (2,17) talent
-		return effectiveHealth;
-		
-		--[[
-		if not (select(5, GetTalentInfo(2, 17)) > 0) then -- Holy Shield: Increases the amount your shield blocks by an additional 20% for 10 sec.
+		if not (select(5, GetTalentInfo(2, 17)) > 0) then -- Check for Holy Shield talent
 			return effectiveHealth
 		end
 		if ((10 / (8 + TP_Table.shieldBlockDelay) >= 1) and not UnitBuff("player", SI["Holy Shield"])) and mobContactChance > 0 then -- If Holy Shield has 100% uptime
@@ -757,27 +752,22 @@ function TankPoints:GetEffectiveHealthWithBlock(TP_Table, mobDamage)
 		sbCoolDown = 8
 		sbDuration = 10
 		sbCharges = 8
-		--]]
 	elseif self.playerClass == "WARRIOR" then
-		--5.0.4 Removed shield block altogether (i assume, since my Pally no longer has one)
-		--[[
 		if not UnitBuff("player", SI["Shield Block"]) then
 			blockValue = blockValue * 2
 		end
-		local _, _, _, _, r = GetTalentInfo(3, 8); --Shield Mastery: Reduces the cooldown of your Shield Block by 10 sec
+		local _, _, _, _, r = GetTalentInfo(3, 8)
 		sbCoolDown = 60 - r * 10
 		sbDuration = 10
 		sbCharges = 100
-
-		mobDamage = ceil(mobDamage)
-		local shieldBlockDelay = TP_Table.shieldBlockDelay
-		local timeBetweenPresses = sbCoolDown + shieldBlockDelay
-		return effectiveHealth * mobDamage / ((mobDamage * (timeBetweenPresses - sbDuration) / timeBetweenPresses) + ((mobDamage - blockValue) * sbDuration / timeBetweenPresses))
-		--]]
 	else -- neither Paladin or Warrior
 		return effectiveHealth
 	end
-
+	
+	mobDamage = ceil(mobDamage)
+	local shieldBlockDelay = TP_Table.shieldBlockDelay
+	local timeBetweenPresses = sbCoolDown + shieldBlockDelay
+	return effectiveHealth * mobDamage / ((mobDamage * (timeBetweenPresses - sbDuration) / timeBetweenPresses) + ((mobDamage - blockValue) * sbDuration / timeBetweenPresses))
 end
 
 ----------------
@@ -1001,8 +991,7 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 	TP_Table.mobLevel = UnitLevel(unit) + self.db.profile.mobLevelDiff
 
 	-- Resilience
-	--Removed 20120804 (5.0.1) Resilience does nothing for tanks
-	--TP_Table.resilience = GetCombatRating(COMBAT_RATING_RESILIENCE_CRIT_TAKEN) --20101017: Changed in Patch4.0 from CR_CRIT_TAKEN_MELEE --Ian
+	TP_Table.resilience = GetCombatRating(COMBAT_RATING_RESILIENCE_CRIT_TAKEN) --20101017: Changed in Patch4.0 from CR_CRIT_TAKEN_MELEE --Ian
 
 	TP_Table.damageTakenMod = {}
 	TP_Table.mobSpellCritDamageMod = {} --20101213 added initialziation
@@ -1408,10 +1397,9 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
         end	
 	end
 	
-	--Removed 20120804 (5.0.1) Resilience does nothing for tanks
-	--if changes.resilience and changes.resilience ~= 0 then
-	--	tpTable.resilience = tpTable.resilience + changes.resilience
-	--end
+	if changes.resilience and changes.resilience ~= 0 then
+		tpTable.resilience = tpTable.resilience + changes.resilience
+	end
 	if changes.mobLevel and changes.mobLevel ~= 0 then
 		tpTable.mobLevel = tpTable.mobLevel + changes.mobLevel
 	end
@@ -1461,7 +1449,7 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 	cmax("playerLevel",1)
 	cmax("playerHealth",0)
 	cmax("mobLevel",1)
-	--cmax("resilience",0)
+	cmax("resilience",0)
 	
 	-- Melee
 	if (not school) or school == TP_MELEE then
@@ -1566,19 +1554,12 @@ function TankPoints:GetBlockedMod(forceShield)
 
 	local result = 0.30; --by default all blocked attacks block a flat 30% of incoming damage
 		
-	if self.playerClass == "WARRIOR" then
-		--4.0.3 Critical Block removed
-		--[[
-		if select(5, GetTalentInfo(3, 24)) > 0 then 
-			-- Warrior Talent: Critical Block (Rank 3) - 3,24
-			--  Your successful blocks have a 20/40/60% chance to block double the normal amount
-			local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.2
-			result = result * critBlock
-		end
-		--]]
+	if self.playerClass == "WARRIOR" and select(5, GetTalentInfo(3, 24)) > 0 then
+		-- Warrior Talent: Critical Block (Rank 3) - 3,24
+		--  Your successful blocks have a 20/40/60% chance to block double the normal amount
+		local critBlock = 1 + select(5, GetTalentInfo(3, 24)) * 0.2
+		result = result * critBlock
 	elseif (self.playerClass == "PALADIN") then
-		--5.0.4 Removed Holy Shield
-		--[[
 		-- Paladin Talent: Holy Shield - 2,15
 		--2011-08-19: Now 20% for 10 seconds, cooldown 30s. Old way: 10% for 20 seconds, cooldown 20s.
 		-- 	Shield blocks for an additional 20% for 10 sec. 30 second cooldown
@@ -1588,7 +1569,6 @@ function TankPoints:GetBlockedMod(forceShield)
 		if (holyShieldTalentRank > 0) then
 			result = result + 0.20*10/30  --  So it blocks for an additional 20% 1/3 of the time. So lets call it can extra 6.66%
 		end;
-		--]]
 	end;
 	
 	return result
@@ -1613,8 +1593,6 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	--]]
 	if self.playerClass == "PALADIN" then
 		--[[
-			5.0.4 (2012/08/03) - Ardent Defender is now native to all Protection paladins (no longer a talent)
-
 			Ardent Defender is on talent page 2, 20
 
 			4.1 (2011-08-19)
@@ -1627,15 +1605,13 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 
 				Note: Ardent Defender used to be page 2, talent 18 (i.e. GetTalentInfo(2,18))
 				
-				local _, _, _, _, r = GetTalentInfo(2, 20) --page 2, talent 20
 		--]]
+		local _, _, _, _, r = GetTalentInfo(2, 20) --page 2, talent 20
 
 		--self:Debug("Ardent Defender points = "..r)
 
-		local knowsArdentDefender = IsSpellKnown(31850); --31850: Ardent Defender - Reduce damage taken by 20% for 10 sec. 3 minute cooldown
 		local forceArdentDefender = false
-
-		if (knowsArdentDefender) or (forceArdentDefender) then
+		if (r > 0) or (forceArdentDefender) then
 			--local inc = 0.35 / (1 - ArdentDefenderRankEffect[r]) - 0.35 -- 8.75% @ rank3    20101017: Old model, when ardent defender was passive
 			local inc = round(TP_Table.playerHealth * ARDENT_DEFENDER_DAMAGE_REDUCTION * (10/180)); --20% increase for some fraction of the time
 
@@ -1646,9 +1622,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	end
 	
 	-- Resilience Mod
-	--Removed 20120804 (5.0.1) Resilience does nothing for tanks
-	--TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, COMBAT_RATING_RESILIENCE_CRIT_TAKEN, TP_Table.playerLevel) * 0.01;  --GetEffectFromRating returns as percentage rather than fraction (GRRRRRRRR!)
-
+	TP_Table.resilienceEffect = StatLogic:GetEffectFromRating(TP_Table.resilience, COMBAT_RATING_RESILIENCE_CRIT_TAKEN, TP_Table.playerLevel) * 0.01;  --GetEffectFromRating returns as percentage rather than fraction (GRRRRRRRR!)
 	if (not school) or school == TP_MELEE then
 		-- Armor Reduction
 		TP_Table.armorReduction = self:GetArmorReduction(TP_Table.armor, TP_Table.mobLevel)
@@ -1724,19 +1698,16 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		end
 		
 		-- Mob's Crit Damage Mod
-		--Removed 20120804 (5.0.1) Resilience does nothing for tanks
-		TP_Table.mobCritDamageMod = 1; --max(0, 1 - TP_Table.resilienceEffect * 2)
+		TP_Table.mobCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
 		
 		--Get the percentage of an attack that is blocked, if it is blocked
 		TP_Table.blockedMod = self:GetBlockedMod(forceShield);
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
-		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY"))
-
+		TP_Table.mobSpellCritChance = max(0, TP_Table.mobSpellCritChance - TP_Table.resilienceEffect + StatLogic:GetStatMod("ADD_CRIT_TAKEN", "HOLY"))
 		-- Mob's Spell Crit Damage Mod
-		--20120804 5.0.1  Resilience does nothing for tanks
-		TP_Table.mobSpellCritDamageMod = 1; --max(0, 1 - TP_Table.resilienceEffect * 2)
+		TP_Table.mobSpellCritDamageMod = max(0, 1 - TP_Table.resilienceEffect * 2)
 	end
 	---------------------
 	-- High caps check --
@@ -1910,21 +1881,15 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	-----------------
 	-- Caculations --
 	-----------------
-	--[[
-	--5.0.4 20120803 - Shield Block removed in Mists
-
 	-- Warrior Skill: Shield Block - 1 min cooldown
 	-- 	Increases your chance to block and block value by 100% for 10 sec.
 	-- Warrior Talent: Shield Mastery (Rank 2) - 3,8
 	--	Increases your block value by 15%/30% and reduces the cooldown of your Shield Block ability by 10/20 sec.
 	-- GetSpellInfo(2565) = "Shield Block"
-
 	if self.playerClass == "WARRIOR" and (not school or school == TP_MELEE) and not UnitBuff("player", SI["Shield Block"]) then
-
 		-- Get a copy for Shield Block skill calculations
 		local inputCopy = {}
 		copyTable(inputCopy, TP_Table)
-
 		-- Build shieldBlockChangesTable
 		shieldBlockChangesTable.blockChance = 1 -- 100%
 		shieldBlockChangesTable.blockValue = 0 --inputCopy.blockValue -- +100%
@@ -1941,7 +1906,6 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		TP_Table.shieldBlockUpTime = shieldBlockUpTime
 		inputCopy = nil
 
-	--20120803 - 5.0.4 - Holy Shield removed in Mists
 	-- Paladin Talent: Holy Shield - 2,15
 	-- 	Shield blocks for an additional 10% for 20 sec.
 	elseif (self.playerClass == "PALADIN") and (select(5, GetTalentInfo(2, 15)) > 0)
@@ -1958,11 +1922,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 		--self:Debug("TankPoints:GetTankPoints: Player is someone who doesn't need to have a block ability manually added")
 		self:CalculateTankPoints(TP_Table, school, forceShield)
 	end
-	--]]
 	
-	self:CalculateTankPoints(TP_Table, school, forceShield)
-
-
 	-------------
 	-- Cleanup --
 	-------------

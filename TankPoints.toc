@@ -1,4 +1,4 @@
-﻿## Interface: 50001
+﻿## Interface: 40300
 ## Title: TankPoints
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
@@ -7,7 +7,7 @@
 ## OptionalDeps: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## SavedVariables: TankPointsDB
 ## Author: Whitetooth
-## Version: 5.0.4
+## Version: 4.3.4.171
 ## X-eMail: hotdogee [at] gmail [dot] com
 ## X-Embeds: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## X-Category: Interface Enhancements
@@ -21,18 +21,13 @@
 #####################
 UTF8\utf8data.lua
 UTF8\utf8.lua
+Toolkit-1.0.lua
 
 #################
 # Ace Libraries #
 #################
 embeds.xml
 AceDebug-3.0\AceDebug-3.0.xml
-
-########################################
-# Non-Ace libraries that depend on Ace #
-########################################
-Toolkit-1.0.lua
-
 
 ######################
 # Localization Files #
