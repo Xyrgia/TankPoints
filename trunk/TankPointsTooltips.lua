@@ -191,9 +191,7 @@ function TPTips:BuildChanges(reserved, table)
 		changes.masteryRating = table.MASTERY_RATING;
 	end
 	changes.blockValue = table.BLOCK_VALUE
-
-	--Removed 20120804  5.0.1  Resilience does nothing for tanks
-	--changes.resilience = table.RESILIENCE_RATING
+	changes.resilience = table.RESILIENCE_RATING
 	return changes
 end
 
@@ -251,7 +249,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 
 	assert(TP)
 	assert(TP.resultsTable)
-	assert(TP.resultsTable.tankPoints, "TP.resultsTable.tankpoints is not assigned")	
+	assert(TP.resultsTable.tankPoints)	
 	
 	local profile = TankPoints.db.profile
 	
@@ -394,8 +392,6 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	
 	-- Calculate tp difference
 	local function rightFromDifference(before, after, diffp, totalp, diff_format, tot_format)
-		local suffix = "";
-
 		diff_format = diff_format or "%+d"
 		tot_format = tot_format or "%d"
 		local diff = before - after
@@ -414,7 +410,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 			end
 		end
 		if suffix and str then
-			str = str..suffix;
+			str = str..suffix
 		end
 		return str
 	end
