@@ -191,7 +191,9 @@ function TPTips:BuildChanges(reserved, table)
 		changes.masteryRating = table.MASTERY_RATING;
 	end
 	changes.blockValue = table.BLOCK_VALUE
-	changes.resilience = table.RESILIENCE_RATING
+
+	--Removed 20120804  5.0.1  Resilience does nothing for tanks
+	--changes.resilience = table.RESILIENCE_RATING
 	return changes
 end
 
@@ -249,7 +251,7 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 
 	assert(TP)
 	assert(TP.resultsTable)
-	assert(TP.resultsTable.tankPoints)	
+	assert(TP.resultsTable.tankPoints, "TP.resultsTable.tankpoints is not assigned")	
 	
 	local profile = TankPoints.db.profile
 	

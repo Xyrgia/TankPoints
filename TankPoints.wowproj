@@ -7,7 +7,7 @@
     <Name>TankPoints</Name>
     <AssemblyName>TankPoints2</AssemblyName>
     <RootNamespace>TankPoints2</RootNamespace>
-    <WowPath>D:\Games\World of Warcraft\</WowPath>
+    <WowPath>D:\Games\World of Warcraft_SpinningPlatter\</WowPath>
     <AddonTitle>TankPoints</AddonTitle>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
