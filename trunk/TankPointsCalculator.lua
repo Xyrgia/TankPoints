@@ -398,7 +398,8 @@ function TPCalc:UpdateResults()
 	changes.blockValue = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
 	-- Resilience
-	changes.resilience = _G[prefix..i..inputEditBox]:GetNumber()
+	--Removed 20120804  5.0.1  Resilience does nothing for tanks
+	--changes.resilience = _G[prefix..i..inputEditBox]:GetNumber()
 	
 	prefix = "TPCMobStats"
 	i = 1
@@ -841,6 +842,8 @@ function TPCalc:UpdateResults()
 	end
 	
 	-- Resilience
+	--[[
+	Removed 20120804  5.0.1  Resilience does nothing for tanks
 	i = i + 1
 	current = self.resultsDT.resilience
 	new = floor(newDT.resilience)
@@ -853,6 +856,7 @@ function TPCalc:UpdateResults()
 	else
 		_G[prefix..i..newStatText]:SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b)
 	end
+	--]]
 	
 	---------------------
 	-- Mob Stats Frame --
