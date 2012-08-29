@@ -3,7 +3,7 @@
 -- @class file
 -- @name AceDebug-3.0
 -- @release $Id: AceDebug-3.0.lua 975 2010-10-23 11:26:18Z nevcairiel $
-local MAJOR, MINOR = "AceDebug-3.0", 3
+local MAJOR, MINOR = "spAceDebug-3.0", 3
 local AceDebug, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not AceDebug then return end
@@ -163,9 +163,9 @@ end
 -- Taken from LibStatLogic, which took it from AceLibrary
 function AceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
 	if type(num) ~= "number" then
-		return error(self, "Bad argument #3 to `argCheck' (number expected, got %s)", type(num))
+		return error(string.format("Bad argument #3 to `argCheck' (number expected, got %s)", type(num)), 2);
 	elseif type(kind) ~= "string" then
-		return error(self, "Bad argument #4 to `argCheck' (string expected, got %s)", type(kind))
+		return error(string.format("Bad argument #4 to `argCheck' (string expected, got %s)", type(kind)), 2);
 	end
 	arg = type(arg)
 	if arg ~= kind and arg ~= kind2 and arg ~= kind3 and arg ~= kind4 and arg ~= kind5 then
@@ -175,15 +175,15 @@ function AceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
 			func = stack:match("([`<].-['>])")
 		end
 		if kind5 then
-			return error(self, "Bad argument #%s to %s (%s, %s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, kind5, arg)
+			return error(string.format("Bad argument #%s to %s (%s, %s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, kind5, arg), 2);
 		elseif kind4 then
-			return error(self, "Bad argument #%s to %s (%s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, arg)
+			return error(string.format("Bad argument #%s to %s (%s, %s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, kind4, arg), 2);
 		elseif kind3 then
-			return error(self, "Bad argument #%s to %s (%s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, arg)
+			return error(string.format("Bad argument #%s to %s (%s, %s, or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, kind3, arg), 2);
 		elseif kind2 then
-			return error(self, "Bad argument #%s to %s (%s or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, arg)
+			return error(string.format("Bad argument #%s to %s (%s or %s expected, got %s)", tonumber(num) or 0/0, func, kind, kind2, arg), 2);
 		else
-			return error(self, "Bad argument #%s to %s (%s expected, got %s)", tonumber(num) or 0/0, func, kind, arg)
+			return error(string.format("Bad argument #%s to %s (%s expected, got %s)", tonumber(num) or 0/0, func, kind, arg), 2);
 		end
 	end
 end

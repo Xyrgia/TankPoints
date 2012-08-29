@@ -423,14 +423,14 @@ function addon:SetDefaultMobStats()
 	--called when user clicks "Restore Default" in mob stats configuration pane
 	--or from /tp mob default
 	
-	profileDB.mobLevelDiff = 3
-	profileDB.mobDamage = 0
-	profileDB.mobCritChance = 0.05
-	profileDB.mobCritBonus = 1
-	profileDB.mobMissChance = 0.05
-	profileDB.mobSpellCritChance = 0
-	profileDB.mobSpellCritBonus = 0.5
-	profileDB.mobSpellMissChance = 0
+	profileDB.mobLevelDiff = 3;
+	profileDB.mobDamage = 0;
+	profileDB.mobMissChance = 0.05;
+	profileDB.mobCritChance = 0.05;
+	profileDB.mobCritBonus = 1.0;
+	profileDB.mobSpellCritChance = 0;
+	profileDB.mobSpellCritBonus = 0.5;
+	profileDB.mobSpellMissChance = 0;
 	self:UpdateStats()
 	
 	-- Update Calculator
