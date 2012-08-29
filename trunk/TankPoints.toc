@@ -1,13 +1,13 @@
-﻿## Interface: 40300
+﻿## Interface: 50001
 ## Title: TankPoints
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
 ## Notes-zhCN: 在角色窗口中计算并显示你的坦克点数
 ## Notes-esES: Calcula y muestra tus Puntos de Tanque en la ventana de personaje
-## OptionalDeps: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
+## OptionalDeps: WoWUnit, Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## SavedVariables: TankPointsDB
 ## Author: Whitetooth
-## Version: 4.3.4.171
+## Version: 5.0.4
 ## X-eMail: hotdogee [at] gmail [dot] com
 ## X-Embeds: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## X-Category: Interface Enhancements
@@ -21,13 +21,18 @@
 #####################
 UTF8\utf8data.lua
 UTF8\utf8.lua
-Toolkit-1.0.lua
 
 #################
 # Ace Libraries #
 #################
 embeds.xml
 AceDebug-3.0\AceDebug-3.0.xml
+
+########################################
+# Non-Ace libraries that depend on Ace #
+########################################
+Toolkit-1.0.lua
+
 
 ######################
 # Localization Files #

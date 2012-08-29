@@ -201,6 +201,7 @@ end
 	@returns The index index of entry in table t. If entry is not in the table then the results are undefined
 --]]
 function Toolkit:GetTableIndex(t, entry)
+	--TODO: switch to for x, element in pairs(table) do  to speed it up (http://lua-users.org/wiki/OptimisationCodingTips)
 	for i = 1, table.getn(t), 1 do
 		if (t[i] == entry) then
 			return i;

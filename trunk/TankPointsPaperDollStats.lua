@@ -74,6 +74,7 @@ end
 
 --updaters
 local function TP_SetTankPoints(statFrame, unit)
+-- Line 1:  TankPoints 
 	TankPoints:GetTankPointsIfNotFilled(TankPoints.resultsTable, nil)
 	-- Line1: TankPoints
 	local tankpoints = commaValue(floor(TankPoints.resultsTable.tankPoints[TP_MELEE]))
@@ -86,6 +87,8 @@ local function TP_SetTankPoints(statFrame, unit)
 end
 
 local function TP_SetMeleeReduction(statFrame, unit)
+-- Line 2: Melee DR
+
 	TankPoints:GetTankPointsIfNotFilled(TankPoints.resultsTable, nil)
 	-- Line2: MeleeDR
 	local meleeReduction = TankPoints.resultsTable.totalReduction[TP_MELEE] * 100
@@ -97,6 +100,8 @@ local function TP_SetMeleeReduction(statFrame, unit)
 end
 
 local function TP_SetSpellTankPoints(statFrame, unit)
+	-- Line4: SpellTankPoints
+
 	TankPoints:GetTankPointsIfNotFilled(TankPoints.resultsTable, nil)
 	if TankPoints.setSchool then
 		TankPoints.currentSchool = TankPoints.setSchool
@@ -115,7 +120,6 @@ local function TP_SetSpellTankPoints(statFrame, unit)
 			end
 		end
 	end
-	-- Line4: SpellTankPoints
 	local spellTankPoints = commaValue(floor(TankPoints.resultsTable.tankPoints[TankPoints.currentSchool]))
 	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" TP"], spellTankPoints)
 	
@@ -126,6 +130,8 @@ local function TP_SetSpellTankPoints(statFrame, unit)
 end
 
 local function TP_SetSpellReduction(statFrame, unit)
+	-- Line5: SpellReduction
+
 	TankPoints:GetTankPointsIfNotFilled(TankPoints.resultsTable, nil)
 	if TankPoints.setSchool then
 		TankPoints.currentSchool = TankPoints.setSchool
@@ -144,7 +150,7 @@ local function TP_SetSpellReduction(statFrame, unit)
 			end
 		end
 	end
-	-- Line5: SpellReduction
+
 	local spellReduction = TankPoints.resultsTable.totalReduction[TankPoints.currentSchool] * 100        
 	PaperDollFrame_SetLabelAndText(statFrame, TankPoints.SchoolName[TankPoints.currentSchool]..L[" DR"], spellReduction, true)
 	
@@ -170,10 +176,11 @@ end
 
 --StatGroup definition
 local function AddTPStatFrame()
-	local id = #PAPERDOLL_STATCATEGORY_DEFAULTORDER + 1
+	local id = #PAPERDOLL_STATCATEGORY_DEFAULTORDER + 1; --highest entry+1
+
 	local frame = CreateFrame("Frame", "CharacterStatsPaneCategory"..id, CharacterStatsPaneScrollChild, "StatGroupTemplate")
 
-	STAT_CATEGORY_TANKPOINTS = L["TankPoints"]
+--	STAT_CATEGORY_TANKPOINTS = L["TankPoints"]
 	PAPERDOLL_STATCATEGORIES["TANKPOINTS"] = {
 		["id"] = id,
 		stats = {
@@ -186,10 +193,10 @@ local function AddTPStatFrame()
 	}
 	PAPERDOLL_STATCATEGORY_DEFAULTORDER[id] = "TANKPOINTS"
 	PAPERDOLL_STATINFO["TP_TANKPOINTS"] = { updateFunc = function(statFrame, unit) TP_SetTankPoints(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_MELEEDR"] = { updateFunc = function(statFrame, unit) TP_SetMeleeReduction(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_SPELLTP"] = { updateFunc = function(statFrame, unit) TP_SetSpellTankPoints(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_SPELLDR"] = { updateFunc = function(statFrame, unit) TP_SetSpellReduction(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_CALC"] = { updateFunc = function(statFrame, unit) TP_SetCalculator(statFrame, unit) end }
+	PAPERDOLL_STATINFO["TP_MELEEDR"]    = { updateFunc = function(statFrame, unit) TP_SetMeleeReduction(statFrame, unit) end }
+	PAPERDOLL_STATINFO["TP_SPELLTP"]    = { updateFunc = function(statFrame, unit) TP_SetSpellTankPoints(statFrame, unit) end }
+	PAPERDOLL_STATINFO["TP_SPELLDR"]    = { updateFunc = function(statFrame, unit) TP_SetSpellReduction(statFrame, unit) end }
+	PAPERDOLL_STATINFO["TP_CALC"]       = { updateFunc = function(statFrame, unit) TP_SetCalculator(statFrame, unit) end }
 end
 
 --------------------------------------
@@ -1257,6 +1264,6 @@ end
 -- Aaaaaaaaaannnnnnnnddd add them
 
 function TankPoints:AddStatFrames()
-	AddTPStatFrame()
-	AddEHStatFrame()
+	AddTPStatFrame();
+	AddEHStatFrame();
 end
