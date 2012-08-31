@@ -21,6 +21,39 @@
     <Content Include="AceDebug-3.0\AceDebug-3.0.xml">
       <SubType>Frame</SubType>
     </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\deDE.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\enGB.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\enUS.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\esES.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\esMX.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\frFR.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\koKR.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\Locales.xml">
+      <SubType>Frame</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\ruRU.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\zhCN.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\zhTW.lua">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="TankPoints_Calculator.lua">
       <SubType>Code</SubType>
     </Content>
@@ -253,6 +286,7 @@
     <Folder Include="libs\AceLocale-3.0\" />
     <Folder Include="libs\CallbackHandler-1.0\" />
     <Folder Include="libs\LibStatLogic-1.2\" />
+    <Folder Include="libs\LibStatLogic-1.2\Locales\" />
     <Folder Include="libs\LibStub\" />
     <Folder Include="libs\LibTipHooker-1.1\" />
     <Folder Include="Locales\" />
