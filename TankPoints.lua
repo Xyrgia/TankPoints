@@ -93,6 +93,82 @@ function TankPoints:SetDebugging(value)
 end
 ]]--
 
+--[[
+	20120901  The Combat table changed in Mists of Panderia
+			http://wow.joystiq.com/2012/03/01/ghostcrawler-explains-stat-changes-in-mists-of-pandaria/
+			http://us.battle.net/wow/en/blog/4544194/Dev_Watercooler_%E2%80%93_Mists_of_Pandaria_Stat_Changes-3_1_2012
+
+	Any attack that is not completely avoided (i.e. was not a miss, dodged or parried)
+	then goes through a separate roll to decide if it will be blocked or not.
+	
+	The old notion of "pushing miss and crit off the combat table" is gone.
+			
+	An attack can be either:
+		Missed   (e.g. 3%)
+		Dodged   (e.g. 3%)
+		Parried  (e.g. 3%)
+		Hit      (e.g. 91%)
+		
+	If it is a hit then the strike has a chance to be blocked, this is done on a separate roll:
+
+		====+==== 3% ==> Missed ====> 0% damage
+			|=== 14% ==> Dodged ====> 0% damage
+			|=== 28% ==> Parried ===> 0% damage
+			|=== 55% ==> Hit ===+=== 35% ===> Blocked ==+=== 5% ==> Crit (Blocked)
+								|						|== 95% ==> Hit (Blocked)
+								|=== 65% ===> Hit ======+=== 5% ==> Crit
+														|== 95% ==> Hit
+
+	Giving a schmorasboard:
+	
+		Miss
+		Dodge
+		Parry
+		Hit
+		Hit (Blocked)
+		Crit
+		Crit (Blocked)
+
+	But really it means that you'll now *always* be hit, and you'll *always* be crit.
+	Adding mastery increases your chance to block, but there's nothing that can reduce your chance to be crit.
+	The only way to mitigate damage from hits (and crits) is to block more often (and have more armor).
+	
+	So the net damage formula is
+		(1 - M - D - P) * ( Bc*(1-Br) + (1-Bc) ) * (1+Cc) * (1-Ar)
+		
+	where
+			M  : miss chance (e.g. 0.03)
+			D  : dodge chance (e.g. 0.1373)
+			P  : parry chance (e.g. 0.2769)
+			Bc : block chance (e.g. 0.3302)
+			Br : block reduction (e.g. 0.31) (everyone blocks for 30%, but meta gem adds +1%)
+			Cc : crit chance (e.g. 0.05)
+			Ar : armor reduction (e.g. 0.5046)
+			H  : health (e.g. 201939)
+
+		= (1 - 0.03 - 0.1373 - 0.2769) * ( 0.3302*(1-0.31) + (1-0.35) ) * (1+0.05) * (1-0.5046)
+		= (0.5558)                     * ( 0.3302*0.69     +  0.65    ) * (1.05)   * (0.4954)
+		= 0.5558                       * ( 0.2278          +  0.65    ) *  1.05    *  0.4954
+		= 0.5558 * 0.8778 * 1.05 * 0.4954
+		  ======   ======   ====   ====== 
+		    ^---------------------------- damage reduction from avoidance
+		             ^------------------- damage reduction from blocking
+		                     ^----------- increased damage from crit
+		                             ^--- reduction from armor
+		= 0.25378
+		
+	TP = H / 0.25378
+	   = 201939 / 0.25378
+	   = 201939 / 0.74622
+	   = 795724
+	   
+	TP'(H)  =      1 / (    (1-M-D-P)   * (  Bc*(1-Br)+ (1-Bc) ) *  (1+Cc) * (1-Ar)  )
+	TP'(D)  =      H / (  ( (1-M-D-P)^2 * ( (Bc*(1-Br)+1-Bc)     * ((1+Cc) * (1-Ar)) ))  )
+	TP'(P)  =      P / (  ( (1-M-D-P)^2 * ( (Bc*(1-Br)+1-Bc)     * ((1+Cc) * (1-Ar))))   )
+	TP'(Bc) = Br * H / (  ( (1-M-D-P)   * ( (Bc*(1-Br)+1-Bc)^2   * ((1+Cc) * (1-Ar)) )   )
+	TP'(Ar) =      H / (  ( (1-M-D-P)   * ( (Bc*(1-Br)+1-Bc)     * ((1+Cc) * (1-Ar)^2))) )
+--]]
+
 
 ----------------------
 -- Global Variables --
@@ -147,7 +223,8 @@ local schoolIDToString = {
 -- SpellInfo
 local SI = {
 --	["Holy Shield'] = GetSpellInfo(48951),
-	["Holy Shield"] = GetSpellInfo(20925), --Paladin: Using Shield of the Righteous or Inquisition increases your block chance by 15% for 20 sec.
+	--["Holy Shield"] = GetSpellInfo(20925), --Removed in 5.0.4: Paladin: Using Shield of the Righteous or Inquisition increases your block chance by 15% for 20 sec.
+	["Sacred Shield"] = GetSpellInfo(20925), --Added in 5.0.4: Paladin: Protects the target with a shield of Holy Light for 30 sec. The shield absorbs up to (30 + 1.17 * holy spell power) damage every 6 sec.
 	["Shield Block"] = GetSpellInfo(2565), --Warrior: Increases your chance to block by 100% for 10 sec.
 }
 
@@ -199,6 +276,7 @@ local GetShapeshiftFormInfo = GetShapeshiftFormInfo;
 local GetDodgeChance = GetDodgeChance;
 local GetParryChance = GetParryChance;
 local GetBlockChance = GetBlockChance;
+local GetMastery = GetMastery;
 local GetCombatRating = GetCombatRating;
 local GetPlayerBuffName = GetPlayerBuffName;
 local GetShieldBlock = GetShieldBlock;
@@ -402,9 +480,9 @@ local defaults = {
 		mobCritBonus = 1,
 		mobMissChance = 0.05,
 		mobSpellCritChance = 0,
-		mobSpellCritBonus = 0.5,
+		mobSpellCritBonus = 1, --5.0.4: Melee and Spells now both crit for double damage
 		mobSpellMissChance = 0,
-		shieldBlockDelay = 2,
+		shieldBlockDelay = 2, --TODO: Remove. shield block was removed in 5.0.4
 		ignoreGemsInTooltipDiff = false,
 		ignoreEnchantsInTooltipDiff = false,
 		ignorePrismaticInTooltipDiff = false,
@@ -547,8 +625,7 @@ effectiveHealth = playerHealth * 1/reduction (armor, school, etc) - this is by C
 effectiveHealthWithBlock = effectiveHealth modified by expected guaranteed blocks. This is done through simulation using the mob attack speed, etc. See GetEffectiveHealthWithBlock.
 --]]
 function TankPoints:GetArmorReduction(armor, attackerLevel)
-
-	--Use LibStatLogic, it's been updated for Cataclysm
+	--Use LibStatLogic, it's been updated for Mists
 	return StatLogic:GetReductionFromArmor(armor, attackerLevel)
 
 	--[[ Following hasn't been updated for Cataclysm. LibStatLogic is right.
@@ -580,7 +657,7 @@ end
 function TankPoints:ShieldIsEquipped()
 	--local _, _, _, _, _, _, itemSubType = GetItemInfo(GetInventoryItemLink("player", 17) or "")
 	--return itemSubType == L["Shields"]
-	return IsEquippedItemType("INVTYPE_SHIELD")
+	return IsEquippedItemType("INVTYPE_SHIELD"); --WoWApi
 end
 
 --[[
@@ -774,6 +851,7 @@ function TankPoints:GetEffectiveHealthWithBlock(TP_Table, mobDamage)
 		local timeBetweenPresses = sbCoolDown + shieldBlockDelay
 		return effectiveHealth * mobDamage / ((mobDamage * (timeBetweenPresses - sbDuration) / timeBetweenPresses) + ((mobDamage - blockValue) * sbDuration / timeBetweenPresses))
 		--]]
+		return effectiveHealth;
 	else -- neither Paladin or Warrior
 		return effectiveHealth
 	end
@@ -1539,11 +1617,15 @@ end
 
 --local ArdentDefenderRankEffect = {0.07, 0.13, 0.2}  20101017 Removed in patch 4.0.1
 
--------------------
--- GetBlockedMod --
--------------------
 function TankPoints:GetBlockedMod(forceShield)
 	--[[
+		5.0.4: Blocking an attack happens on a separate roll. 
+			So the chance on blocking an attack depends first on the odds of an attack not being
+				- Missed
+				- Dodged
+				- Parried
+			only then can we figure out your actual chance of blocking.
+
 		GetBlockedMod returns the average damage reduction due to a shield.
 		
 		Arguments
@@ -1555,7 +1637,7 @@ function TankPoints:GetBlockedMod(forceShield)
 			The amount of damage blocked by a shield
 			
 			e.g. Warrior: 30%
-			     Warriorreduction due to blocking attacks. For example: 
+			     Warrior reduction due to blocking attacks. For example: 
 			
 			A block chance of 36%, with paladin's shield blocking 40% of the damage the shield reduces damage by 14.4%. (36% * 40% = 14.4%)
 	--]]
@@ -1565,6 +1647,8 @@ function TankPoints:GetBlockedMod(forceShield)
 	end
 
 	local result = 0.30; --by default all blocked attacks block a flat 30% of incoming damage
+
+	--TODO: There is a Meta gem that incrases block amount by an extra 1%, meaning 0.31 should be returned
 		
 	if self.playerClass == "WARRIOR" then
 		--4.0.3 Critical Block removed
@@ -1614,10 +1698,10 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	if self.playerClass == "PALADIN" then
 		--[[
 			5.0.4 (2012/08/03) - Ardent Defender is now native to all Protection paladins (no longer a talent)
-
-			Ardent Defender is on talent page 2, 20
+				Protection: Reduce damage taken by 20% for 10 seconds. 3 min cooldown
 
 			4.1 (2011-08-19)
+				Ardent Defender is on talent page 2, 20
 				Paladin Talent: Ardent Defender - 2,20
 				Reduce damage taken by 20% for 10 seconds. 3 min cooldown
 
@@ -1828,8 +1912,20 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- School Reduction
 		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
 		
-		
-		-- Total Reduction 
+		local avoidance = (1-TP_Table.mobMissChance-TP_Table.dodgeChance-TP_Table.parryChance);
+
+		--fraction of damage taken (e.g. 0.247 = 24.7%)
+		local damageTaken = avoidance*
+				(TP_Table.blockChance*TP_Table.blockedMod + (1-TP_Table.blockChance) )* 
+				(1+TP_Table.mobCritChance*TP_Table.mobCritBonus*TP_Table.mobCritDamageMod)* --crit damage
+				(1-TP_Table.armorReduction)*
+				TP_Table.damageTakenMod[TP_MELEE];
+		assert(damageTaken, "damageTaken is nil");
+				
+
+		-- Total Reduction (e.g. 0.753 = 75.3%)
+		TP_Table.totalReduction[TP_MELEE] = (1 - damageTaken);
+		--[[
 		TP_Table.totalReduction[TP_MELEE] = 1 - 
 			(
 				--this is the heart of the combat table
@@ -1841,6 +1937,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 				+ (TP_Table.mobCritChance * TP_Table.mobCritBonus * TP_Table.mobCritDamageMod)
 				+ (TP_Table.mobCrushChance * 0.5)
 			) * (1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE]
+		--]]
 		-- TankPoints
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
 		-- Guaranteed Reduction

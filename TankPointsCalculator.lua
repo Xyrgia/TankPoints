@@ -279,9 +279,11 @@ function TankPointsCalculatorFrame_ResetButton_OnClick(self, button, down)
 	end
 end
 
-local round = function(n,decimal_places)
+local round = function(n, decimal_places)
 	decimal_places = decimal_places or 0
-	return floor((n + 0.5) * (10^decimal_places))/(10^decimal_places)
+	local factor = 10^decimal_places;
+
+	return floor(n*factor + 0.5) / factor;
 end
 
 
@@ -478,15 +480,15 @@ function TPCalc:UpdateResults()
 	
 	-- Damage Reduction
 	i = i + 1
-	current = floor(self.resultsDT.totalReduction[TP_MELEE] * 100 * 100) / 100
-	new = floor(newDT.totalReduction[TP_MELEE] * 100 * 100) / 100
-	paint_result_line("%.2f")
+	current = round(self.resultsDT.totalReduction[TP_MELEE]*100, 2);
+	new = round(newDT.totalReduction[TP_MELEE]*100, 2);
+	paint_result_line("%.02f")
 
 	-- Guaranteed Reduction
 	i = i + 1
 	current = round(self.resultsDT.guaranteedReduction[TP_MELEE]*100, 2)
 	new = round(newDT.guaranteedReduction[TP_MELEE]*100, 2)
-	paint_result_line("%.2f")
+	paint_result_line("%.02f")
 
 	------------------------
 	-- Combat Table Frame --
@@ -494,11 +496,11 @@ function TPCalc:UpdateResults()
 	prefix = "TPCCombatTable"
 	-- mobMissChance
 	i = 1
-	current = floor(self.resultsDT.mobMissChance * 100 * 100) / 100
-	new = floor(newDT.mobMissChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.mobMissChance*100, 2);
+	new = round(newDT.mobMissChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new > current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -512,11 +514,11 @@ function TPCalc:UpdateResults()
 	
 	-- dodgeChance
 	i = i + 1
-	current = floor(self.resultsDT.dodgeChance * 100 * 100) / 100
-	new = floor(newDT.dodgeChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.dodgeChance*100, 2);
+	new = round(newDT.dodgeChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new > current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -530,11 +532,11 @@ function TPCalc:UpdateResults()
 	
 	-- parryChance
 	i = i + 1
-	current = floor(self.resultsDT.parryChance * 100 * 100) / 100
-	new = floor(newDT.parryChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.parryChance*100, 2);
+	new = round(newDT.parryChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new > current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -548,11 +550,11 @@ function TPCalc:UpdateResults()
 	
 	-- blockChance
 	i = i + 1
-	current = floor(self.resultsDT.blockChance * 100 * 100) / 100
-	new = floor(newDT.blockChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.blockChance*100, 2);
+	new = round(newDT.blockChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new > current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -566,11 +568,11 @@ function TPCalc:UpdateResults()
 	
 	-- mobCritChance
 	i = i + 1
-	current = floor(self.resultsDT.mobCritChance * 100 * 100) / 100
-	new = floor(newDT.mobCritChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.mobCritChance*100, 2);
+	new = round(newDT.mobCritChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new < current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -584,11 +586,11 @@ function TPCalc:UpdateResults()
 	
 	-- mobCrushChance
 	i = i + 1
-	current = floor(self.resultsDT.mobCrushChance * 100 * 100) / 100
-	new = floor(newDT.mobCrushChance * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = round(self.resultsDT.mobCrushChance*100, 2);
+	new = round(newDT.mobCrushChance*100, 2);
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new < current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
@@ -602,11 +604,11 @@ function TPCalc:UpdateResults()
 	
 	-- mobHitChance
 	i = i + 1
-	current = floor(max(0, (1 - self.resultsDT.mobCrushChance - self.resultsDT.mobCritChance - self.resultsDT.blockChance - self.resultsDT.parryChance - self.resultsDT.dodgeChance - self.resultsDT.mobMissChance)) * 100 * 100) / 100
-	new = floor(max(0, (1 - newDT.mobCrushChance - newDT.mobCritChance - newDT.blockChance - newDT.parryChance - newDT.dodgeChance - newDT.mobMissChance)) * 100 * 100) / 100
-	_G[prefix..i..currentText]:SetText(format("%.2f", current))
-	_G[prefix..i..resultText]:SetText(format("%.2f", new))
-	_G[prefix..i..differenceText]:SetText(format("%.2f", (new - current)))
+	current = max(0, (1 - self.resultsDT.mobCrushChance - self.resultsDT.mobCritChance - self.resultsDT.blockChance - self.resultsDT.parryChance - self.resultsDT.dodgeChance - self.resultsDT.mobMissChance));
+	new = max(0, (1 - newDT.mobCrushChance - newDT.mobCritChance - newDT.blockChance - newDT.parryChance - newDT.dodgeChance - newDT.mobMissChance));
+	_G[prefix..i..currentText]:SetText(format("%.02f", current))
+	_G[prefix..i..resultText]:SetText(format("%.02f", new))
+	_G[prefix..i..differenceText]:SetText(format("%.02f", (new - current)))
 	if (new < current) then
 		_G[prefix..i..resultText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
 		_G[prefix..i..differenceText]:SetTextColor(GREEN_FONT_COLOR.r, GREEN_FONT_COLOR.g, GREEN_FONT_COLOR.b)
