@@ -328,6 +328,7 @@ TP_RESILIENCE = 11
 -------------------------
 -- Calculator tooltips --
 -------------------------
+	L["Increases attack power and chance to parry an attack"] = true;
 	L["Armor reduces physical damage taken"] = true
 	L["TPCalc_PlayerStatsTooltip_MasteryRating"] = "Mastery Rating increases your Mastery.\nMastery increases your chance to block an attack."
 	L["TPCalc_PlayerStatsTooltip_Mastery"] = "Mastery increases your chance to block an attack."
