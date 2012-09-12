@@ -78,7 +78,8 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	--------------
 	-- 1 Str = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") Parry%
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR"), CR_PARRY, newDT.playerLevel)) * 0.01
+	--newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR"), CR_PARRY, newDT.playerLevel)) * 0.01
+	TankPoints:AlterSourceData(newDT, {str=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	strengthValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE])
 
@@ -86,7 +87,8 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Agility --
 	-------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()) * 0.01
+	--newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetStatMod("MOD_AGI") * StatLogic:GetDodgePerAgi()) * 0.01
+	TankPoints:AlterSourceData(newDT, {agi=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	agilityValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
 
@@ -94,9 +96,8 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Stamina --
 	-------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.playerHealth = newDT.playerHealth + 1 * 10 * StatLogic:GetStatMod("MOD_HEALTH");
---	changesDT = { sta=1; } --clear out the changes table
---	TankPoints:AlterSourceData(newDT, changesDT)
+	--newDT.playerHealth = newDT.playerHealth + 1 * 10 * StatLogic:GetStatMod("MOD_HEALTH");
+	TankPoints:AlterSourceData(newDT, {sta=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	staminaValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
 
@@ -104,10 +105,10 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Armor --
 	-----------
 	copyTable(newDT, sourceDT) -- load default data
-	local armorMod = StatLogic:GetStatMod("MOD_ARMOR")
-	newDT.armor = newDT.armor + 1 * armorMod
+--	local armorMod = StatLogic:GetStatMod("MOD_ARMOR")
+--	newDT.armor = newDT.armor + 1 * armorMod
 	--changesDT = { armorFromItems=1; };
-	--TankPoints:AlterSourceData(newDT, changesDT)
+	TankPoints:AlterSourceData(newDT, {armorFromItems=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	armorValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
 
@@ -115,9 +116,9 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Dodge Rating --
 	------------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DODGE, newDT.playerLevel)) * 0.01;
+	--newDT.dodgeChance = newDT.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(1, CR_DODGE, newDT.playerLevel)) * 0.01;
 	--changesDT = { dodgeChance=1; };
-	--TankPoints:AlterSourceData(newDT, changesDT)
+	TankPoints:AlterSourceData(newDT, { dodgeRating=1} );
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	dodgeValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
 
@@ -125,9 +126,8 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Parry Rating --
 	------------------
 	copyTable(newDT, sourceDT) -- load default data
-	newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_PARRY, newDT.playerLevel)) * 0.01;
-	--changesDT = { parryRating=1; };
-	--TankPoints:AlterSourceData(newDT, changesDT)
+	--newDT.parryChance = newDT.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(1, CR_PARRY, newDT.playerLevel)) * 0.01;
+	TankPoints:AlterSourceData(newDT, {parryRating=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	parryValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
 
@@ -143,11 +143,9 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats)
 	-- Mastery Rating --
 	--------------------
 	copyTable(newDT, sourceDT) -- load default data
-	changesDT = { masteryRating=1; }; --clear out the changes table
-	TankPoints:AlterSourceData(newDT, changesDT)
+	TankPoints:AlterSourceData(newDT, {masteryRating=1});
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
 	masteryValue = (newDT.tankPoints[TP_MELEE] - resultsDT.tankPoints[TP_MELEE]);
-
 
 	return strengthValue, agilityValue, staminaValue, armorValue, dodgeValue, parryValue, 0, masteryValue;
 end

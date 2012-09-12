@@ -184,14 +184,12 @@ TP_SHADOW = 6;
 TP_ARCANE = 7;
 
 --Initialize various sets of damage
-TankPoints.ElementalSchools = {
-    TP_HOLY, TP_FIRE, TP_NATURE, TP_FROST, TP_SHADOW, TP_ARCANE
-}
+TankPoints.ElementalSchools = { }; 
+    --{TP_HOLY, TP_FIRE, TP_NATURE, TP_FROST, TP_SHADOW, TP_ARCANE}
 
 -- schools you can get resist gear for
-TankPoints.ResistableElementalSchools = {
-    TP_FIRE, TP_NATURE, TP_FROST, TP_SHADOW, TP_ARCANE,
-}
+TankPoints.ResistableElementalSchools = { };
+    --{TP_FIRE, TP_NATURE, TP_FROST, TP_SHADOW, TP_ARCANE}
 
 --GlobalStrings are strings made availabe by Wow, they're localized too!
 --see http://wowprogramming.com/utils/xmlbrowser/diff/FrameXML/GlobalStrings.lua
@@ -492,7 +490,9 @@ local defaults = {
 -- OnInitialize(name) called at ADDON_LOADED by WowAce 
 function TankPoints:OnInitialize()
 	self:Debug("TankPoints:OnInitialize()");
-	self.db = LibStub("AceDB-3.0"):New("TankPointsDB", defaults)
+	self.db = LibStub("AceDB-3.0"):New("TankPointsDB", defaults);
+
+	self:InitializePlayerStats();
 
 	-- Initialize profileDB
 	profileDB = self.db.profile
@@ -519,6 +519,43 @@ function TankPoints:OnInitialize()
 		self:RegisterLDBDataObjects(); --in TankPointsLibDataBroker
 	end;
 end
+
+function TankPoints:InitializePlayerStats()
+	if PlayerStats == nil then
+
+		local header = string.format(
+				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
+				"%s,%s,".. --Strength, BaseStrength
+				"%s,%s,".. --Agility, BaseAgility
+				"%s,%s,".. --Stamina,BaseStamina
+				"%s,%s,".. --Intellect,BaseIntellect
+				"%s,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
+				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
+				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
+				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
+				"%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
+				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
+				"%s,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+   
+				"PlayerLevel","PlayerClass","PlayerRace",
+				"Strength", "BaseStrength",
+				"Agility", "BaseAgility",
+				"Stamina","BaseStamina",
+				"Intellect","BaseIntellect",
+				"DodgeRating","DodgeRatingBonus","DodgeChance",
+				"ParryRating","ParryRatingBonus","ParryChance",
+				"CritRating","CritRatingBonus","CritChance",
+				"BlockRating","BlockRatingBonus","BlockChance",
+				"MasteryRating","MasteryRatingBonus","Mastery",
+				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
+				"SpellHitRating","SpellHitRatingBonus","SpellHitChance");
+
+		PlayerStats = {};
+		PlayerStats[header] = true;
+	else
+		print("PlayerStats loaded. Be sure to dump them into Excel");
+	end;	
+end;
 
 -- OnEnable() called at PLAYER_LOGIN by WowAce
 function TankPoints:OnEnable()
@@ -549,9 +586,9 @@ end
 -------------------------
 -- Update TankPoints panal stats if selected
 function TankPoints:UpdateStats()
-	self:UpdateDataTable()
-	
-	PaperDollFrame_UpdateStats()
+	self:UpdateDataTable();
+
+	PaperDollFrame_UpdateStats();
 	
 --	self:Print("UpdateStats() - "..self.resultsTable.tankPoints[TP_MELEE]);
 --	self:Debug("UpdateStats() - "..self.resultsTable.tankPoints[TP_MELEE]);
@@ -560,6 +597,83 @@ function TankPoints:UpdateStats()
 	if (self.UpdateLDBDataObjects) then
 		self:UpdateLDBDataObjects();
 	end;
+end
+
+function TankPoints:RecordStats()
+	local PlayerLevel = UnitLevel("player");
+	local _, PlayerClass, _ = UnitClass("player");
+	local _, PlayerRace = UnitRace("player");
+
+	Strength, _, posBuff, negBuff = UnitStat("player", 1); --strength
+	local BaseStrength = Strength - posBuff + negBuff;
+
+	Agility, _, posBuff, negBuff = UnitStat("player", 2); --agility
+	local BaseAgility = Agility - posBuff + negBuff;
+
+	Stamina, _, posBuff, negBuff = UnitStat("player", 3); --stamina
+	local BaseStamina = Stamina - posBuff + negBuff;
+
+	Intellect, _, posBuff, negBuff = UnitStat("player", 4); --intellect
+	local BaseIntellect = Intellect - posBuff + negBuff;
+
+	local DodgeRating = GetCombatRating(CR_DODGE);
+	local DodgeRatingBonus = GetCombatRatingBonus(CR_DODGE);
+	local DodgeChance = GetDodgeChance();
+
+	local ParryRating = GetCombatRating(CR_PARRY);
+	local ParryRatingBonus = GetCombatRatingBonus(CR_PARRY);
+	local ParryChance = GetParryChance();
+
+	local CritRating = GetCombatRating(CR_CRIT_MELEE);
+	local CritRatingBonus = GetCombatRatingBonus(CR_CRIT_MELEE);
+	local CritChance = GetCritChance();
+
+	local BlockRating = GetCombatRating(CR_BLOCK);
+	local BlockRatingBonus = GetCombatRatingBonus(CR_BLOCK);
+	local BlockChance = GetBlockChance();
+
+	local MasteryRating = GetCombatRating(CR_MASTERY);
+	local MasteryRatingBonus = GetCombatRatingBonus(CR_MASTERY);
+	local Mastery = GetMastery();
+
+	local MeleeHitRating = GetCombatRating(CR_HIT_MELEE);
+	local MeleeHitRatingBonus = GetCombatRatingBonus(CR_HIT_MELEE);
+	local MeleeHitChance = GetCombatRatingBonus(CR_HIT_MELEE) + GetHitModifier();
+
+	local SpellHitRating = GetCombatRating(CR_HIT_SPELL);
+	local SpellHitRatingBonus = GetCombatRatingBonus(CR_HIT_SPELL);
+	local SpellHitChance = GetCombatRatingBonus(CR_HIT_SPELL) + GetSpellHitModifier();
+
+	local csv = string.format(
+			"%d,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
+			"%d,%d,".. --Strength, BaseStrength
+			"%d,%d,".. --Agility, BaseAgility
+			"%d,%d,".. --Stamina,BaseStamina
+			"%d,%d,".. --Intellect,BaseIntellect
+			"%d,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
+			"%d,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
+			"%d,%s,%s,".. --CritRating,CritRatingBonus,CritChance
+			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
+			"%d,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
+			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
+			"%d,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+   
+			PlayerLevel,PlayerClass,PlayerRace,
+			Strength, BaseStrength,
+			Agility, BaseAgility,
+			Stamina,BaseStamina,
+			Intellect,BaseIntellect,
+			DodgeRating,DodgeRatingBonus,DodgeChance,
+			ParryRating,ParryRatingBonus,ParryChance,
+			CritRating,CritRatingBonus,CritChance,
+			BlockRating,BlockRatingBonus,BlockChance,
+			MasteryRating,MasteryRatingBonus,Mastery,
+			MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance,
+			SpellHitRating,SpellHitRatingBonus,SpellHitChance);
+
+	--print(csv);
+	PlayerStats[csv] = true;
+	--print(string.format("Recorded %d player stat lines", #PlayerStats));
 end
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
@@ -583,6 +697,7 @@ end
 -- arg1 = UnitID of the entity
 function TankPoints:UNIT_AURA(_, unit)
 	if unit == "player" then
+		self:RecordStats();
 		self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
 	end
 end
@@ -592,6 +707,7 @@ TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
 -- arg1 = New player level
 function TankPoints:PLAYER_LEVEL_UP(_, level)
 	self.playerLevel = level
+	self:RecordStats();
 	self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
 end
 
@@ -1111,9 +1227,12 @@ function TankPoints:GetSourceData(TP_Table, school, forceShield)
 		TP_Table.masteryRating = GetCombatRating(CR_MASTERY);
 
 		-- Dodge, Parry
-		-- 2.0.2.6144 includes defense factors in these functions
-		TP_Table.dodgeChance = GetDodgeChance() * 0.01-- + TP_Table.defenseEffect
-		TP_Table.parryChance = GetParryChance() * 0.01-- + TP_Table.defenseEffect
+		TP_Table.dodgeRating = GetCombatRating(CR_DODGE);
+		TP_Table.dodgeChance = GetDodgeChance() * 0.01;
+		TP_Table.parryRating = GetCombatRating(CR_PARRY);
+		TP_Table.parryChance = GetParryChance() * 0.01;
+		TP_Table.str = UnitStat("player", 1); --1=Strength
+		TP_Table.agi = UnitStat("player", 2); --2=Agility
 
 		-- Shield Block key press delay
 		TP_Table.shieldBlockDelay = self.db.profile.shieldBlockDelay
@@ -1203,9 +1322,16 @@ end
 -- 4. TP_Table is then passed in TankPoints:GetTankPoints(TP_Table, TP_MELEE), and the results are writen in TP_Table
 -- 5. Read the results from TP_Table
 function TankPoints:AlterSourceData(tpTable, changes, forceShield)
-	
+	assert(tpTable, "AlterSourceData: argument 1 'tpTable' is nil");
+	assert(tpTable, "AlterSourceData: argument 2 'changes' is nil");
+
 	self:Debug("AlterSourceData(): changes="..self:VarAsString(changes));
 
+	--self:Debug("AlterSourceData(): tpTable="..self:VarAsString(tpTable));
+
+	local calculateParry = false;
+	local calculateDodge = false;
+	
 	if changes.str and changes.str ~= 0 then
 		------- Formulas -------
 		-- totalStr = floor(baseStr * strMod) + floor(bonusStr * strMod)
@@ -1213,23 +1339,29 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- StatLogic:GetStatMod("MOD_STR")
 		-- ADD_PARRY_RATING_MOD_STR (formerly ADD_CR_PARRY_MOD_STR)
 		------------------------
-		local totalStr, _, bonusStr = UnitStat("player", 1) --1=Strength
-		local strMod = StatLogic:GetStatMod("MOD_STR")
-		-- WoW floors numbers after being multiplied by stat mods, so to obtain the original value, you need to ceil it after dividing it with the stat mods
-		changes.str = max(0, floor((ceil(bonusStr / strMod) + changes.str) * strMod)) - bonusStr
+		local totalStr, _, bonusStr = UnitStat("player", 1); --1=Strength
+
+		local strMod = StatLogic:GetStatMod("MOD_STR");
+		if strMod ~= 1 then
+			-- WoW floors numbers after being multiplied by stat mods, so to obtain the original value, you need to ceil it after dividing it with the stat mods
+			changes.str = max(0, floor((ceil(bonusStr / strMod) + changes.str) * strMod)) - bonusStr;
+			self:Debug(string.format("    Modifying strength by %.2f to %.2f due to MOD_STR", strMod, changes.str));
+			
+		end;
+
+		tpTable.str = tpTable.str + changes.str;
+		self:Debug(string.format("    Adding %d strength to existing %d strength.", changes.str, tpTable.str));
 		
-		if GetParryChance() ~= 0 and StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR") ~= 0 then
-			local addParryRatingModStr = StatLogic:GetStatMod("ADD_PARRY_RATING_MOD_STR");
-		
+		local addParryModStr = StatLogic:GetStatMod("ADD_PARRY_MOD_STR");
+		if (addParryModStr ~= 0) then
+			--[[
 			local parryRatingIncrease = floor((bonusStr + changes.str) * addParryRatingModStr) - floor(bonusStr * addParryRatingModStr)
 			
 			local parry = StatLogic:GetEffectFromRating(parryRatingIncrease, CR_PARRY, tpTable.playerLevel); --GetEffectFromRating returns as percentage rather than fraction
 			parry = StatLogic:GetAvoidanceGainAfterDR("PARRY", parry) * 0.01; --apply diminishing returns, and convert percentage to fraction
-			
-			self:Debug(string.format("   Adding %.4f%% Parry (%d Parry Rating from %d Strength) to existing %.4f%% Parry",
-					parry*100, parryRatingIncrease, changes.str, tpTable.parryChance*100));
-			
-			tpTable.parryChance = tpTable.parryChance + parry;
+			--]]
+			self:Debug(string.format("    Strength changing by %d, and ADD_PARRY_MOD_STR=%d. Will recalculate Parry Chance", changes.str, addParryModStr));
+			calculateParry = true;
 		end
 	end
 	
@@ -1249,7 +1381,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- Hunter: Lightning Reflexes (Rank 5) - 3,18
 		--         Increases your Agility by 3%/6%/9%/12%/15%.
 		------------------------
-		local _, _, agility = UnitStat("player", 2)
+		local _, _, agility = UnitStat("player", 2); --2=Agility
 		local agiMod = StatLogic:GetStatMod("MOD_AGI")
 		
 		if (agiMod ~= 1.0) then
@@ -1257,18 +1389,10 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			self:Debug(string.format("   Adjusting agility change to %d because of MOD_AGI %.2f", changes.agi, agiMod));
 		end
 		
-		-- Calculate dodge chance
-		local dodgeThroughAgility = StatLogic:GetDodgePerAgi() * changes.agi; --could also use StatLogic:GetDodgeFromAgi(changes.agi)
+		tpTable.agi = tpTable.agi + changes.agi;
 
-		--Adjust dodge percentage for diminishing returns
-		dodgeThroughAgility = StatLogic:GetAvoidanceGainAfterDR("DODGE", dodgeThroughAgility);
-		--self:Debug("dodgeThroughAgility after DR = "..dodgeThroughAgility)
-
-		self:Debug(string.format("   Adding %.4f%% dodge (from %d Agility) to existing %.4f%% Dodge", dodgeThroughAgility, changes.agi, tpTable.dodgeChance*100));
-		
-		--self:Debug("tpTable.dodgeChance = "..tpTable.dodgeChance)
-		tpTable.dodgeChance = tpTable.dodgeChance + (dodgeThroughAgility * 0.01)
-		--self:Debug("tpTable.dodgeChance after = "..tpTable.dodgeChance)
+		self:Debug(string.format("    Agility changing by %d. Will recalculate Dodge Chance", changes.agi));
+		calculateDodge = true;
 		
 		-- Armor mods don't effect armor from agi
 		--20110103: Agility no longer affects armor (at least it doesn't affect mine)
@@ -1439,15 +1563,88 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		end
 	end--]]
 	
-	if (changes.dodgeChance and changes.dodgeChance ~= 0) then
-		tpTable.dodgeChance = tpTable.dodgeChance + changes.dodgeChance
-	end
+
+	-- *** +Parry Rating --> Parry Chance
+	if (changes.parryRating and changes.parryRating ~= 0) then
+		tpTable.parryRating = tpTable.parryRating or 0;
+
+		local newParryRating = tpTable.parryRating + changes.parryRating;
+		self:Debug(string.format("   Adding %d Parry Rating to existing %d Parry Rating. New ParryRating = %d. Will recalculate Parry Chance", 
+				changes.parryRating, tpTable.parryRating, newParryRating));
+		tpTable.parryRating = newParryRating;
+		calculateParry = true;
+	end;
 	
+	-- *** +Parry Chance --> Parry Chance
 	if (changes.parryChance and changes.parryChance ~= 0) then
-		if GetParryChance() ~= 0 then
-			tpTable.parryChance = tpTable.parryChance + changes.parryChance
-		end
-	end
+		self:Debug(string.format("   Parry Chance changing by %.4f%%. Will recalculate Parry Chance", changes.parryChance));
+		calculateParry = true;
+	end;
+	
+	if calculateParry then
+		local strength = tpTable.str;
+		self:Debug(string.format("AlterSourceData: calculateParry, tpTable.parryRating = %d", tpTable.parryRating));
+
+		local parryRating = tpTable.parryRating;
+		
+		local addParryModStr = StatLogic:GetStatMod("ADD_PARRY_MOD_STR");
+		--if (addParryModStr == 0) then
+--			strength = 0;
+		--end
+
+		local newParryChance = StatLogic:GetParryChance(parryRating, strength);		
+		self:Debug(string.format("   Making Parry Chance %.4f%% from Parry Rating=%d and Strength=%d",
+				newParryChance, parryRating, strength));
+		tpTable.parryChance = newParryChance*0.01;
+
+		if (changes.parryChance and changes.parryChance ~= 0) then
+			tpTable.parryChance = (tpTable.parryChance or 0);
+
+			newParryChance = tpTable.parryChance + changes.parryChance;
+			self:Debug(string.format("   Setting Parry Chance to %.4f%% by adding %.4f%% Parry Chance to existing %.4f%% Parry Chance",
+				newParryChance, changes.parryChance, tpTable.parryChance));
+
+			tpTable.parryChance = newParryChance;
+		end;
+	end;
+
+	-- *** Dodge Rating --> Dodge Chance
+	if (changes.dodgeRating and changes.dodgeRating ~= 0) then
+		tpTable.dodgeRating = tpTable.dodgeRating or 0;
+
+		local newDodgeRating = tpTable.dodgeRating + changes.dodgeRating;
+		self:Debug(string.format("   Adding %d Dodge Rating to existing %d Dodge Rating. New DodgeRating = %d. Will recalculate Dodge Chance", 
+				changes.dodgeRating, tpTable.dodgeRating, newDodgeRating));
+		tpTable.dodgeRating = newDodgeRating;
+		calculateDodge = true;
+	end;
+	
+	-- *** +Dodge Chance --> Dodge Chance
+	if (changes.dodgeChance and changes.dodgeChance ~= 0) then
+		self:Debug(string.format("   Dodge Chance changing by %.4f%%. Will recalculate Dodge Chance", changes.dodgeChance));
+		calculateDodge = true;
+	end;
+	
+	if calculateDodge then
+		local dodgeRating = tpTable.dodgeRating;
+		local agility = tpTable.agi;
+
+		local newDodgeChance = StatLogic:GetDodgeChance(dodgeRating, agility);		
+		self:Debug(string.format("   Making Dodge Chance %.4f%% from Dodge Rating=%d and Agility=%d",
+				newDodgeChance, dodgeRating, agility));
+		tpTable.dodgeChance = newDodgeChance*0.01;
+
+		if (changes.dodgeChance and changes.dodgeChance ~= 0) then
+			tpTable.dodgeChance = (tpTable.dodgeChance or 0);
+
+			newDodgeChance = tpTable.dodgeChance + changes.dodgeChance;
+			self:Debug(string.format("   Setting Dodge Chance to %.4f%% by adding %.4f%% Dodge Chance to existing %.4f%% Dodge Chance",
+				newDodgeChance, changes.dodgeChance, tpTable.dodgeChance));
+
+			tpTable.dodgeChance = newDodgeChance;
+		end;
+	end;
+
 	
 	if changes.blockChance and changes.blockChance ~= 0 then
 		--self:Debug("Apply blockChance change "..changes.blockChance);
@@ -1471,12 +1668,12 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	
 	if (changes.mastery and changes.mastery ~= 0) then
-		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 3) then
+		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetSpecialization() == 3) then --5.0.4 GetPrimaryTalentTree replaced with GetSpecialization()
 			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)*0.01;
 			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f warrior Mastery) to existing %.4f%% Block Chance", blockChanceFromMastery*100, changes.mastery, tpTable.blockChance*100));
 			
 			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
-        elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetPrimaryTalentTree() == 2) then
+        elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetSpecialization() == 2) then --5.0.4 GetPrimaryTalentTree replaced with GetSpecialization()
 			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)*0.01
 
 			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f paladin Mastery) to existing %.4f%% Block Chance)", 
@@ -1503,33 +1700,45 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	--self:Print("changes.str = "..(changes.str or "0")..", changes.sta = "..(changes.sta or "0"))
 end
 
-function TankPoints:CheckSourceData(TP_Table, school, forceShield)
+--[[
+	Validate the passed dataTable ensuring that all required fields are present.
+	If the table is valid and complete the function returns true. 
+	If the table has missing or invalid values the function returns false,
+	and additional error information can be obtained from the member field TankPoints.noTPReason.
+	
+	Sample usage:
+	
+		if (not TankPoints:CheckSourceData(dt)) then
+			error('Data table "dt" is invalid: '..TankPoints.noTPReason);
+		end
+--]]
+function TankPoints:CheckSourceData(dataTable, school, forceShield)
 	local result = true
 	
 	self.noTPReason = "should have TankPoints"
 	
 	local function cmax(var, maxi)
 		if result then
-			if nil == TP_Table[var] then
+			if nil == dataTable[var] then
 				local msg = var.." is nil"
 				self.noTPReason = msg
 				--self:Print(msg)
 				result = nil
 			else
 				--self:Print("cmax("..var..")");
-				TP_Table[var] = max(maxi, TP_Table[var])
+				dataTable[var] = max(maxi, dataTable[var])
 			end
 		end
 	end
 	local function cmax2(var1, var2, maxi)
 		if result then
-			if nil == TP_Table[var1][var2] then
-				local msg = format("TP_Table[%s][%s] is nil", tostring(var1), tostring(var2))
+			if nil == dataTable[var1][var2] then
+				local msg = format("dataTable[%s][%s] is nil", tostring(var1), tostring(var2))
 				self.noTPReason = msg
 				--self:Print(msg)
 				result = nil
 			else
-				TP_Table[var1][var2] = max(maxi, TP_Table[var1][var2])
+				dataTable[var1][var2] = max(maxi, dataTable[var1][var2])
 			end
 		end
 	end
@@ -1551,15 +1760,15 @@ function TankPoints:CheckSourceData(TP_Table, school, forceShield)
 		--cmax("defenseRating",0)
 		cmax("dodgeChance",0)
 		if GetParryChance() == 0 then
-			TP_Table.parryChance = 0
+			dataTable.parryChance = 0
 		end
-		cmax("parryChance",0)
+		cmax("parryChance",0);
 		if (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped()) then
 			cmax("blockChance",0)
 			--cmax("blockValue",0)
 		else
-			TP_Table.blockChance = 0
-			--TP_Table.blockValue = 0
+			dataTable.blockChance = 0
+			--dataTable.blockValue = 0
 		end
 		--cmax("mobDamage",0)
 		cmax2("damageTakenMod",TP_MELEE,0)
@@ -1685,7 +1894,10 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 	------------------
 	-- Check Inputs --
 	------------------
-	if not self:CheckSourceData(TP_Table, school, forceShield) then return end
+	if not self:CheckSourceData(TP_Table, school, forceShield) then 
+		error("TankPoints:CalculateTankPoints: supplied dataTable is invalid: "..TankPoints.noTPReason);
+		return 
+	end
 
 	-----------------
 	-- Caculations --
@@ -2001,6 +2213,7 @@ function TankPoints:GetTankPoints(TP_Table, school, forceShield)
 	------------------
 	if (not self:CheckSourceData(TP_Table, school, forceShield)) then 
 		self:Debug("TankPoints:GetTankPoints: CheckSourceData failed ("..self.noTPReason.."). Returning pre-maturely")
+		error("TankPoints:GetTankPoints: supplied dataTable is invalid: "..TankPoints.noTPReason);
 		return 
 	end
 
