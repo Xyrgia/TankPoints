@@ -104,7 +104,7 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	------------------
 	TPCMobStats2.tooltip = L["Mob Damage before DR"]
 
-
+	TPCPlayerStats1.tooltip =  L["Increases attack power and chance to parry an attack"] --Strength
 	TPCPlayerStats5.tooltip =  L["Armor reduces physical damage taken"] --Armor (Items)
 	TPCPlayerStats6.tooltip =  L["Armor reduces physical damage taken"] --Armor
 	TPCPlayerStats7.tooltip =  L["TPCalc_PlayerStatsTooltip_MasteryRating"] --Mastery Rating
@@ -310,7 +310,10 @@ function TPCalc:UpdateResults()
 
 	--And since this is a what-if calculation screen, we constuct another table (newDT) that we apply our sandbox calculations to
 	local newDT = {}
+
+	assert(self.sourceDT.parryChance, "sourceDT.parryChance is nil");
 	copyTable(newDT, self.sourceDT)
+	assert(newDT.parryChance, "newDT.parryChance is nil");
 	--TankPoints:Debug("3. newDT.mobMissChance = "..newDT.mobMissChance);
 	
 	--TankPoints:Debug(table.tostring(newDT))
@@ -370,22 +373,36 @@ function TPCalc:UpdateResults()
 	changes.dodgeChance = 0
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
 	if diff then
-		changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(diff, CR_DODGE, newDT.playerLevel)) * 0.01
+		--changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(diff, CR_DODGE, newDT.playerLevel)) * 0.01
+		changes.dodgeRating = diff;
 	end
 	i = i + 1
 	-- Dodge
-	changes.dodgeChance = changes.dodgeChance + _G[prefix..i..inputEditBox]:GetNumber() * 0.01
+	changes.dodgeChance = 0;
+	diff = _G[prefix..i..inputEditBox]:GetNumber();
+	if diff then
+		changes.dodgeChance = changes.dodgeChance + diff*0.01;
+	end;
 	i = i + 1
+
+
 	-- Parry Rating
-	changes.parryChance = 0
+	changes.parryRating = 0;
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
 	if diff then
-		changes.parryChance = StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(diff, CR_PARRY, newDT.playerLevel)) * 0.01
+		--changes.parryChance = StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(diff, CR_PARRY, newDT.playerLevel)) * 0.01
+		changes.parryRating = diff;
 	end
 	i = i + 1
 	-- Parry
-	changes.parryChance = changes.parryChance + _G[prefix..i..inputEditBox]:GetNumber() * 0.01
+	changes.parryChance = 0;
+	diff = _G[prefix..i..inputEditBox]:GetNumber();
+	if diff then
+		changes.parryChance = changes.parryChance + diff*0.01;
+	end;
 	i = i + 1
+
+
 	-- Block Rating
 	changes.blockChance = 0
 	diff = _G[prefix..i..inputEditBox]:GetNumber()
@@ -405,9 +422,11 @@ function TPCalc:UpdateResults()
 	
 	prefix = "TPCMobStats"
 	i = 1
+
 	-- mobLevel
 	changes.mobLevel = _G[prefix..i..inputEditBox]:GetNumber()
 	i = i + 1
+
 	-- mobDamage
 	changes.mobDamage = _G[prefix..i..inputEditBox]:GetNumber()
 	
@@ -422,6 +441,8 @@ function TPCalc:UpdateResults()
 	-- Calculate new TankPoints --
 	------------------------------
 	TankPoints:GetTankPoints(newDT, TP_MELEE)
+
+	--assert(newDT.tankPoints, "newDT.tankPoints is not assigned after calling GetTankPoints(newDT)");
 
 
 --	TankPoints:Debug("Done calling GetTankPoints")
@@ -459,16 +480,16 @@ function TPCalc:UpdateResults()
 	end
 
 	-- TankPoints
-	i = 1
-	current = floor(self.resultsDT.tankPoints[TP_MELEE])
-	new = floor(newDT.tankPoints[TP_MELEE])
-	paint_result_line("%.0f")
+	i = 1;
+	current = floor(self.resultsDT.tankPoints[TP_MELEE]);
+	new = floor(newDT.tankPoints[TP_MELEE]);
+	paint_result_line("%.0f");
 
 	-- Effective Health
-	i = i + 1
-	current = round(self.resultsDT.effectiveHealth[TP_MELEE])
-	new = round(newDT.effectiveHealth[TP_MELEE])
-	paint_result_line("%.0f")
+	i = i + 1;
+	current = round(self.resultsDT.effectiveHealth[TP_MELEE]);
+	new = round(newDT.effectiveHealth[TP_MELEE]);
+	paint_result_line("%.0f");
 
 	-- Effective Health with Block
 	if self:ShouldShowEHB() then

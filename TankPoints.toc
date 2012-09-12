@@ -5,7 +5,7 @@
 ## Notes-zhCN: 在角色窗口中计算并显示你的坦克点数
 ## Notes-esES: Calcula y muestra tus Puntos de Tanque en la ventana de personaje
 ## OptionalDeps: WoWUnit, Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
-## SavedVariables: TankPointsDB
+## SavedVariables: TankPointsDB, PlayerStats
 ## Author: Whitetooth
 ## Version: 5.0.4.183
 ## X-eMail: hotdogee [at] gmail [dot] com

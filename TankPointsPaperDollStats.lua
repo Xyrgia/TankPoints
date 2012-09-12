@@ -186,16 +186,16 @@ local function AddTPStatFrame()
 		stats = {
 			"TP_TANKPOINTS",
 			"TP_MELEEDR",
-			"TP_SPELLTP",
-			"TP_SPELLDR",
+			--"TP_SPELLTP",
+			--"TP_SPELLDR",
 			"TP_CALC",
 		}
 	}
 	PAPERDOLL_STATCATEGORY_DEFAULTORDER[id] = "TANKPOINTS"
 	PAPERDOLL_STATINFO["TP_TANKPOINTS"] = { updateFunc = function(statFrame, unit) TP_SetTankPoints(statFrame, unit) end }
 	PAPERDOLL_STATINFO["TP_MELEEDR"]    = { updateFunc = function(statFrame, unit) TP_SetMeleeReduction(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_SPELLTP"]    = { updateFunc = function(statFrame, unit) TP_SetSpellTankPoints(statFrame, unit) end }
-	PAPERDOLL_STATINFO["TP_SPELLDR"]    = { updateFunc = function(statFrame, unit) TP_SetSpellReduction(statFrame, unit) end }
+	--PAPERDOLL_STATINFO["TP_SPELLTP"]    = { updateFunc = function(statFrame, unit) TP_SetSpellTankPoints(statFrame, unit) end }
+	--PAPERDOLL_STATINFO["TP_SPELLDR"]    = { updateFunc = function(statFrame, unit) TP_SetSpellReduction(statFrame, unit) end }
 	PAPERDOLL_STATINFO["TP_CALC"]       = { updateFunc = function(statFrame, unit) TP_SetCalculator(statFrame, unit) end }
 end
 
@@ -999,15 +999,15 @@ local function AddEHStatFrame()
 		stats = {
 			"EH_EFFECTIVEHEALTH",
 			"EH_EHBLOCK",
-			"EH_SPELLEH",
-			"EH_SPELLEHALL",
+			--"EH_SPELLEH",
+			--"EH_SPELLEHALL",
 		}
 	}
 	PAPERDOLL_STATCATEGORY_DEFAULTORDER[id] = "EFFECTIVEHEALTH"
 	PAPERDOLL_STATINFO["EH_EFFECTIVEHEALTH"] = { updateFunc = function(statFrame, unit) EH_SetEffectiveHealth(statFrame, unit) end }
 	PAPERDOLL_STATINFO["EH_EHBLOCK"] = { updateFunc = function(statFrame, unit) EH_SetEffectiveHealthWithBlock(statFrame, unit) end }
-	PAPERDOLL_STATINFO["EH_SPELLEH"] = { updateFunc = function(statFrame, unit) EH_SetSpellEffectiveHealth(statFrame, unit) end }
-	PAPERDOLL_STATINFO["EH_SPELLEHALL"] = { updateFunc = function(statFrame, unit) EH_SetSpellEffectiveHealthAllSchools(statFrame, unit) end }
+	--PAPERDOLL_STATINFO["EH_SPELLEH"] = { updateFunc = function(statFrame, unit) EH_SetSpellEffectiveHealth(statFrame, unit) end }
+	--PAPERDOLL_STATINFO["EH_SPELLEHALL"] = { updateFunc = function(statFrame, unit) EH_SetSpellEffectiveHealthAllSchools(statFrame, unit) end }
 end
 
 --tooltips
