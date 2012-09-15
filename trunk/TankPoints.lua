@@ -525,6 +525,7 @@ function TankPoints:InitializePlayerStats()
 
 		local header = string.format(
 				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
+				"%d,%s,".. --SpecializationIndex,MasterySpell
 				"%s,%s,".. --Strength, BaseStrength
 				"%s,%s,".. --Agility, BaseAgility
 				"%s,%s,".. --Stamina,BaseStamina
@@ -538,6 +539,7 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
    
 				"PlayerLevel","PlayerClass","PlayerRace",
+				"SpecializationIndex","MasterySpell",
 				"Strength", "BaseStrength",
 				"Agility", "BaseAgility",
 				"Stamina","BaseStamina",
@@ -604,6 +606,9 @@ function TankPoints:RecordStats()
 	local _, PlayerClass, _ = UnitClass("player");
 	local _, PlayerRace = UnitRace("player");
 
+	specializationIndex = GetSpecialization();
+	masterySpell = GetSpecializationMasterySpells(specializationIndex);
+
 	Strength, _, posBuff, negBuff = UnitStat("player", 1); --strength
 	local BaseStrength = Strength - posBuff + negBuff;
 
@@ -646,6 +651,7 @@ function TankPoints:RecordStats()
 
 	local csv = string.format(
 			"%d,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
+			"%d,%d,".. --SpecializationIndex,MasterySpell
 			"%d,%d,".. --Strength, BaseStrength
 			"%d,%d,".. --Agility, BaseAgility
 			"%d,%d,".. --Stamina,BaseStamina
@@ -659,6 +665,7 @@ function TankPoints:RecordStats()
 			"%d,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
    
 			PlayerLevel,PlayerClass,PlayerRace,
+			specializationIndex, masterySpell,
 			Strength, BaseStrength,
 			Agility, BaseAgility,
 			Stamina,BaseStamina,
@@ -1645,14 +1652,6 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		end;
 	end;
 
-	
-	if changes.blockChance and changes.blockChance ~= 0 then
-		--self:Debug("Apply blockChance change "..changes.blockChance);
-		if doBlock then
-			tpTable.blockChance = tpTable.blockChance + changes.blockChance
-		end
-	end
-	
 	--Convert Mastery Rating & Mastery into Block (paladins and warriors)
 	--self:Debug("changes.masteryRating="..self:VarAsString(changes.masteryRating));
 	if (changes.masteryRating and changes.masteryRating ~= 0) then
@@ -1668,19 +1667,23 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	end
 	
 	if (changes.mastery and changes.mastery ~= 0) then
-		if (tpTable.playerClass == "WARRIOR") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetSpecialization() == 3) then --5.0.4 GetPrimaryTalentTree replaced with GetSpecialization()
-			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 3, tpTable.playerClass)*0.01;
-			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f warrior Mastery) to existing %.4f%% Block Chance", blockChanceFromMastery*100, changes.mastery, tpTable.blockChance*100));
-			
-			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
-        elseif (tpTable.playerClass == "PALADIN") and IsSpellKnown(CLASS_MASTERY_SPELLS[tpTable.playerClass]) and (GetSpecialization() == 2) then --5.0.4 GetPrimaryTalentTree replaced with GetSpecialization()
-			local blockChanceFromMastery = StatLogic:GetEffectFromMastery(changes.mastery, 2, tpTable.playerClass)*0.01
+		tpTable.mastery = tpTable.mastery + changes.mastery;	
+	
+		--does Mastery affect Block Chance?
+		--Warror Protection.  SpellID: 76857  Mastery: Critical Block
+		--Paladin Protection. SpellID: 76671  Mastery: Divine Bulwark
+		local masterySpellID = GetSpecializationMasterySpells(GetSpecialization());
 
-			self:Debug(string.format("   Adding %.4f%% Block Chance (from %.4f paladin Mastery) to existing %.4f%% Block Chance)", 
-					blockChanceFromMastery*100, changes.mastery, tpTable.blockChance*100));
-			
-			tpTable.blockChance = tpTable.blockChance + blockChanceFromMastery;
+		if (masterySpellID == 76857) or (masterySpellID == 76671) then
+			tpTable.blockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass)*0.01;
         end	
+	end
+
+	if changes.blockChance and changes.blockChance ~= 0 then
+		--self:Debug("Apply blockChance change "..changes.blockChance);
+		if doBlock then
+			tpTable.blockChance = tpTable.blockChance + changes.blockChance
+		end
 	end
 	
 	--Removed 20120804 (5.0.1) Resilience does nothing for tanks
