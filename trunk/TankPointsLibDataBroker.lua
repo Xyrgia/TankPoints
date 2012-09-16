@@ -94,7 +94,18 @@ function dataObject:OnTooltipShow()
 	self:AddDoubleLine("Total Reduction (%):", HIGHLIGHT_FONT_COLOR_CODE..format("%.2f%%", totalReduction)..FONT_COLOR_CODE_CLOSE);
 	self:AddDoubleLine("Guaranteed Reduction (%):", HIGHLIGHT_FONT_COLOR_CODE..format("%.2f%%", guaranteedReduction)..FONT_COLOR_CODE_CLOSE);
 
-	local str, agi, sta, ar, dodge, parry, _, mastery = TankPointsCalculator:ComputeTankPointsDelta(nil);
+	--sometimes adding only +1 to a stat has no effect due to rounding, and it takes a few for the value to jump
+	--So we'll assume a jump by 10 and then normalize it back to per 1
+	local factor = 10;
+	local str, agi, sta, ar, dodge, parry, _, mastery = TankPointsCalculator:ComputeTankPointsDelta(nil, factor);
+
+	str = str / factor;
+	agi = agi / factor;
+	sta = sta / factor;
+	ar = ar / factor;
+	dodge = dodge / factor;
+	parry = parry / factor;
+	mastery = mastery / factor;
 
 	local minRel = math.min(str, agi, sta, ar, dodge, parry, mastery);
 	local maxRel = math.max(str, agi, sta, ar, dodge, parry, mastery);

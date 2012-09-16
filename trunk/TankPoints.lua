@@ -282,9 +282,9 @@ local GetShieldBlock = GetShieldBlock;
 ---------------
 -- Constants --
 ---------------
---HEALTH_PER_STAMINA = 10 --removed 20101211: At best it's not used. At worst it was overwriting a global in Bliz FrameXml
-BLOCK_DAMAGE_REDUCTION = 0.30 --blocked attacks reduce damage by 30%
-ARDENT_DEFENDER_DAMAGE_REDUCTION  = 0.20 --Paladin Ardent Defender ability reduces all damage by 20% for 10 seconds
+--HEALTH_PER_STAMINA = 10 --removed 20101211: It's wrong after level 80. At best it's not used. At worst it was overwriting a global in Bliz FrameXml
+--BLOCK_DAMAGE_REDUCTION = 0.30 --blocked attacks reduce damage by 30%, unless you have a meta, in which case it's 31%
+
 
 
 -----------
@@ -1356,8 +1356,9 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			
 		end;
 
-		tpTable.str = tpTable.str + changes.str;
+		local newStrength = tpTable.str + changes.str;
 		self:Debug(string.format("    Adding %d strength to existing %d strength.", changes.str, tpTable.str));
+		tpTable.str = newStrength;
 		
 		local addParryModStr = StatLogic:GetStatMod("ADD_PARRY_MOD_STR");
 		if (addParryModStr ~= 0) then
@@ -1461,12 +1462,12 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		end
 
 		-- Calculate player health
-		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
+		local healthMod = StatLogic:GetStatMod("MOD_HEALTH");
 		--self:Debug("AlterSourceData()[modify stamina] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 
 	
 		local playerHealthWithoutModifiers = round(tpTable.playerHealth / healthMod);
-		local healthFromStaminaWithoutModifiers = changes.sta * 10; --We will later reapply the MOD_HEALTH
+		local healthFromStaminaWithoutModifiers = StatLogic:GetHealthFromSta(changes.sta); --20120916: 1 stamina no longer grants 10 healthWe will later reapply the MOD_HEALTH
 		
 		self:Debug(string.format("   Adding %.2f Health from %.2f Stamina (%d before health modifier of %.4f%%) to existing %d Health",
 				healthFromStaminaWithoutModifiers*healthMod, changes.sta, healthFromStaminaWithoutModifiers, healthMod*100, tpTable.playerHealth));
@@ -1489,7 +1490,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		-- Death Knight: Frost Presence - Stance
 		--               Increasing total health by 10%
 		------------------------
-		local healthMod = StatLogic:GetStatMod("MOD_HEALTH")
+		local healthMod = StatLogic:GetStatMod("MOD_HEALTH");
 		--self:Debug("AlterSourceData()[modify health] GetStatMod(\"MOD_HEALTH\") = "..healthMod)
 		
 		self:Debug(string.format("   Adding %.2f Health (%.2f before health modifier of %.4f%%) to existing %d Health",
@@ -1522,6 +1523,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		changes.armor = changes.armor or 0
 		
 		local armorMod = StatLogic:GetStatMod("MOD_ARMOR")
+		--[[
 		local _, _, _, pos, neg = UnitArmor("player")
 		local _, agility = UnitStat("player", 2)
 		if changes.agi then
@@ -1538,39 +1540,20 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 					( round((tpTable.armor - agility * 2 - pos + neg) / armorMod) + changes.armorFromItems )*armorMod
 				) + agility*2 + pos - neg + changes.armor
 		--self:Print(tpTable.armor.." = floor(((floor((("..tpTable.armor.." - "..agility.." * 2 - "..pos.." + "..neg..") / "..armorMod..") + 0.5) + "..changes.armor..") * "..armorMod..") + 0.5) + "..agility.." * 2 + "..pos.." - "..neg)
+		--]]
 		
+		if (changes.armorFromItems ~= 0) and (armorMod ~= 0) and (armorMod ~= 1) then
+			local newArmorFromItemsChanges = changes.armorFromItems*armorMod;
+			self:Debug(string.format("   Adjusting %d armor from items by %.4f%%, to %d", changes.armorFromItems, armorMod, newArmorFromItemsChanges));
+			changes.armorFromItems = newArmorFromItemsChanges;
+		end;
+
+		local newArmor = floor(tpTable.armor + changes.armor + changes.armorFromItems);
 		self:Debug(string.format("   Adding %d Armor, %d Armor From Items, to existing %d Armor, giving %d Armor",
-				changes.armor, changes.armorFromItems, armorBefore, tpTable.armor));
-
+				changes.armor, changes.armorFromItems, tpTable.armor, newArmor));
+		tpTable.armor = newArmor;
 	end
 	
-	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
-
-	--[[20101018: Defense removed from game
-	if changes.defense and changes.defense ~= 0 then
-		tpTable.defense = tpTable.defense + changes.defense
-		-- tpTable.dodgeChance = tpTable.dodgeChance + changes.defense * 0.0004
-		-- if GetParryChance() ~= 0 then
-			-- tpTable.parryChance = tpTable.parryChance + changes.defense * 0.0004
-		-- end
-		-- if doBlock then
-			-- tpTable.blockChance = tpTable.blockChance + changes.defense * 0.0004
-		-- end
-	end
-	if changes.defenseRating and changes.defenseRating ~= 0 then
-		local defenseChange = floor(StatLogic:GetEffectFromRating(tpTable.defenseRating + changes.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel)) - floor(StatLogic:GetEffectFromRating(tpTable.defenseRating, CR_DEFENSE_SKILL, tpTable.playerLevel))
-		tpTable.defense = tpTable.defense + defenseChange
-		tpTable.defenseRating = tpTable.defenseRating + changes.defenseRating
-		tpTable.dodgeChance = tpTable.dodgeChance + StatLogic:GetAvoidanceGainAfterDR("DODGE", defenseChange * 0.04) * 0.01
-		if GetParryChance() ~= 0 then
-			tpTable.parryChance = tpTable.parryChance + StatLogic:GetAvoidanceGainAfterDR("PARRY", defenseChange * 0.04) * 0.01
-		end
-		if doBlock then
-			tpTable.blockChance = tpTable.blockChance + defenseChange * 0.0004
-		end
-	end--]]
-	
-
 	-- *** +Parry Rating --> Parry Chance
 	if (changes.parryRating and changes.parryRating ~= 0) then
 		tpTable.parryRating = tpTable.parryRating or 0;
@@ -1652,6 +1635,8 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		end;
 	end;
 
+	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
+
 	--Convert Mastery Rating & Mastery into Block (paladins and warriors)
 	--self:Debug("changes.masteryRating="..self:VarAsString(changes.masteryRating));
 	if (changes.masteryRating and changes.masteryRating ~= 0) then
@@ -1675,7 +1660,9 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		local masterySpellID = GetSpecializationMasterySpells(GetSpecialization());
 
 		if (masterySpellID == 76857) or (masterySpellID == 76671) then
-			tpTable.blockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass)*0.01;
+			local newBlockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass);
+			self:Debug("    Setting Block Chance to %.4f (from %.4f Mastery, and using mastery spell %d", newBlockChance, tpTable.mastery, masterySpellID);
+			tpTable.blockChance = newBlockChance/100;
         end	
 	end
 
@@ -1858,7 +1845,8 @@ function TankPoints:GetBlockedMod(forceShield)
 		return 0
 	end
 
-	local result = 0.30; --by default all blocked attacks block a flat 30% of incoming damage
+	--local result = 0.30; --by default all blocked attacks block a flat 30% of incoming damage
+	local result = GetShieldBlock(); --base 30%, will return 31% if you have the meta gem
 
 	--TODO: There is a Meta gem that incrases block amount by an extra 1%, meaning 0.31 should be returned
 		
@@ -1932,15 +1920,18 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--self:Debug("Ardent Defender points = "..r)
 
 		local knowsArdentDefender = IsSpellKnown(31850); --31850: Ardent Defender - Reduce damage taken by 20% for 10 sec. 3 minute cooldown
-		local forceArdentDefender = false
+		local includeArdentDefender = false
 
-		if (knowsArdentDefender) or (forceArdentDefender) then
+		if (knowsArdentDefender) and (includeArdentDefender) then
 			--local inc = 0.35 / (1 - ArdentDefenderRankEffect[r]) - 0.35 -- 8.75% @ rank3    20101017: Old model, when ardent defender was passive
+
+			local ARDENT_DEFENDER_DAMAGE_REDUCTION  = 0.20 --Paladin Ardent Defender ability reduces all damage by 20% for 10 seconds. 3 minute cooldown
+
 			local inc = round(TP_Table.playerHealth * ARDENT_DEFENDER_DAMAGE_REDUCTION * (10/180)); --20% increase for some fraction of the time
 
-			TP_Table.playerHealth = TP_Table.playerHealth + inc
+			--TP_Table.playerHealth = TP_Table.playerHealth + inc
 
-			--self:Debug("TankPoints:CalculateTankPoints(): Applied Ardent Defender health effective increase of "..inc..". New health = "..TP_Table.playerHealth)
+			self:Debug("TankPoints:CalculateTankPoints(): Applied Ardent Defender health effective increase of "..inc..". New health = "..TP_Table.playerHealth)
 		end
 	end
 	
@@ -2027,7 +2018,7 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		TP_Table.mobCritDamageMod = 1; --max(0, 1 - TP_Table.resilienceEffect * 2)
 		
 		--Get the percentage of an attack that is blocked, if it is blocked
-		TP_Table.blockedMod = self:GetBlockedMod(forceShield);
+		TP_Table.blockedMod = self:GetBlockedMod(forceShield)/100; --31 --> 0.31
 	end
 	if (not school) or school > TP_MELEE then
 		-- Mob's Spell Crit
@@ -2128,14 +2119,37 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
 		
 		local avoidance = (1-TP_Table.mobMissChance-TP_Table.dodgeChance-TP_Table.parryChance);
+		--self:Debug(string.format("(avoidance%s) = 1 - (mobMissChance:%s) - (dodgeChance:%s) - (parryChance:%s)", 
+				--avoidance, TP_Table.mobMissChance, TP_Table.dodgeChance, TP_Table.parryChance));
 
 		--fraction of damage taken (e.g. 0.247 = 24.7%)
-		local damageTaken = avoidance*
-				(TP_Table.blockChance*TP_Table.blockedMod + (1-TP_Table.blockChance) )* 
-				(1+TP_Table.mobCritChance*TP_Table.mobCritBonus*TP_Table.mobCritDamageMod)* --crit damage
-				(1-TP_Table.armorReduction)*
-				TP_Table.damageTakenMod[TP_MELEE];
-		assert(damageTaken, "damageTaken is nil");
+		local reductionFromBlock = 
+				TP_Table.blockChance*(1-TP_Table.blockedMod) + (1-TP_Table.blockChance);
+				--(0.3301921081543*(1-0.3) + (1-0.3301921081543) ) = 0.90094236755371
+
+		--self:Debug(string.format("(reductionFromBlock:%s) = (blockChance:%s)*(1 - blockedMod:%s) * (1 - blockChance)",
+				--reductionFromBlock, TP_Table.blockChance, TP_Table.blockedMod, TP_Table.blockChance));
+
+		local increaseFromCrit = 
+				(1 + TP_Table.mobCritChance*TP_Table.mobCritBonus*TP_Table.mobCritDamageMod); --crit damage
+				--(1 + 0.03*1*1 ) = 1.03
+
+		local reductionFromArmor = 
+				(1-TP_Table.armorReduction);
+				--(1 - 0.598366969650285) = 0.401633030349715
+
+		local damageTaken = 
+				avoidance* --0.53735492229 
+				reductionFromBlock * --0.90094236755371
+				increaseFromCrit* --1.03
+				reductionFromArmor* --0.401633030349715
+				TP_Table.damageTakenMod[TP_MELEE]; --0.85
+
+		self:Debug(string.format("(damageTaken:%s) =  (avoidance:%s)*(reductionFromBlock:%s)*(increaseFromCrit:%s)*(reductionFromArmor:%s)*(damageModTaken:%s)",
+				damageTaken, avoidance, reductionFromBlock, increaseFromCrit, reductionFromArmor, TP_Table.damageTakenMod[TP_MELEE]));
+
+		--assert(damageTaken, "damageTaken is nil");
+		--self:Debug(string.format("damageTaken: %s", damageTaken));
 				
 
 		-- Total Reduction (e.g. 0.753 = 75.3%)
@@ -2155,6 +2169,9 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		--]]
 		-- TankPoints
 		TP_Table.tankPoints[TP_MELEE] = TP_Table.playerHealth / (1 - TP_Table.totalReduction[TP_MELEE])
+		self:Debug(string.format("(tankPoints:%s) = (playerHealth:%s) / (1 - (totalReduction:%s)",
+				TP_Table.tankPoints[TP_MELEE], TP_Table.playerHealth, TP_Table.totalReduction[TP_MELEE]));
+
 		-- Guaranteed Reduction
 		TP_Table.guaranteedReduction[TP_MELEE] = 1 - ((1 - TP_Table.armorReduction) * TP_Table.damageTakenMod[TP_MELEE])
 		-- Effective Health
