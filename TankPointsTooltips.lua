@@ -178,18 +178,10 @@ function TPTips:BuildChanges(reserved, table)
 	changes.armorFromItems = table.ARMOR
 	changes.armor = table.ARMOR_BONUS
 	changes.defenseRating = table.DEFENSE_RATING
-	if table.DODGE_RATING then
-		changes.dodgeChance = StatLogic:GetAvoidanceGainAfterDR("DODGE", StatLogic:GetEffectFromRating(table.DODGE_RATING, CR_DODGE, TP.playerLevel)) * 0.01
-	end
-	if table.PARRY_RATING then
-		changes.parryChance = StatLogic:GetAvoidanceGainAfterDR("PARRY", StatLogic:GetEffectFromRating(table.PARRY_RATING, CR_PARRY, TP.playerLevel)) * 0.01
-	end
-	if table.BLOCK_RATING then
-		changes.blockChance = StatLogic:GetEffectFromRating(table.BLOCK_RATING, CR_BLOCK, TP.playerLevel) * 0.01
-	end
-	if table.MASTERY_RATING then
-		changes.masteryRating = table.MASTERY_RATING;
-	end
+	changes.dodgeRating = table.DODGE_RATING;
+	changes.parryRating = table.PARRY_RATING;
+	changes.blockRating = table.BLOCK_RATING;
+	changes.masteryRating = table.MASTERY_RATING;
 	changes.blockValue = table.BLOCK_VALUE
 
 	--Removed 20120804  5.0.1  Resilience does nothing for tanks
@@ -242,6 +234,8 @@ end
 -- Debug
 -- TankPointsTooltips:BuildChanges({}, StatLogic:GetDiff(24396))
 function TPTips.ProcessTooltip(tooltip, name, link)
+	--TP:Debug("(TPTips.ProcessTooltip)");
+
 	if not (TP.resultsTable and TP.resultsTable.tankPoints) then
 		TP:Debug("(TPTips.ProcessTooltip) TP:resultsTable or TP:resultsTable.tankPoints is nil; building with call to TP:ProcessTooltip");
 		TP:Debug("(TPTips.ProcessTooltip) TP:resultsTable = "..TP:VarAsString(TP.resultsTable));
@@ -258,10 +252,10 @@ function TPTips.ProcessTooltip(tooltip, name, link)
 	-- Check if option is enabled
 	if not (profile.showTooltipDiff or profile.showTooltipTotal or
 			profile.showTooltipDRDiff or profile.showtooltipDRTotal or
-		    profile.showTooltipEHDiff or profile.showTooltipEHTotal or
-		    profile.showTooltipEHBDiff or profile.showTooltipEHBTotal) then 
+			profile.showTooltipEHDiff or profile.showTooltipEHTotal or
+			profile.showTooltipEHBDiff or profile.showTooltipEHBTotal) then 
 		TP:Debug("TPTips:ProcessTooltip: No option to show toolsips enabled. Exiting");
-			return 
+		return 
 	end
 			
 	-- Check if item is equippable, bags will still pass through
