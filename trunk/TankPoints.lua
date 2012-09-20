@@ -2118,14 +2118,14 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		-- School Reduction
 		TP_Table.schoolReduction[TP_MELEE] = TP_Table.armorReduction
 		
-		local avoidance = (1-TP_Table.mobMissChance-TP_Table.dodgeChance-TP_Table.parryChance);
+		local avoidance = 1 - (TP_Table.mobMissChance+TP_Table.dodgeChance+TP_Table.parryChance);
 		--self:Debug(string.format("(avoidance%s) = 1 - (mobMissChance:%s) - (dodgeChance:%s) - (parryChance:%s)", 
 				--avoidance, TP_Table.mobMissChance, TP_Table.dodgeChance, TP_Table.parryChance));
+		assert(avoidance >= 0, "Avoidance must be positive");
 
-		--fraction of damage taken (e.g. 0.247 = 24.7%)
-		local reductionFromBlock = 
-				TP_Table.blockChance*(1-TP_Table.blockedMod) + (1-TP_Table.blockChance);
-				--(0.3301921081543*(1-0.3) + (1-0.3301921081543) ) = 0.90094236755371
+		--fraction of damage taken (e.g. 0.8701 = 87.01%)
+		local reductionFromBlock = 1 - TP_Table.blockChance*TP_Table.blockedMod;
+		assert(reductionFromBlock >= 0, "reductionFromBlock must be positive");
 
 		--self:Debug(string.format("(reductionFromBlock:%s) = (blockChance:%s)*(1 - blockedMod:%s) * (1 - blockChance)",
 				--reductionFromBlock, TP_Table.blockChance, TP_Table.blockedMod, TP_Table.blockChance));
@@ -2133,10 +2133,12 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 		local increaseFromCrit = 
 				(1 + TP_Table.mobCritChance*TP_Table.mobCritBonus*TP_Table.mobCritDamageMod); --crit damage
 				--(1 + 0.03*1*1 ) = 1.03
+		assert(increaseFromCrit >= 0, "reductionFromBlock is negative");
 
 		local reductionFromArmor = 
 				(1-TP_Table.armorReduction);
 				--(1 - 0.598366969650285) = 0.401633030349715
+		assert(reductionFromArmor >= 0, "reductionFromArmor must be positive");
 
 		local damageTaken = 
 				avoidance* --0.53735492229 
@@ -2144,9 +2146,22 @@ function TankPoints:CalculateTankPoints(TP_Table, school, forceShield)
 				increaseFromCrit* --1.03
 				reductionFromArmor* --0.401633030349715
 				TP_Table.damageTakenMod[TP_MELEE]; --0.85
+		assert(damageTaken >= 0, "damageTaken must be positive");
 
-		self:Debug(string.format("(damageTaken:%s) =  (avoidance:%s)*(reductionFromBlock:%s)*(increaseFromCrit:%s)*(reductionFromArmor:%s)*(damageModTaken:%s)",
-				damageTaken, avoidance, reductionFromBlock, increaseFromCrit, reductionFromArmor, TP_Table.damageTakenMod[TP_MELEE]));
+		local damageTakenCalculationDetails = string.format(
+				"DamageTaken: %.4f%% = \r\n"..
+				"   Avoidance: %.4f%% * \r\n"..
+				"   Block: %.4f%% * \r\n"..
+				"   Crit: %.2f%% * \r\n"..
+				"   Armor: %.4f%% * \r\n"..
+				"   Damage Taken Modifier: %.4f%%",
+				damageTaken*100, avoidance*100, reductionFromBlock*100, increaseFromCrit*100, reductionFromArmor*100, TP_Table.damageTakenMod[TP_MELEE]*100
+				);
+
+		TP_Table.damageTaken = damageTaken;
+		TP_Table.damageTakenCalculationDetails = damageTakenCalculationDetails;
+
+		--print(damageTakenCalculationDetails);
 
 		--assert(damageTaken, "damageTaken is nil");
 		--self:Debug(string.format("damageTaken: %s", damageTaken));

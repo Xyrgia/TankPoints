@@ -102,8 +102,12 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	------------------
 	-- Set tooltips --
 	------------------
-	TPCMobStats2.tooltip = L["Mob Damage before DR"]
+	--Results
+	TPCResults3:SetScript("OnEnter", TPCResults3_OnEnter); --Total Reduction
+	TPCResults3:SetScript("OnLeave", TPCResults3_OnLeave); --Total Reduction
 
+
+	--Player Stats
 	TPCPlayerStats1.tooltip =  L["Increases attack power and chance to parry an attack"] --Strength
 	TPCPlayerStats5.tooltip =  L["Armor reduces physical damage taken"] --Armor (Items)
 	TPCPlayerStats6.tooltip =  L["Armor reduces physical damage taken"] --Armor
@@ -117,6 +121,9 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	TPCPlayerStats14.tooltip = L["Your chance to block an attack. Blocked attacks hit for 30% less damage."] --Block(%)
 	TPCPlayerStats15.tooltip = L["(removed) Block value was removed from the game in patch 4.0.1. All blocked attacks hit for 30% less damage"] --Block value
 	
+	--Mob Stats
+	TPCMobStats2.tooltip = L["Mob Damage before DR"]
+
 	-- Register events
 	self:RegisterEvent("UNIT_LEVEL")
 	self:RegisterEvent("UNIT_RESISTANCES")
@@ -126,6 +133,22 @@ function TankPointsCalculatorFrame_OnLoad(self)
 	self:RegisterEvent("UNIT_AURA")
 	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
 end
+
+function TPCResults3_OnEnter(self) 
+	local tooltip = "one\r\n"..
+			"two\r\n"..
+			"three\r\n"..
+			"four\r\n"..
+			"tell me that you love me...at all";
+	tooltip = TPCalc.resultsDT.damageTakenCalculationDetails;
+	GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+	GameTooltip:SetText(tooltip, nil, nil, nil, nil, true);
+	GameTooltip:Show();
+end;
+
+function TPCResults3_OnLeave(self) 
+	GameTooltip_Hide();
+end;
 
 function TankPointsCalculatorFrame_OnEvent(self, event, ...)
 --[[
