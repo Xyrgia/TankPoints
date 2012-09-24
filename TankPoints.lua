@@ -525,7 +525,7 @@ function TankPoints:InitializePlayerStats()
 
 		local header = string.format(
 				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
-				"%d,%s,".. --SpecializationIndex,MasterySpell
+				"%s,%s,".. --SpecializationIndex,MasterySpell
 				"%s,%s,".. --Strength, BaseStrength
 				"%s,%s,".. --Agility, BaseAgility
 				"%s,%s,".. --Stamina,BaseStamina
@@ -537,6 +537,7 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
 				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
 				"%s,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
    
 				"PlayerLevel","PlayerClass","PlayerRace",
 				"SpecializationIndex","MasterySpell",
@@ -550,7 +551,9 @@ function TankPoints:InitializePlayerStats()
 				"BlockRating","BlockRatingBonus","BlockChance",
 				"MasteryRating","MasteryRatingBonus","Mastery",
 				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
-				"SpellHitRating","SpellHitRatingBonus","SpellHitChance");
+				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
+				"MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste"
+				);
 
 		PlayerStats = {};
 		PlayerStats[header] = true;
@@ -606,8 +609,13 @@ function TankPoints:RecordStats()
 	local _, PlayerClass, _ = UnitClass("player");
 	local _, PlayerRace = UnitRace("player");
 
-	specializationIndex = GetSpecialization();
-	masterySpell = GetSpecializationMasterySpells(specializationIndex);
+	local specializationIndex = GetSpecialization()
+	local masterySpell;
+	if (specializationIndex) then
+		masterySpell = GetSpecializationMasterySpells(specializationIndex);
+	else
+		masterySpell = 0;
+	end;
 
 	Strength, _, posBuff, negBuff = UnitStat("player", 1); --strength
 	local BaseStrength = Strength - posBuff + negBuff;
@@ -649,6 +657,10 @@ function TankPoints:RecordStats()
 	local SpellHitRatingBonus = GetCombatRatingBonus(CR_HIT_SPELL);
 	local SpellHitChance = GetCombatRatingBonus(CR_HIT_SPELL) + GetSpellHitModifier();
 
+	local meleeHasteRating = GetCombatRating(CR_HASTE_MELEE);
+	local meleeHasteRatingBonus = GetCombatRatingBonus(CR_HASTE_MELEE);
+	local meleeHaste = GetMeleeHaste();
+
 	local csv = string.format(
 			"%d,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
 			"%d,%d,".. --SpecializationIndex,MasterySpell
@@ -676,7 +688,9 @@ function TankPoints:RecordStats()
 			BlockRating,BlockRatingBonus,BlockChance,
 			MasteryRating,MasteryRatingBonus,Mastery,
 			MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance,
-			SpellHitRating,SpellHitRatingBonus,SpellHitChance);
+			SpellHitRating,SpellHitRatingBonus,SpellHitChance,
+			meleeHasteRating,meleeHasteRatingBonus,meleeHaste
+	);
 
 	--print(csv);
 	PlayerStats[csv] = true;
@@ -1657,7 +1671,14 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		--does Mastery affect Block Chance?
 		--Warror Protection.  SpellID: 76857  Mastery: Critical Block
 		--Paladin Protection. SpellID: 76671  Mastery: Divine Bulwark
-		local masterySpellID = GetSpecializationMasterySpells(GetSpecialization());
+		local specIndex = GetSpecialization();
+		local masterySpellID;
+		if specIndex then
+			masterySpellID = GetSpecializationMasterySpells(specIndex);
+		else
+			masterySpellID = 0;
+		end;
+		
 
 		if (masterySpellID == 76857) or (masterySpellID == 76671) then
 			local newBlockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass);
@@ -2417,5 +2438,55 @@ function TankPoints:ToggleCalculator()
 		end
 		self:UpdateStats()
 	end
-end;								
+end;
 
+
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+if (WoWUnit) then
+
+local function checkEquals(expected, actual, message)
+	--print("LibStatLogic:checkEquals");
+	--print("1-->expected: "..(expected or "nil"));
+	--print("1-->actual: "..(actual or "nil"));
+	--print("1-->message: "..(message or "nil"));
+	
+	return WoWUnit.CheckEquals(expected, actual, message);
+end;
+
+local LibStatLogicTests = {
+
+	mocks = {
+		UnitName = function(arg)
+			return "Soandso";
+		end;
+	};
+	
+	setUp = function()
+		return {};
+	end;
+	tearDown = function()
+		-- no tear down required
+	end;
+	
+	testExample = function()
+		assert(UnitName("player") == "Soandso", "Expected player name to be 'Soandso'");
+	end;
+	
+	--testFailure = function()
+	--	assert(UnitName("player") == "Feithar", "Expected player name to be 'Feithar'");
+	--end;
+	
+	testGetSpecializationWithNoActiveSpecialization = function()
+		TankPoints:RecordStats();
+	end;
+
+};	
+
+WoWUnit:AddTestSuite("tp", LibStatLogicTests);
+print("Registered TankPoints unit tests. Run the tests using: /wu tp");
+else
+	--no WoWUnit
+	--print("LibStatLogic: Could not register TankPoints unit tests");
+end; --if (WoWUnit)
