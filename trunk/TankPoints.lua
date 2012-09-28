@@ -520,7 +520,7 @@ function TankPoints:OnInitialize()
 end
 
 function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 2;
+	local playerStatsVersion = 3;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 		PlayerStats = nil;
@@ -531,6 +531,7 @@ function TankPoints:InitializePlayerStats()
 		local header = string.format(
 				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
 				"%s,%s,".. --SpecializationIndex,MasterySpell
+				"%s,".. --ShapeshiftFormID
 				"%s,%s,".. --Strength, BaseStrength
 				"%s,%s,".. --Agility, BaseAgility
 				"%s,%s,".. --Stamina,BaseStamina
@@ -624,6 +625,8 @@ function TankPoints:RecordStats()
 		masterySpell = 0;
 	end;
 
+	local shapeshiftFormID = (GetShapeshiftFormID() or 0);
+
 	Strength, _, posBuff, negBuff = UnitStat("player", 1); --strength
 	local BaseStrength = Strength - posBuff + negBuff;
 
@@ -673,6 +676,7 @@ function TankPoints:RecordStats()
 	local csv = string.format(
 			"%d,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
 			"%d,%d,".. --SpecializationIndex,MasterySpell
+			"%d,".. --ShapeshiftFormID
 			"%d,%d,".. --Strength, BaseStrength
 			"%d,%d,".. --Agility, BaseAgility
 			"%d,%d,".. --Stamina,BaseStamina
@@ -689,6 +693,7 @@ function TankPoints:RecordStats()
    
 			PlayerLevel,PlayerClass,PlayerRace,
 			specializationIndex, masterySpell,
+			shapeshiftFormID,
 			Strength, BaseStrength,
 			Agility, BaseAgility,
 			Stamina,BaseStamina,
