@@ -712,7 +712,7 @@ function TankPoints:RecordStats()
 
 	--print(csv);
 	PlayerStats[csv] = true;
-	print(csv);
+	--print(csv);
 end
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
