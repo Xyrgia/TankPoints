@@ -492,10 +492,9 @@ function TankPoints:OnInitialize()
 	self:Debug("TankPoints:OnInitialize()");
 	self.db = LibStub("AceDB-3.0"):New("TankPointsDB", defaults);
 
-	self:InitializePlayerStats();
-
 	-- Initialize profileDB
 	profileDB = self.db.profile
+	self:InitializePlayerStats();
 	
 	-- OnUpdate Frame
 	self.OnUpdateFrame = CreateFrame("Frame")
@@ -521,6 +520,12 @@ function TankPoints:OnInitialize()
 end
 
 function TankPoints:InitializePlayerStats()
+	local playerStatsVersion = 2;
+	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
+		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
+		PlayerStats = nil;
+	end;
+
 	if PlayerStats == nil then
 
 		local header = string.format(
@@ -530,13 +535,14 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,".. --Agility, BaseAgility
 				"%s,%s,".. --Stamina,BaseStamina
 				"%s,%s,".. --Intellect,BaseIntellect
+				"%s,".. --Armor
 				"%s,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
 				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
 				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 				"%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
 				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-				"%s,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+				"%s,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
 				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
    
 				"PlayerLevel","PlayerClass","PlayerRace",
@@ -545,6 +551,7 @@ function TankPoints:InitializePlayerStats()
 				"Agility", "BaseAgility",
 				"Stamina","BaseStamina",
 				"Intellect","BaseIntellect",
+				"Armor",
 				"DodgeRating","DodgeRatingBonus","DodgeChance",
 				"ParryRating","ParryRatingBonus","ParryChance",
 				"CritRating","CritRatingBonus","CritChance",
@@ -552,7 +559,7 @@ function TankPoints:InitializePlayerStats()
 				"MasteryRating","MasteryRatingBonus","Mastery",
 				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
 				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
-				"MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste"
+				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste"
 				);
 
 		PlayerStats = {};
@@ -629,6 +636,8 @@ function TankPoints:RecordStats()
 	Intellect, _, posBuff, negBuff = UnitStat("player", 4); --intellect
 	local BaseIntellect = Intellect - posBuff + negBuff;
 
+	local baseArmor = UnitArmor("player");
+
 	local DodgeRating = GetCombatRating(CR_DODGE);
 	local DodgeRatingBonus = GetCombatRatingBonus(CR_DODGE);
 	local DodgeChance = GetDodgeChance();
@@ -668,6 +677,7 @@ function TankPoints:RecordStats()
 			"%d,%d,".. --Agility, BaseAgility
 			"%d,%d,".. --Stamina,BaseStamina
 			"%d,%d,".. --Intellect,BaseIntellect
+			"%d,".. --Armor
 			"%d,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
 			"%d,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 			"%d,%s,%s,".. --CritRating,CritRatingBonus,CritChance
@@ -675,6 +685,7 @@ function TankPoints:RecordStats()
 			"%d,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
 			"%d,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+			"%d,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
    
 			PlayerLevel,PlayerClass,PlayerRace,
 			specializationIndex, masterySpell,
@@ -682,6 +693,7 @@ function TankPoints:RecordStats()
 			Agility, BaseAgility,
 			Stamina,BaseStamina,
 			Intellect,BaseIntellect,
+			baseArmor,
 			DodgeRating,DodgeRatingBonus,DodgeChance,
 			ParryRating,ParryRatingBonus,ParryChance,
 			CritRating,CritRatingBonus,CritChance,
@@ -1536,7 +1548,12 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		changes.armorFromItems = changes.armorFromItems or 0
 		changes.armor = changes.armor or 0
 		
-		local armorMod = StatLogic:GetStatMod("MOD_ARMOR")
+		local armorMod = StatLogic:GetStatMod("MOD_ARMOR");
+
+		--Guardian Druid: Mastery: Nature's Guardian. Increases your armor by Mastery %
+		--if (IsSpellKnown(77494)) then
+--			armorMod = armorMod * (1+GetMastery()
+
 		--[[
 		local _, _, _, pos, neg = UnitArmor("player")
 		local _, agility = UnitStat("player", 2)
@@ -1668,9 +1685,10 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	if (changes.mastery and changes.mastery ~= 0) then
 		tpTable.mastery = tpTable.mastery + changes.mastery;	
 	
-		--does Mastery affect Block Chance?
-		--Warror Protection.  SpellID: 76857  Mastery: Critical Block
-		--Paladin Protection. SpellID: 76671  Mastery: Divine Bulwark
+		--Mastery affect Block Chance?
+		--	Warror Protection.  SpellID: 76857  Mastery: Critical Block
+		--	Paladin Protection. SpellID: 76671  Mastery: Divine Bulwark
+		--	Druid Guardian.     SpellID: 77494  Mastery: Nature's Guardian. Increases armor by x
 		local specIndex = GetSpecialization();
 		local masterySpellID;
 		if specIndex then
@@ -1679,12 +1697,11 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 			masterySpellID = 0;
 		end;
 		
-
 		if (masterySpellID == 76857) or (masterySpellID == 76671) then
 			local newBlockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass);
 			self:Debug("    Setting Block Chance to %.4f (from %.4f Mastery, and using mastery spell %d", newBlockChance, tpTable.mastery, masterySpellID);
 			tpTable.blockChance = newBlockChance/100;
-        end	
+		end;
 	end
 
 	if changes.blockChance and changes.blockChance ~= 0 then
