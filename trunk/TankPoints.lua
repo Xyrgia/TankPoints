@@ -520,7 +520,7 @@ function TankPoints:OnInitialize()
 end
 
 function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 4;
+	local playerStatsVersion = 5;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 		PlayerStats = nil;
@@ -689,7 +689,7 @@ function TankPoints:RecordStats()
 			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 			"%d,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-			"%d,%s,%s", --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+			"%d,%s,%s".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
 			"%d,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
    
 			PlayerLevel,PlayerClass,PlayerRace,
@@ -712,7 +712,7 @@ function TankPoints:RecordStats()
 
 	--print(csv);
 	PlayerStats[csv] = true;
-	--print(string.format("Recorded %d player stat lines", #PlayerStats));
+	print(csv);
 end
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
@@ -737,7 +737,7 @@ end
 function TankPoints:UNIT_AURA(_, unit)
 	if unit == "player" then
 		self:RecordStats();
-		self:Schedule("UpdateStats", 0.1, TankPoints.UpdateStats, TankPoints)
+		self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints)
 	end
 end
 TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
@@ -747,7 +747,7 @@ TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
 function TankPoints:PLAYER_LEVEL_UP(_, level)
 	self.playerLevel = level
 	self:RecordStats();
-	self:Schedule("UpdateStats", 0.1, TankPoints.UpdateStats, TankPoints)
+	self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints)
 end
 
 
