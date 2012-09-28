@@ -520,7 +520,7 @@ function TankPoints:OnInitialize()
 end
 
 function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 3;
+	local playerStatsVersion = 4;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 		PlayerStats = nil;
@@ -548,6 +548,7 @@ function TankPoints:InitializePlayerStats()
    
 				"PlayerLevel","PlayerClass","PlayerRace",
 				"SpecializationIndex","MasterySpell",
+				"ShapeshiftForm",
 				"Strength", "BaseStrength",
 				"Agility", "BaseAgility",
 				"Stamina","BaseStamina",
@@ -736,7 +737,7 @@ end
 function TankPoints:UNIT_AURA(_, unit)
 	if unit == "player" then
 		self:RecordStats();
-		self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
+		self:Schedule("UpdateStats", 0.1, TankPoints.UpdateStats, TankPoints)
 	end
 end
 TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
@@ -746,7 +747,7 @@ TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
 function TankPoints:PLAYER_LEVEL_UP(_, level)
 	self.playerLevel = level
 	self:RecordStats();
-	self:Schedule("UpdateStats", 0.7, TankPoints.UpdateStats, TankPoints)
+	self:Schedule("UpdateStats", 0.1, TankPoints.UpdateStats, TankPoints)
 end
 
 
