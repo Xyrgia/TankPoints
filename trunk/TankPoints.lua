@@ -520,7 +520,7 @@ function TankPoints:OnInitialize()
 end
 
 function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 5;
+	local playerStatsVersion = 6;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 		PlayerStats = nil;
@@ -541,7 +541,7 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
 				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
-				"%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
+				"%s,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
 				"%s,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
 				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
@@ -558,7 +558,7 @@ function TankPoints:InitializePlayerStats()
 				"ParryRating","ParryRatingBonus","ParryChance",
 				"CritRating","CritRatingBonus","CritChance",
 				"BlockRating","BlockRatingBonus","BlockChance",
-				"MasteryRating","MasteryRatingBonus","Mastery",
+				"MasteryRating","MasteryRatingBonus","Mastery","MasteryEffect","MasteryFactor",
 				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
 				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
 				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste"
@@ -661,6 +661,7 @@ function TankPoints:RecordStats()
 	local MasteryRating = GetCombatRating(CR_MASTERY);
 	local MasteryRatingBonus = GetCombatRatingBonus(CR_MASTERY);
 	local Mastery = GetMastery();
+	local MasteryEffect, MasteryFactor = GetMasteryEffect();
 
 	local MeleeHitRating = GetCombatRating(CR_HIT_MELEE);
 	local MeleeHitRatingBonus = GetCombatRatingBonus(CR_HIT_MELEE);
@@ -687,7 +688,7 @@ function TankPoints:RecordStats()
 			"%d,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 			"%d,%s,%s,".. --CritRating,CritRatingBonus,CritChance
 			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
-			"%d,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery
+			"%d,%s,%s%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
 			"%d,%s,%s".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
 			"%d,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
@@ -704,7 +705,7 @@ function TankPoints:RecordStats()
 			ParryRating,ParryRatingBonus,ParryChance,
 			CritRating,CritRatingBonus,CritChance,
 			BlockRating,BlockRatingBonus,BlockChance,
-			MasteryRating,MasteryRatingBonus,Mastery,
+			MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor,
 			MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance,
 			SpellHitRating,SpellHitRatingBonus,SpellHitChance,
 			meleeHasteRating,meleeHasteRatingBonus,meleeHaste
