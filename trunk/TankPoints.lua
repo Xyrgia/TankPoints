@@ -574,9 +574,27 @@ end;
 -- OnEnable() called at PLAYER_LOGIN by WowAce
 function TankPoints:OnEnable()
 	self:Debug("TankPoints:OnEnable()")
-	self:RegisterEvent("UNIT_AURA")
-	self:RegisterEvent("PLAYER_LEVEL_UP")
-	self:RegisterEvent("UNIT_INVENTORY_CHANGED")
+--	self:RegisterEvent("UNIT_AURA", "UnitStatsChanged");
+
+	self:RegisterEvent("UNIT_AURA", "UnitStatsChanged"); 
+			--fires before the effect is in place. 
+			--But we have to use it because things like Blessing of Might (which gives +mana/5) doesn't count as a stat change
+			--and there is no event for regen changing
+			--To get the event after the effect has happened track the real event 
+			--e.g. UNIT_STATS, UNIT_ATTACK_POWER
+	--self:RegisterEvent("UNIT_LEVEL", "UnitStatsChanged");
+	self:RegisterEvent("PLAYER_LEVEL_UP");
+	--self:RegisterEvent("UNIT_MAXMANA", "UnitStatsChanged"); event removed in 4.3
+	self:RegisterEvent("UNIT_STATS", "UnitStatsChanged"); --Strength, Spirit, Stamina, Agility, Intellect
+	self:RegisterEvent("UNIT_SPELL_HASTE", "UnitStatsChanged"); --Spell Haste
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB", "SpellsChanged");
+	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "TalentsChanged");
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "TalentsChanged"); 
+	self:RegisterEvent("LEARNED_SPELL_IN_TAB", "TalentsChanged"); 
+	self:RegisterEvent("PLAYER_TALENT_UPDATE", "TalentsChanged"); 
+	self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS", "UnitStatsChanged"); --finally i can record Spell Healing
+--	self:RegisterEvent("SPELL_POWER_CHANGED", "SpellPowerChanged");
+
 	-- Initialize TankPoints.playerLevel
 	self.playerLevel = UnitLevel("player")
 	-- by default don't show tank points per stat
@@ -587,6 +605,55 @@ function TankPoints:OnEnable()
 	-- Add "TankPoints" to playerstat drop down list
 	self:AddStatFrames()
 end
+
+------------
+-- Events --
+------------
+--- This method is called whenever one of the player's stats changes.
+function TankPoints:UnitStatsChanged(event, unitID) -- UNIT_AURA, UNIT_LEVEL, UNIT_MAXMANA, UNIT_STATS
+	if (unitID == nil) or (unitID == "") then
+		--error(string.format("HealPoints:StatsChanged(event=%s, unitID=%s) unitID is empty or nil", event or "nil", unitID or "nil"), 2);
+		return;
+	end;
+
+	if (UnitIsUnit(unitID, "player")) then
+		self:UpdateTankPoints(event or "");
+	end
+end
+
+function TankPoints:PLAYER_LEVEL_UP(_, level)
+	self.playerLevel = level;
+	self:UpdateTankPoints("PLAYER_LEVEL_UP")
+end
+
+function TankPoints:FORGE_MASTER_ITEM_CHANGED()
+	self:UpdateTankPoints("FORGE_MASTER_ITEM_CHANGED");
+end;
+
+
+function TankPoints:SpellPowerChanged(event, b, c, d) --SPELL_POWER_CHANGED
+	--print(string.format("HealPoints:SpellPowerChanged(event=%s, b=%s, c=%s, d=%s)", event or "nil", b or "nil", c or "nil", d or "nil"));
+
+	self:UpdateTankPoints((event or ""));
+end;
+
+function TankPoints:SpellsChanged(spellID, tabID) -- LEARNED_SPELL_IN_TAB
+	self:UpdateTankPoints("SpellChanged");
+end
+
+function TankPoints:TalentsChanged(delta) -- CHARACTER_POINTS_CHANGED
+	self:UpdateTankPoints("TalentsChanged");
+end
+
+function TankPoints:GearChanged()
+	self:UpdateTankPoints("GearChanged");
+end
+
+function TankPoints:UpdateTankPoints(reason)
+	self:RecordStats();
+	self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints);
+end;
+
 
 function TankPoints:ShowPerStat()
 	return self.tpPerStat
@@ -729,28 +796,6 @@ function TankPoints:UpdateDataTable()
 	end;
 	--print(self.resultsTable.tankPoints[TP_MELEE], StatLogic:GetStatMod("MOD_ARMOR"), self.sourceTable.armor, UnitArmor("player"))
 end
-
-------------
--- Events --
-------------
--- event = UNIT_AURA
--- arg1 = UnitID of the entity
-function TankPoints:UNIT_AURA(_, unit)
-	if unit == "player" then
-		self:RecordStats();
-		self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints)
-	end
-end
-TankPoints.UNIT_INVENTORY_CHANGED = TankPoints.UNIT_AURA
-
--- event = PLAYER_LEVEL_UP
--- arg1 = New player level
-function TankPoints:PLAYER_LEVEL_UP(_, level)
-	self.playerLevel = level
-	self:RecordStats();
-	self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints)
-end
-
 
 ---------------------
 -- TankPoints Core --
