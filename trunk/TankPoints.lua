@@ -456,59 +456,6 @@ function TankPoints:OnInitialize()
 	end;
 end
 
-function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 6;
-	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
-		PlayerStats = nil;
-		playerStatsVersion = 6;
-		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
-	end;
-
-	if PlayerStats == nil then
-
-		local header = string.format(
-				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
-				"%s,%s,".. --SpecializationIndex,MasterySpell
-				"%s,".. --ShapeshiftFormID
-				"%s,%s,".. --Strength, BaseStrength
-				"%s,%s,".. --Agility, BaseAgility
-				"%s,%s,".. --Stamina,BaseStamina
-				"%s,%s,".. --Intellect,BaseIntellect
-				"%s,".. --Armor
-				"%s,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
-				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
-				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
-				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
-				"%s,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
-				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-				"%s,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
-				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
-   
-				"PlayerLevel","PlayerClass","PlayerRace",
-				"SpecializationIndex","MasterySpell",
-				"ShapeshiftForm",
-				"Strength", "BaseStrength",
-				"Agility", "BaseAgility",
-				"Stamina","BaseStamina",
-				"Intellect","BaseIntellect",
-				"Armor",
-				"DodgeRating","DodgeRatingBonus","DodgeChance",
-				"ParryRating","ParryRatingBonus","ParryChance",
-				"CritRating","CritRatingBonus","CritChance",
-				"BlockRating","BlockRatingBonus","BlockChance",
-				"MasteryRating","MasteryRatingBonus","Mastery","MasteryEffect","MasteryFactor",
-				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
-				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
-				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste"
-				);
-
-		PlayerStats = {};
-		PlayerStats[header] = true;
-	else
-		print("PlayerStats loaded. Be sure to dump them into Excel");
-	end;	
-end;
-
 function TankPoints:ShowPerStat()
 	return self.tpPerStat
 end
@@ -709,9 +656,9 @@ function TankPoints:RecordStats(reason)
 			"%d,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 			"%d,%s,%s,".. --CritRating,CritRatingBonus,CritChance
 			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
-			"%d,%s,%s%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
+			"%d,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-			"%d,%s,%s".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+			"%d,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
 			"%d,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
    
 			PlayerLevel,PlayerClass,PlayerRace,
@@ -736,6 +683,60 @@ function TankPoints:RecordStats(reason)
 	PlayerStats[csv] = true;
 	--print(csv);
 end
+
+function TankPoints:InitializePlayerStats()
+	local playerStatsVersion = 6;
+	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
+		PlayerStats = nil;
+		profileDB.PlayerStatsVersion = playerStatsVersion;
+		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
+	end;
+
+	if PlayerStats == nil then
+
+		local header = string.format(
+				"%s,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
+				"%s,%s,".. --SpecializationIndex,MasterySpell
+				"%s,".. --ShapeshiftFormID
+				"%s,%s,".. --Strength, BaseStrength
+				"%s,%s,".. --Agility, BaseAgility
+				"%s,%s,".. --Stamina,BaseStamina
+				"%s,%s,".. --Intellect,BaseIntellect
+				"%s,".. --Armor
+				"%s,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
+				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
+				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
+				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
+				"%s,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
+				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
+				"%s,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
+				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
+   
+				"PlayerLevel","PlayerClass","PlayerRace",
+				"SpecializationIndex","MasterySpell",
+				"ShapeshiftForm",
+				"Strength", "BaseStrength",
+				"Agility", "BaseAgility",
+				"Stamina","BaseStamina",
+				"Intellect","BaseIntellect",
+				"Armor",
+				"DodgeRating","DodgeRatingBonus","DodgeChance",
+				"ParryRating","ParryRatingBonus","ParryChance",
+				"CritRating","CritRatingBonus","CritChance",
+				"BlockRating","BlockRatingBonus","BlockChance",
+				"MasteryRating","MasteryRatingBonus","Mastery","MasteryEffect","MasteryFactor",
+				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
+				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
+				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste"
+				);
+
+		PlayerStats = {};
+		PlayerStats[header] = true;
+	else
+		print("PlayerStats loaded. Be sure to dump them into Excel");
+	end;	
+end;
+
 
 -- Update sourceTable, recalculate TankPoints, and store it in resultsTable
 function TankPoints:UpdateDataTable()
