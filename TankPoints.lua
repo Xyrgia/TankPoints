@@ -18,7 +18,7 @@ local StatLogic = LibStub("LibStatLogic-1.2");
 -- AceAddon Setup --
 --------------------
 -- AceAddon Initialization
-TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceEvent-3.0", "spAceDebug-3.0");
+TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0", "spAceDebug-3.0");
 local TankPoints = TankPoints;
 
 TankPoints.version = "5.0.4 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1")..")";
@@ -313,69 +313,6 @@ local function copyTable(to, from)
 	return to
 end
 
---------------------
--- Schedule Tasks --
---------------------
-TankPoints.ScheduledTasks = {}
-function TankPoints:Schedule(taskName, timeAfter, functionName, ...)
-	if (taskName and timeAfter) then -- functionName not required so we can use IsScheduled as a timer check
-		self.ScheduledTasks[taskName] = {
-			TargetTime = GetTime() + timeAfter,
-			FunctionName = functionName,
-			Arg = {...},
-		}
-	end
-end
-
-function TankPoints:ScheduleRepeat(taskName, repeatRate, functionName, ...)
-	if (taskName and repeatRate and functionName) then -- functionName required
-		self.ScheduledTasks[taskName] = {
-			Elapsed = 0,
-			RepeatRate = repeatRate,
-			FunctionName = functionName,
-			Arg = {...},
-		}
-	end
-end
-
-function TankPoints:UnSchedule(taskName)
-	--WT_RaidWarningAPI.Announce({HOTDOG = taskName})
-	if not taskName then return end
-	self.ScheduledTasks[taskName] = nil
-end
-
-function TankPoints:IsScheduled(taskName)
-	return (self.ScheduledTasks[taskName] ~= nil)
-end
-
-function TankPoints:OnUpdate(elapsed)
---[[	
-	Run each time the screen is drawn by the game engine. 
-	This handler runs for each frame (not Frame) drawn. If WoW is currently running at 27.5 frames per second, 
-	the OnUpdate handlers for every visible Frame, Animation, and AnimationGroup (or descendant thereof) are run 
-	approximately every 2/55ths of a second. 
-	Therefore, OnUpdate handler can be useful for processes which need to be run very frequently 
-	or with accurate timing, 
-	but extensive processing in an OnUpdate handler can slow down the game's framerate.
---]]
---	TankPoints:Debug("OnUpdate(elapsed="..tostring(elapsed)..")")
-	local currentTime = GetTime()
-	for taskName, task in pairs(TankPoints.ScheduledTasks) do
-		if type(task.TargetTime) ~= "nil" and (currentTime >= task.TargetTime) then
-			TankPoints:UnSchedule(taskName)
-			if (task.FunctionName) then
-				task.FunctionName(unpack(task.Arg))
-			end
-		elseif type(task.Elapsed) ~= "nil" then
-			task.Elapsed = task.Elapsed + arg1
-			if (task.Elapsed >= task.RepeatRate) then
-				task.FunctionName(unpack(task.Arg))
-				task.Elapsed = task.Elapsed - task.RepeatRate
-			end
-		end
-	end
-end
-
 function table.val_to_str ( v )
   if "string" == type( v ) then
     v = string.gsub( v, "\n", "\\n" )
@@ -571,29 +508,35 @@ function TankPoints:InitializePlayerStats()
 	end;	
 end;
 
+function TankPoints:ShowPerStat()
+	return self.tpPerStat
+end
+function TankPoints:SetShowPerStat(x)
+	self.tpPerStat = x
+end
+
 -- OnEnable() called at PLAYER_LOGIN by WowAce
 function TankPoints:OnEnable()
 	self:Debug("TankPoints:OnEnable()")
 --	self:RegisterEvent("UNIT_AURA", "UnitStatsChanged");
-
-	self:RegisterEvent("UNIT_AURA", "UnitStatsChanged"); 
+--	self:RegisterEvent("UNIT_AURA", "UnitStatsChanged"); 
 			--fires before the effect is in place. 
 			--But we have to use it because things like Blessing of Might (which gives +mana/5) doesn't count as a stat change
 			--and there is no event for regen changing
+
 			--To get the event after the effect has happened track the real event 
 			--e.g. UNIT_STATS, UNIT_ATTACK_POWER
-	--self:RegisterEvent("UNIT_LEVEL", "UnitStatsChanged");
+	--self:RegisterEvent("UNIT_LEVEL", "UnitStatsChanged"); --use PLAYER_LEVEL_UP instead; it's only for the player (faster)
 	self:RegisterEvent("PLAYER_LEVEL_UP");
 	--self:RegisterEvent("UNIT_MAXMANA", "UnitStatsChanged"); event removed in 4.3
 	self:RegisterEvent("UNIT_STATS", "UnitStatsChanged"); --Strength, Spirit, Stamina, Agility, Intellect
 	self:RegisterEvent("UNIT_SPELL_HASTE", "UnitStatsChanged"); --Spell Haste
 	self:RegisterEvent("LEARNED_SPELL_IN_TAB", "SpellsChanged");
-	self:RegisterEvent("CHARACTER_POINTS_CHANGED", "TalentsChanged");
-	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "TalentsChanged"); 
-	self:RegisterEvent("LEARNED_SPELL_IN_TAB", "TalentsChanged"); 
-	self:RegisterEvent("PLAYER_TALENT_UPDATE", "TalentsChanged"); 
+	--self:RegisterEvent("CHARACTER_POINTS_CHANGED", "TalentsChanged");
+	self:RegisterEvent("ACTIVE_TALENT_GROUP_CHANGED", "TalentsChanged"); --when you switch talent specs
+	--self:RegisterEvent("PLAYER_TALENT_UPDATE", "TalentsChanged"); --when you gain or spend talent points
 	self:RegisterEvent("PLAYER_DAMAGE_DONE_MODS", "UnitStatsChanged"); --finally i can record Spell Healing
---	self:RegisterEvent("SPELL_POWER_CHANGED", "SpellPowerChanged");
+	self:RegisterEvent("SPELL_POWER_CHANGED", "OnSpellPowerChanged");
 
 	-- Initialize TankPoints.playerLevel
 	self.playerLevel = UnitLevel("player")
@@ -612,7 +555,7 @@ end
 --- This method is called whenever one of the player's stats changes.
 function TankPoints:UnitStatsChanged(event, unitID) -- UNIT_AURA, UNIT_LEVEL, UNIT_MAXMANA, UNIT_STATS
 	if (unitID == nil) or (unitID == "") then
-		--error(string.format("HealPoints:StatsChanged(event=%s, unitID=%s) unitID is empty or nil", event or "nil", unitID or "nil"), 2);
+		error(string.format("TankPoints:StatsChanged(event=%s, unitID=%s) unitID is empty or nil", event or "nil", unitID or "nil"), 2);
 		return;
 	end;
 
@@ -631,8 +574,8 @@ function TankPoints:FORGE_MASTER_ITEM_CHANGED()
 end;
 
 
-function TankPoints:SpellPowerChanged(event, b, c, d) --SPELL_POWER_CHANGED
-	--print(string.format("HealPoints:SpellPowerChanged(event=%s, b=%s, c=%s, d=%s)", event or "nil", b or "nil", c or "nil", d or "nil"));
+function TankPoints:OnSpellPowerChanged(event, b, c, d) --SPELL_POWER_CHANGED
+	--print(string.format("TankPoints:SpellPowerChanged(event=%s, b=%s, c=%s, d=%s)", event or "nil", b or "nil", c or "nil", d or "nil"));
 
 	self:UpdateTankPoints((event or ""));
 end;
@@ -649,24 +592,34 @@ function TankPoints:GearChanged()
 	self:UpdateTankPoints("GearChanged");
 end
 
-function TankPoints:UpdateTankPoints(reason)
-	self:RecordStats();
-	self:Schedule("UpdateStats", 0.6, TankPoints.UpdateStats, TankPoints);
+local tmrUpdate = nil;
+function TankPoints:UpdateTankPoints(sender)
+	--self:RecordStats(sender);
+
+	if tmrUpdate then
+		--print('Cancelling timer');
+		self:CancelTimer(tmrUpdate);
+		tmrUpdate = nil;
+	end;
+
+	if (tmrUpdate == nil) then
+		--print('Scheduling time to fire in 4 seconds');
+		tmrUpdate = self:ScheduleTimer("EndUpdateTankPoints", 0.100, sender); --100ms = 10fps. 50ms = 20fps.  16.666ms = 60fps
+	end;
 end;
 
-
-function TankPoints:ShowPerStat()
-	return self.tpPerStat
-end
-function TankPoints:SetShowPerStat(x)
-	self.tpPerStat = x
-end
 
 -------------------------
 -- Updating TankPoints --
 -------------------------
 -- Update TankPoints panal stats if selected
-function TankPoints:UpdateStats()
+function TankPoints:EndUpdateTankPoints(sender)
+	tmrUpdate = nil;
+	--print("Timer fired");
+	
+	self:RecordStats(sender);
+
+
 	self:UpdateDataTable();
 
 	PaperDollFrame_UpdateStats();
@@ -680,7 +633,7 @@ function TankPoints:UpdateStats()
 	end;
 end
 
-function TankPoints:RecordStats()
+function TankPoints:RecordStats(reason)
 	local PlayerLevel = UnitLevel("player");
 	local _, PlayerClass, _ = UnitClass("player");
 	local _, PlayerRace = UnitRace("player");
@@ -778,7 +731,7 @@ function TankPoints:RecordStats()
 			meleeHasteRating,meleeHasteRatingBonus,meleeHaste
 	);
 
-	--print(csv);
+	self:Debug("Recording player stats: %s", reason or "nil");
 	PlayerStats[csv] = true;
 	--print(csv);
 end
