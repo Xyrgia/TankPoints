@@ -459,8 +459,9 @@ end
 function TankPoints:InitializePlayerStats()
 	local playerStatsVersion = 6;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
-		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 		PlayerStats = nil;
+		playerStatsVersion = 6;
+		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 	end;
 
 	if PlayerStats == nil then
@@ -2458,7 +2459,7 @@ function TankPoints:ToggleCalculator()
 		else
 			tpc:Show()
 		end
-		self:UpdateStats()
+		self:UpdateTankPoints("Toggle_Calculator")
 	end
 end;
 

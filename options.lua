@@ -127,7 +127,7 @@ local function getOptions()
 									TankPointsCalculatorFrame:Show()
 
 								end
-								TankPoints:UpdateStats()
+								TankPoints:UpdateTankPoints("TankPoints calc option exeucted")
 							end,
 						}, --calc
 						dumptable = {
@@ -183,7 +183,7 @@ local function getOptions()
 								get = function(info) return profileDB.shieldBlockDelay end,
 								set = function(info, value)
 									profileDB.shieldBlockDelay = value
-									TankPoints:UpdateStats()
+									TankPoints:UpdateTankPoints("Shield block delay option")
 									-- Update Calculator
 									if TankPointsCalculatorFrame:IsVisible() then
 										TPCalc:UpdateResults()
@@ -206,7 +206,7 @@ local function getOptions()
 								get = function(info) return profileDB.mobLevelDiff end,
 								set = function(info, value)
 									profileDB.mobLevelDiff = value
-									TankPoints:UpdateStats()
+									TankPoints:UpdateTankPoints("Mob level difference");
 									-- Update Calculator
 									if TankPointsCalculatorFrame:IsVisible() then
 										TPCalc:UpdateResults()
@@ -240,7 +240,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobCritChance end,
 										set = function(info, value)
 											profileDB.mobCritChance = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob melee crit chance");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -257,7 +257,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobCritBonus end,
 										set = function(info, value)
 											profileDB.mobCritBonus = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob melee crit bonus");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -273,7 +273,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobMissChance end,
 										set = function(info, value)
 											profileDB.mobMissChance = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob melee miss chance");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -290,7 +290,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobSpellCritChance end,
 										set = function(info, value)
 											profileDB.mobSpellCritChance = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob spell crit chance");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -307,7 +307,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobSpellCritBonus end,
 										set = function(info, value)
 											profileDB.mobSpellCritBonus = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob spell crit bonus");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -323,7 +323,7 @@ local function getOptions()
 										get = function(info) return profileDB.mobSpellMissChance end,
 										set = function(value)
 											profileDB.mobSpellMissChance = value
-											TankPoints:UpdateStats()
+											TankPoints:UpdateTankPoints("Mob spell miss chance");
 											-- Update Calculator
 											if TankPointsCalculatorFrame:IsVisible() then
 												TPCalc:UpdateResults()
@@ -431,7 +431,7 @@ function addon:SetDefaultMobStats()
 	profileDB.mobSpellCritChance = 0;
 	profileDB.mobSpellCritBonus = 0.5;
 	profileDB.mobSpellMissChance = 0;
-	self:UpdateStats()
+	self:UpdateTankPoints("Reset mob stats to default");
 	
 	-- Update Calculator
 	if TankPointsCalculatorFrame:IsVisible() then

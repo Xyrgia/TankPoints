@@ -250,7 +250,7 @@ function TankPoints.SpellFrame_OnMouseUp(frame, button)
 		end
 		TankPoints.currentSchool = TankPoints.setSchool
 		frame:GetScript("OnEnter")(frame)
-		TankPoints:UpdateStats()
+		TankPoints:UpdateTankPoints("spell frame left mouse up");
 	-- Reset school
 	elseif button == "RightButton" then
 		TankPoints.setSchool = nil
@@ -262,13 +262,13 @@ function TankPoints.SpellFrame_OnMouseUp(frame, button)
 			end
 		end
 		frame:GetScript("OnEnter")(frame)
-		TankPoints:UpdateStats()
+		TankPoints:UpdateTankPoints("spell frame right mouse up");
 	end
 end
 
 function TankPoints.TankPointsFrame_OnMouseUp(frame, button)
 	TankPoints:SetShowPerStat(not TankPoints:ShowPerStat())
-	TankPoints:UpdateStats()
+	TankPoints:UpdateTankPoints("TankPointsFrame_OnMouseUp")
 end
 
 ----------------------------------------
