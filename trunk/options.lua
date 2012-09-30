@@ -168,6 +168,16 @@ local function getOptions()
 								addon:SetDebugging(value);
 							end,
 						},
+						purgestats = {
+							type = "execute",
+							name = L["Purge Player Stats"],
+							desc = L["Purge collected set of historical player stats"],
+							order = 51,
+							func = function()
+								addon:PurgePlayerStats()
+							end,
+						}, --calc
+
 
 					}, --general group entries
 				}, --general group
