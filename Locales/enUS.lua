@@ -239,6 +239,10 @@ TP_RESILIENCE = 11
 	L["Mob Spell Miss"] = true
 	L["Sets mob's spell miss chance"] = true
 	
+	--/tp purgeplayerstats
+	L["Purge Player Stats"] = true;
+	L["Purge collected set of historical player stats"] = true;
+	
 	--Tooltips Options group
 	L["Tooltip options"] = true
 	L["Change TankPoints tooltip options"] = true

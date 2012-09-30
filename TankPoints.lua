@@ -635,13 +635,17 @@ function TankPoints:RecordStats(reason)
 	local MeleeHitRatingBonus = GetCombatRatingBonus(CR_HIT_MELEE);
 	local MeleeHitChance = GetCombatRatingBonus(CR_HIT_MELEE) + GetHitModifier();
 
-	local SpellHitRating = GetCombatRating(CR_HIT_SPELL);
-	local SpellHitRatingBonus = GetCombatRatingBonus(CR_HIT_SPELL);
-	local SpellHitChance = GetCombatRatingBonus(CR_HIT_SPELL) + GetSpellHitModifier();
+--	local SpellHitRating = GetCombatRating(CR_HIT_SPELL);
+--	local SpellHitRatingBonus = GetCombatRatingBonus(CR_HIT_SPELL);
+--	local SpellHitChance = GetCombatRatingBonus(CR_HIT_SPELL) + GetSpellHitModifier();
 
 	local meleeHasteRating = GetCombatRating(CR_HASTE_MELEE);
 	local meleeHasteRatingBonus = GetCombatRatingBonus(CR_HASTE_MELEE);
 	local meleeHaste = GetMeleeHaste();
+
+	local expertiseRating = GetCombatRating(CR_EXPERTISE);
+	local expertiseRatingBonus = GetCombatRatingBonus(CR_EXPERTISE);
+	local expertise = GetExpertise();
 
 	local csv = string.format(
 			"%d,%s,%s,".. --PlayerLevel,PlayerClass,PlayerRace
@@ -658,8 +662,8 @@ function TankPoints:RecordStats(reason)
 			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 			"%d,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-			"%d,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
-			"%d,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
+			"%d,%s,%s,".. --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
+			"%d,%s,%s", --expertiseRating, expertiseRatingBonus, expertise
    
 			PlayerLevel,PlayerClass,PlayerRace,
 			specializationIndex, masterySpell,
@@ -675,8 +679,8 @@ function TankPoints:RecordStats(reason)
 			BlockRating,BlockRatingBonus,BlockChance,
 			MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor,
 			MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance,
-			SpellHitRating,SpellHitRatingBonus,SpellHitChance,
-			meleeHasteRating,meleeHasteRatingBonus,meleeHaste
+			meleeHasteRating,meleeHasteRatingBonus,meleeHaste,
+			expertiseRating, expertiseRatingBonus, expertise
 	);
 
 	self:Debug("Recording player stats: %s", reason or "nil");
@@ -684,12 +688,18 @@ function TankPoints:RecordStats(reason)
 	--print(csv);
 end
 
+function TankPoints:PurgePlayerStats()
+	PlayerStats = nil;
+	self:InitializePlayerStats();
+	self:Print("Purged historical player statistics");
+end;
+
+local playerStatsVersion = 7;
 function TankPoints:InitializePlayerStats()
-	local playerStatsVersion = 6;
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		PlayerStats = nil;
-		profileDB.PlayerStatsVersion = playerStatsVersion;
-		print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
+		profileDB.PlayerStatsVersion = playerStatsVersion ;
+		self:Print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 	end;
 
 	if PlayerStats == nil then
@@ -709,8 +719,9 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 				"%s,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
-				"%s,%s,%s,".. --SpellHitRating,SpellHitRatingBonus,SpellHitChance
-				"%s,%s,%s", --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
+				"%s,%s,%s,".. --MeleeHasteRating,MeleeHasteRatingBonus,MeleeHaste
+				"%s,%s,%s", --expertiseRating, expertiseRatingBonus, expertise
+
    
 				"PlayerLevel","PlayerClass","PlayerRace",
 				"SpecializationIndex","MasterySpell",
@@ -726,14 +737,14 @@ function TankPoints:InitializePlayerStats()
 				"BlockRating","BlockRatingBonus","BlockChance",
 				"MasteryRating","MasteryRatingBonus","Mastery","MasteryEffect","MasteryFactor",
 				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
-				"SpellHitRating","SpellHitRatingBonus","SpellHitChance",
-				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste"
+				"MeleeHasteRating","MeleeHasteRatingBonus","MeleeHaste",
+				"ExpertiseRating","ExpertiseRatingBonus","Expertise"
 				);
 
 		PlayerStats = {};
 		PlayerStats[header] = true;
 	else
-		print("PlayerStats loaded. Be sure to dump them into Excel");
+		TankPoints:Print("PlayerStats loaded. Be sure to dump them into Excel");
 	end;	
 end;
 
