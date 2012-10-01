@@ -542,7 +542,8 @@ end
 
 local tmrUpdate = nil;
 function TankPoints:UpdateTankPoints(sender)
-	--self:RecordStats(sender);
+	self:RecordStats(sender); --something about recording stats 0.1 seconds later caused them to record mostly nonsnse
+
 
 	if tmrUpdate then
 		--print('Cancelling timer');
@@ -552,7 +553,7 @@ function TankPoints:UpdateTankPoints(sender)
 
 	if (tmrUpdate == nil) then
 		--print('Scheduling time to fire in 4 seconds');
-		tmrUpdate = self:ScheduleTimer("EndUpdateTankPoints", 0.100, sender); --100ms = 10fps. 50ms = 20fps.  16.666ms = 60fps
+		tmrUpdate = self:ScheduleTimer("EndUpdateTankPoints", 0.200, sender); --100ms = 10fps. 50ms = 20fps.  16.666ms = 60fps
 	end;
 end;
 
@@ -565,9 +566,6 @@ function TankPoints:EndUpdateTankPoints(sender)
 	tmrUpdate = nil;
 	--print("Timer fired");
 	
-	self:RecordStats(sender);
-
-
 	self:UpdateDataTable();
 
 	PaperDollFrame_UpdateStats();
@@ -694,7 +692,7 @@ function TankPoints:PurgePlayerStats()
 	self:Print("Purged historical player statistics");
 end;
 
-local playerStatsVersion = 7;
+local playerStatsVersion = 8;
 function TankPoints:InitializePlayerStats()
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		PlayerStats = nil;
