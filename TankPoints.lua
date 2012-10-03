@@ -696,7 +696,7 @@ local playerStatsVersion = 8;
 function TankPoints:InitializePlayerStats()
 	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
 		PlayerStats = nil;
-		profileDB.PlayerStatsVersion = playerStatsVersion ;
+		profileDB.PlayerStatsVersion = playerStatsVersion;
 		self:Print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 	end;
 
@@ -1378,6 +1378,15 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 
 	--self:Debug("AlterSourceData(): tpTable="..self:VarAsString(tpTable));
 
+	--Record our current mastery spell, as it decides what we need to do with Mastery
+	local masterySpellID;
+	local specIndex = GetSpecialization();
+	if specIndex then --GetSpecializationMasterySpells only works if they're in spec
+		masterySpellID = GetSpecializationMasterySpells(specIndex);
+	else
+		masterySpellID = 0;
+	end;	
+	
 	local calculateParry = false;
 	local calculateDodge = false;
 	
@@ -1543,64 +1552,6 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		--self:Debug("changes.playerHealth = "..(changes.playerHealth or "0")..", newHealth = "..(tpTable.playerHealth or "0"))
 	end
 	
-	if (changes.armorFromItems and changes.armorFromItems ~= 0) or (changes.armor and changes.armor ~= 0) then
-		------- Talants -------
-		-- Hunter: Thick Hide (Rank 3) - 1,5
-		--         Increases the armor rating of your pets by 20% and your armor contribution from items by 4%/7%/10%.
-		-- Druid: Thick Hide (Rank 3) - 2,5
-		--        Increases your Armor contribution from items by 4%/7%/10%.
-		-- Druid: Bear Form - buff (didn't use stance because Bear Form and Dire Bear Form has the same icon)
-		--        Shapeshift into a bear, increasing melee attack power by 30, armor contribution from items by 180%, and stamina by 25%.
-		-- Druid: Dire Bear Form - buff
-		--        Shapeshift into a dire bear, increasing melee attack power by 120, armor contribution from items by 400%, and stamina by 25%.
-		-- Druid: Moonkin Form - buff
-		--        While in this form the armor contribution from items is increased by 400%, attack power is increased by 150% of your level and all party members within 30 yards have their spell critical chance increased by 5%.
-		-- Shaman: Toughness (Rank 5) - 2,11
-		--          Increases your armor value from items by 2%/4%/6%/8%/10%.
-		-- Warrior: Toughness (Rank 5) - 3,5
-		--          Increases your armor value from items by 2%/4%/6%/8%/10%.
-		------------------------
-		-- Make sure armorFromItems and armor aren't nil
-		changes.armorFromItems = changes.armorFromItems or 0
-		changes.armor = changes.armor or 0
-		
-		local armorMod = StatLogic:GetStatMod("MOD_ARMOR");
-
-		--Guardian Druid: Mastery: Nature's Guardian. Increases your armor by Mastery %
-		--if (IsSpellKnown(77494)) then
---			armorMod = armorMod * (1+GetMastery()
-
-		--[[
-		local _, _, _, pos, neg = UnitArmor("player")
-		local _, agility = UnitStat("player", 2)
-		if changes.agi then
-			agility = agility + changes.agi
-		end
-		-- Armor is treated different then stats, 小數點採四捨五入法
-		--local armorFromItem = floor(((tpTable.armor - agility * 2 - pos + neg) / armorMod) + 0.5)
-		--tpTable.armor = floor(((armorFromItem + changes.armor) * armorMod) + 0.5) + agility * 2 + pos - neg
-		--(floor((ceil(stamina / staMod) + changes.sta) * staMod) - stamina)
-		local armorBefore = tpTable.armor or 0;
-		
-		tpTable.armor = 
-				round(
-					( round((tpTable.armor - agility * 2 - pos + neg) / armorMod) + changes.armorFromItems )*armorMod
-				) + agility*2 + pos - neg + changes.armor
-		--self:Print(tpTable.armor.." = floor(((floor((("..tpTable.armor.." - "..agility.." * 2 - "..pos.." + "..neg..") / "..armorMod..") + 0.5) + "..changes.armor..") * "..armorMod..") + 0.5) + "..agility.." * 2 + "..pos.." - "..neg)
-		--]]
-		
-		if (changes.armorFromItems ~= 0) and (armorMod ~= 0) and (armorMod ~= 1) then
-			local newArmorFromItemsChanges = changes.armorFromItems*armorMod;
-			self:Debug(string.format("   Adjusting %d armor from items by %.4f%%, to %d", changes.armorFromItems, armorMod, newArmorFromItemsChanges));
-			changes.armorFromItems = newArmorFromItemsChanges;
-		end;
-
-		local newArmor = floor(tpTable.armor + changes.armor + changes.armorFromItems);
-		self:Debug(string.format("   Adding %d Armor, %d Armor From Items, to existing %d Armor, giving %d Armor",
-				changes.armor, changes.armorFromItems, tpTable.armor, newArmor));
-		tpTable.armor = newArmor;
-	end
-	
 	-- *** +Parry Rating --> Parry Chance
 	if (changes.parryRating and changes.parryRating ~= 0) then
 		tpTable.parryRating = tpTable.parryRating or 0;
@@ -1685,6 +1636,7 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 	local doBlock = (forceShield == true) or ((forceShield == nil) and self:ShieldIsEquipped())
 
 	--Convert Mastery Rating & Mastery into Block (paladins and warriors)
+	--And into Armor for druids
 	--self:Debug("changes.masteryRating="..self:VarAsString(changes.masteryRating));
 	if (changes.masteryRating and changes.masteryRating ~= 0) then
 		if (not changes.mastery) then --initialize mastery if needed
@@ -1698,27 +1650,95 @@ function TankPoints:AlterSourceData(tpTable, changes, forceShield)
 		changes.mastery = changes.mastery + masteryFromRating;
 	end
 	
+	local recalculateArmor = false;
+
 	if (changes.mastery and changes.mastery ~= 0) then
-		tpTable.mastery = tpTable.mastery + changes.mastery;	
+	
+		local effectiveMastery, masteryEffect = GetMasteryEffect();
+	
+		tpTable.mastery = tpTable.mastery + changes.mastery*masteryEffect;	
 	
 		--Mastery affect Block Chance?
 		--	Warror Protection.  SpellID: 76857  Mastery: Critical Block
 		--	Paladin Protection. SpellID: 76671  Mastery: Divine Bulwark
-		--	Druid Guardian.     SpellID: 77494  Mastery: Nature's Guardian. Increases armor by x
-		local specIndex = GetSpecialization();
-		local masterySpellID;
-		if specIndex then
-			masterySpellID = GetSpecializationMasterySpells(specIndex);
-		else
-			masterySpellID = 0;
-		end;
-		
+		--	Druid Guardian.     SpellID: 77494  Mastery: Nature's Guardian. Increases armor by x%
 		if (masterySpellID == 76857) or (masterySpellID == 76671) then
 			local newBlockChance = StatLogic:GetBlockChance(tpTable.mastery, tpTable.playerClass);
-			self:Debug("    Setting Block Chance to %.4f (from %.4f Mastery, and using mastery spell %d", newBlockChance, tpTable.mastery, masterySpellID);
+			self:Debug("    Setting Block Chance to %.4f (from %.4f Mastery, and using mastery spell %d)", newBlockChance, tpTable.mastery, masterySpellID);
 			tpTable.blockChance = newBlockChance/100;
+		elseif (masterySpellID == 77494) then
+			recalculateArmor = true;
 		end;
 	end
+
+	if (changes.armorFromItems and changes.armorFromItems ~= 0) or (changes.armor and changes.armor ~= 0) or recalculateArmor then
+		------- Talants -------
+		-- Hunter: Thick Hide (Rank 3) - 1,5
+		--         Increases the armor rating of your pets by 20% and your armor contribution from items by 4%/7%/10%.
+		-- Druid: Thick Hide (Rank 3) - 2,5
+		--        Increases your Armor contribution from items by 4%/7%/10%.
+		-- Druid: Bear Form - buff (didn't use stance because Bear Form and Dire Bear Form has the same icon)
+		--        Shapeshift into a bear, increasing melee attack power by 30, armor contribution from items by 180%, and stamina by 25%.
+		-- Druid: Dire Bear Form - buff
+		--        Shapeshift into a dire bear, increasing melee attack power by 120, armor contribution from items by 400%, and stamina by 25%.
+		-- Druid: Moonkin Form - buff
+		--        While in this form the armor contribution from items is increased by 400%, attack power is increased by 150% of your level and all party members within 30 yards have their spell critical chance increased by 5%.
+		-- Shaman: Toughness (Rank 5) - 2,11
+		--          Increases your armor value from items by 2%/4%/6%/8%/10%.
+		-- Warrior: Toughness (Rank 5) - 3,5
+		--          Increases your armor value from items by 2%/4%/6%/8%/10%.
+		------------------------
+		-- Make sure armorFromItems and armor aren't nil
+		changes.armorFromItems = changes.armorFromItems or 0
+		changes.armor = changes.armor or 0
+		
+		local armorMod = StatLogic:GetStatMod("MOD_ARMOR");
+		local effectiveMastery, masteryEffect = GetMasteryEffect();
+
+		--Guardian Druid: Mastery: Nature's Guardian. Increases your armor by Mastery %
+		--if (IsSpellKnown(77494)) then
+--			armorMod = armorMod * (1+GetMastery()
+
+		--[[
+		local _, _, _, pos, neg = UnitArmor("player")
+		local _, agility = UnitStat("player", 2)
+		if changes.agi then
+			agility = agility + changes.agi
+		end
+		-- Armor is treated different then stats, 小數點採四捨五入法
+		--local armorFromItem = floor(((tpTable.armor - agility * 2 - pos + neg) / armorMod) + 0.5)
+		--tpTable.armor = floor(((armorFromItem + changes.armor) * armorMod) + 0.5) + agility * 2 + pos - neg
+		--(floor((ceil(stamina / staMod) + changes.sta) * staMod) - stamina)
+		local armorBefore = tpTable.armor or 0;
+		
+		tpTable.armor = 
+				round(
+					( round((tpTable.armor - agility * 2 - pos + neg) / armorMod) + changes.armorFromItems )*armorMod
+				) + agility*2 + pos - neg + changes.armor
+		--self:Print(tpTable.armor.." = floor(((floor((("..tpTable.armor.." - "..agility.." * 2 - "..pos.." + "..neg..") / "..armorMod..") + 0.5) + "..changes.armor..") * "..armorMod..") + 0.5) + "..agility.." * 2 + "..pos.." - "..neg)
+		--]]
+		
+		local newArmorFromItemsChanges;
+		if (changes.armorFromItems ~= 0) and (armorMod ~= 0) and (armorMod ~= 1) then
+			newArmorFromItemsChanges = changes.armorFromItems*armorMod;
+			self:Debug(string.format("   Adjusting %d armor from items by %.4f%%, to %d", changes.armorFromItems, armorMod, newArmorFromItemsChanges));
+			changes.armorFromItems = newArmorFromItemsChanges;
+		end;
+		
+		--	Druid Guardian.     SpellID: 77494  Mastery: Nature's Guardian. Increases armor by x%
+		if (masterySpellID == 77494) and (masteryEffect ~= 1) then
+			newArmorFromItemsChanges = changes.armorFromItems*masteryEffect;
+			self:Debug(string.format("   Adjusting %d armor from items by %.4f%%, to %d due to Mastery Effect", 
+					changes.armorFromItems, masteryEffect, newArmorFromItemsChanges));
+			changes.armorFromItems = newArmorFromItemsChanges;
+		end;		
+
+		local newArmor = floor(tpTable.armor + changes.armor + changes.armorFromItems);
+		self:Debug(string.format("   Adding %d Armor, %d Armor From Items, to existing %d Armor, giving %d Armor",
+				changes.armor, changes.armorFromItems, tpTable.armor, newArmor));
+		tpTable.armor = newArmor;
+	end
+
 
 	if changes.blockChance and changes.blockChance ~= 0 then
 		--self:Debug("Apply blockChance change "..changes.blockChance);
@@ -2515,6 +2535,18 @@ local LibStatLogicTests = {
 		TankPoints:RecordStats();
 	end;
 
+	testMasteryAndArmorChange = function()
+
+		-- Initialize Tables --
+		local sourceDT = TankPoints.sourceTable; --the player's current stats
+		local resultsDT = TankPoints.resultsTable; --the player's current TankPoints
+		local changesDT = {}; --the changes we wish to apply
+		local newDT = {}; --the players updated TankPoints after the changes are applied
+	
+		copyTable(newDT, sourceDT) -- load default data
+		TankPoints:AlterSourceData(newDT, {armorFromItems=500, masteryRating=50});
+	end;
+	
 };	
 
 WoWUnit:AddTestSuite("tp", LibStatLogicTests);
