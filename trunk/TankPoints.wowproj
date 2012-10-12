@@ -21,6 +21,12 @@
     <Content Include="AceDebug-3.0\AceDebug-3.0.xml">
       <SubType>Frame</SubType>
     </Content>
+    <Content Include="libs\AceTimer-3.0\AceTimer-3.0.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\AceTimer-3.0\AceTimer-3.0.xml">
+      <SubType>Frame</SubType>
+    </Content>
     <Content Include="libs\LibStatLogic-1.2\Locales\deDE.lua">
       <SubType>Code</SubType>
     </Content>
@@ -284,6 +290,7 @@
     <Folder Include="libs\AceGUI-3.0\" />
     <Folder Include="libs\AceGUI-3.0\widgets\" />
     <Folder Include="libs\AceLocale-3.0\" />
+    <Folder Include="libs\AceTimer-3.0\" />
     <Folder Include="libs\CallbackHandler-1.0\" />
     <Folder Include="libs\LibStatLogic-1.2\" />
     <Folder Include="libs\LibStatLogic-1.2\Locales\" />
