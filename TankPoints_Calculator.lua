@@ -64,7 +64,7 @@ function TankPointsCalculator:ComputeTankPointsDelta(currentStats, delta)
 	local parryValue = 0;
 	--local blockValue = -999;
 	local masteryValue = 0;
-	if delta == null then
+	if delta == nil then
 		delta = 10;
 	end;
 

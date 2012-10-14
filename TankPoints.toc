@@ -7,7 +7,7 @@
 ## OptionalDeps: WoWUnit, Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## SavedVariables: TankPointsDB, PlayerStats
 ## Author: Whitetooth
-## Version: 5.0.5.297
+## Version: 5.0.5.210
 ## X-eMail: hotdogee [at] gmail [dot] com
 ## X-Embeds: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## X-Category: Interface Enhancements
