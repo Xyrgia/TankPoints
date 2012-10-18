@@ -620,6 +620,11 @@ function TankPoints:RecordStats(reason)
 	local CritRatingBonus = GetCombatRatingBonus(CR_CRIT_MELEE);
 	local CritChance = GetCritChance();
 
+	local spellCritChance = GetSpellCritChance(1);
+	local rangedCritChance = GetRangedCritChance();
+	local spellCritChanceFromIntellect = GetSpellCritChanceFromIntellect("player");
+	local critChanceFromAgility = GetCritChanceFromAgility("player");
+
 	local BlockRating = GetCombatRating(CR_BLOCK);
 	local BlockRatingBonus = GetCombatRatingBonus(CR_BLOCK);
 	local BlockChance = GetBlockChance();
@@ -657,6 +662,8 @@ function TankPoints:RecordStats(reason)
 			"%d,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
 			"%d,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 			"%d,%s,%s,".. --CritRating,CritRatingBonus,CritChance
+			"%s,%s,".. --SpellCritChance, RangedCritChance
+			"%s,%s,".. --SpellCritChanceFromIntellect, CritChanceFromAgility
 			"%d,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 			"%d,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 			"%d,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
@@ -674,6 +681,8 @@ function TankPoints:RecordStats(reason)
 			DodgeRating,DodgeRatingBonus,DodgeChance,
 			ParryRating,ParryRatingBonus,ParryChance,
 			CritRating,CritRatingBonus,CritChance,
+			spellCritChance, rangedCritChance, 
+			spellCritChanceFromIntellect, critChanceFromAgility,
 			BlockRating,BlockRatingBonus,BlockChance,
 			MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor,
 			MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance,
@@ -692,11 +701,11 @@ function TankPoints:PurgePlayerStats()
 	self:Print("Purged historical player statistics");
 end;
 
-local playerStatsVersion = 8;
+local playerStatsVersion = 9;
 function TankPoints:InitializePlayerStats()
-	if (profileDB.PlayerStatsVersion or 0) < playerStatsVersion then
+	if (self.db.global.PlayerStatsVersion or 0) < playerStatsVersion then
 		PlayerStats = nil;
-		profileDB.PlayerStatsVersion = playerStatsVersion;
+		self.db.global.PlayerStatsVersion = playerStatsVersion;
 		self:Print(string.format("Deleted player stats to use new version %d", playerStatsVersion));
 	end;
 
@@ -714,6 +723,8 @@ function TankPoints:InitializePlayerStats()
 				"%s,%s,%s,".. --DodgeRating,DodgeRatingBonus,DodgeChance
 				"%s,%s,%s,".. --ParryRating,ParryRatingBonus,ParryChance
 				"%s,%s,%s,".. --CritRating,CritRatingBonus,CritChance
+				"%s,%s,".. --SpellCritChance, RangedCritChance
+				"%s,%s,".. --SpellCritChanceFromIntellect, CritChanceFromAgility
 				"%s,%s,%s,".. --BlockRating,BlockRatingBonus,BlockChance
 				"%s,%s,%s,%s,%s,".. --MasteryRating,MasteryRatingBonus,Mastery,MasteryEffect,MasteryFactor
 				"%s,%s,%s,".. --MeleeHitRating,MeleeHitRatingBonus,MeleeHitChance
@@ -732,6 +743,8 @@ function TankPoints:InitializePlayerStats()
 				"DodgeRating","DodgeRatingBonus","DodgeChance",
 				"ParryRating","ParryRatingBonus","ParryChance",
 				"CritRating","CritRatingBonus","CritChance",
+				"SpellCritChance", "RangedCritChance",
+				"SpellCritChanceFromIntellect", "CritChanceFromAgility",
 				"BlockRating","BlockRatingBonus","BlockChance",
 				"MasteryRating","MasteryRatingBonus","Mastery","MasteryEffect","MasteryFactor",
 				"MeleeHitRating","MeleeHitRatingBonus","MeleeHitChance",
