@@ -21,10 +21,10 @@ local StatLogic = LibStub("LibStatLogic-1.2");
 TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0", "spAceDebug-3.0");
 local TankPoints = TankPoints;
 
-TankPoints.version = "5.0.4 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1")..")";
+TankPoints.version = "5.1.0 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1")..")";
 --Append "a" (alpha) to revision if it's alpha. The wowace packager will convert alpha..end-alpha into a block level comment
 --@alpha@
-TankPoints.version = "5.0.4 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1").."a)";
+TankPoints.version = "5.1.0 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1").."a)";
 --@end-alpha@
 TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1");
 

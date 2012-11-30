@@ -1,4 +1,4 @@
-﻿## Interface: 50001
+﻿## Interface: 50100
 ## Title: TankPoints
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
@@ -7,7 +7,7 @@
 ## OptionalDeps: WoWUnit, Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## SavedVariables: TankPointsDB, PlayerStats
 ## Author: Whitetooth
-## Version: 5.0.5.211
+## Version: 5.1.0.212
 ## X-eMail: hotdogee [at] gmail [dot] com
 ## X-Embeds: Ace3, LibStatLogic-1.2, LibTipHooker-1.1, UTF8
 ## X-Category: Interface Enhancements
