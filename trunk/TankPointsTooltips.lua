@@ -234,6 +234,12 @@ end
 -- Debug
 -- TankPointsTooltips:BuildChanges({}, StatLogic:GetDiff(24396))
 function TPTips.ProcessTooltip(tooltip, name, link)
+--[[
+	tooltip: A game tooltip window object that we should add our TankPoints calculations to.
+	name: reserved (not used)
+	link: an ItemLink of the item being inspected
+--]]
+
 	--TP:Debug("(TPTips.ProcessTooltip)");
 
 	if not (TP.resultsTable and TP.resultsTable.tankPoints) then
