@@ -1,4 +1,4 @@
-﻿## Interface: 50300
+## Interface: 50400
 ## Title: TankPoints
 ## Notes: Calculates and shows your TankPoints in the PaperDall Frame.
 ## Notes-zhTW: 計算並顯示你的坦克點。
@@ -26,7 +26,7 @@ UTF8\utf8.lua
 # Ace Libraries #
 #################
 embeds.xml
-AceDebug-3.0\AceDebug-3.0.xml
+AceDebug-3.0\SpAceDebug-3.0.xml
 
 ########################################
 # Non-Ace libraries that depend on Ace #
