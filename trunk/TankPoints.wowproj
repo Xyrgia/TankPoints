@@ -7,26 +7,30 @@
     <Name>TankPoints</Name>
     <AssemblyName>TankPoints2</AssemblyName>
     <RootNamespace>TankPoints2</RootNamespace>
-    <WowPath>D:\Games\World of Warcraft_SpinningPlatter\</WowPath>
+    <WowPath>D:\Games\World of Warcraft</WowPath>
     <AddonTitle>TankPoints</AddonTitle>
+    <DeployBasePath>D:\Games\World of Warcraft</DeployBasePath>
+    <RuntimePath>D:\Games\World of Warcraft</RuntimePath>
+    <SccProjectName>Svn</SccProjectName>
+    <SccProvider>SubversionScc</SccProvider>
+    <SccAuxPath>Svn</SccAuxPath>
+    <SccLocalPath>Svn</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Default' ">
     <OutputPath>.</OutputPath>
   </PropertyGroup>
   <ItemGroup>
     <Content Include=".pkgmeta" />
-    <Content Include="AceDebug-3.0\AceDebug-3.0.lua">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="AceDebug-3.0\AceDebug-3.0.xml">
-      <SubType>Frame</SubType>
-    </Content>
+    <Content Include="About TankPoints 2.0.txt" />
+    <Content Include="CalculatorFrame Documentation.psd" />
+    <Content Include="GPL.txt" />
     <Content Include="libs\AceTimer-3.0\AceTimer-3.0.lua">
       <SubType>Code</SubType>
     </Content>
     <Content Include="libs\AceTimer-3.0\AceTimer-3.0.xml">
       <SubType>Frame</SubType>
     </Content>
+    <Content Include="libs\LibStatLogic-1.2\Formulas.docx" />
     <Content Include="libs\LibStatLogic-1.2\Locales\deDE.lua">
       <SubType>Code</SubType>
     </Content>
@@ -45,11 +49,17 @@
     <Content Include="libs\LibStatLogic-1.2\Locales\frFR.lua">
       <SubType>Code</SubType>
     </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\itIT.lua">
+      <SubType>Code</SubType>
+    </Content>
     <Content Include="libs\LibStatLogic-1.2\Locales\koKR.lua">
       <SubType>Code</SubType>
     </Content>
     <Content Include="libs\LibStatLogic-1.2\Locales\Locales.xml">
       <SubType>Frame</SubType>
+    </Content>
+    <Content Include="libs\LibStatLogic-1.2\Locales\ptBR.lua">
+      <SubType>Code</SubType>
     </Content>
     <Content Include="libs\LibStatLogic-1.2\Locales\ruRU.lua">
       <SubType>Code</SubType>
@@ -59,6 +69,19 @@
     </Content>
     <Content Include="libs\LibStatLogic-1.2\Locales\zhTW.lua">
       <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStub\.pkgmeta" />
+    <Content Include="libs\LibStub\LibStub.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="libs\LibStub\LibStub.toc">
+      <SubType>TableOfContents</SubType>
+    </Content>
+    <Content Include="SpaceDebug-3.0\SpaceDebug-3.0.lua">
+      <SubType>Code</SubType>
+    </Content>
+    <Content Include="SpaceDebug-3.0\SpaceDebug-3.0.xml">
+      <SubType>Frame</SubType>
     </Content>
     <Content Include="TankPoints_Calculator.lua">
       <SubType>Code</SubType>
@@ -204,13 +227,6 @@
     <Content Include="libs\LibStatLogic-1.2\LibStatLogic-1.2.lua">
       <SubType>Code</SubType>
     </Content>
-    <Content Include="libs\LibStub\.pkgmeta" />
-    <Content Include="libs\LibStub\LibStub.lua">
-      <SubType>Code</SubType>
-    </Content>
-    <Content Include="libs\LibStub\LibStub.toc">
-      <SubType>TableOfContents</SubType>
-    </Content>
     <Content Include="libs\LibTipHooker-1.1\lib.xml">
       <SubType>Frame</SubType>
     </Content>
@@ -276,7 +292,6 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="AceDebug-3.0\" />
     <Folder Include="libs\" />
     <Folder Include="libs\AceAddon-3.0\" />
     <Folder Include="libs\AceConfig-3.0\" />
@@ -293,10 +308,11 @@
     <Folder Include="libs\AceTimer-3.0\" />
     <Folder Include="libs\CallbackHandler-1.0\" />
     <Folder Include="libs\LibStatLogic-1.2\" />
-    <Folder Include="libs\LibStatLogic-1.2\Locales\" />
+    <Folder Include="libs\LibStatLogic-1.2\Locales" />
     <Folder Include="libs\LibStub\" />
     <Folder Include="libs\LibTipHooker-1.1\" />
     <Folder Include="Locales\" />
+    <Folder Include="SpaceDebug-3.0\" />
     <Folder Include="UTF8\" />
   </ItemGroup>
   <Import Project="$(DevEnvDir)\Extensions\Tools\MSBuild\Microsoft\WowAddonStudio\3.0\WowAddonStudio.targets" />
