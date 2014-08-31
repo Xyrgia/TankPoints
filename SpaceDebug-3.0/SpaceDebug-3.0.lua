@@ -1,12 +1,12 @@
-﻿--- AceDebug-3.0 simplified addon debugging.
+﻿--- SpaceDebug-3.0 simplified addon debugging.
 --
 -- @class file
--- @name AceDebug-3.0
--- @release $Id: AceDebug-3.0.lua 975 2010-10-23 11:26:18Z nevcairiel $
-local MAJOR, MINOR = "spAceDebug-3.0", 3
-local AceDebug, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
+-- @name SpaceDebug-3.0
+-- @release $Id: SpaceDebug-3.0.lua 975 2010-10-23 11:26:18Z  $
+local MAJOR, MINOR = "AceDebug-3.0", 3
+local SpaceDebug, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
-if not AceDebug then return end
+if not SpaceDebug then return end
 
 --[[
 	function Debug(...)
@@ -87,7 +87,7 @@ end
 
 local tmp = {}
 
-function AceDebug:CustomDebug(r, g, b, frame, delay, a1, ...)
+function SpaceDebug:CustomDebug(r, g, b, frame, delay, a1, ...)
 	if not self.debugging then
 		return
 	end
@@ -121,15 +121,15 @@ function AceDebug:CustomDebug(r, g, b, frame, delay, a1, ...)
 	print(output, r, g, b, frame or self.debugFrame, delay)
 end
 
-function AceDebug:Debug(...)
-	AceDebug.CustomDebug(self, nil, nil, nil, nil, nil, ...)
+function SpaceDebug:Debug(...)
+	SpaceDebug.CustomDebug(self, nil, nil, nil, nil, nil, ...)
 end
 
-function AceDebug:IsDebugging()
+function SpaceDebug:IsDebugging()
 	return self.debugging
 end
 
-function AceDebug:SetDebugging(debugging)
+function SpaceDebug:SetDebugging(debugging)
 	if debugging then
 		self.debugging = debugging;
 		print("Debugging enabled");
@@ -151,20 +151,20 @@ end
 -- Level 2: Should be used for local debugging (function calls, etc)
 -- Level 3: Very verbose debugging, will dump everything and anything
 -- If set to nil, you will receive no debug information
-function AceDebug:SetDebugLevel(level)
-	AceDebug:argCheck(level, 1, "number", "nil")
+function SpaceDebug:SetDebugLevel(level)
+	SpaceDebug:argCheck(level, 1, "number", "nil")
 	if not level then
 		self.debuglevel = nil
 		return
 	end
 	if level < 1 or level > 3 then
-		AceDebug:error("Bad argument #1 to `SetDebugLevel`, must be a number 1-3")
+		SpaceDebug:error("Bad argument #1 to `SetDebugLevel`, must be a number 1-3")
 	end
 	self.debuglevel = level
 end
 
 -- Taken from LibStatLogic, which took it from AceLibrary
-function AceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
+function SpaceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
 	if type(num) ~= "number" then
 		return error(string.format("Bad argument #3 to `argCheck' (number expected, got %s)", type(num)), 2);
 	elseif type(kind) ~= "string" then
@@ -192,19 +192,19 @@ function AceDebug:argCheck(arg, num, kind, kind2, kind3, kind4, kind5)
 end
 
 
-function AceDebug:GetDebugPrefix()
+function SpaceDebug:GetDebugPrefix()
 	return ("|cff7fff7f(DEBUG) %s:[%s.%3d]|r"):format( tostring(self), date("%H:%M:%S"), (GetTime() % 1) * 1000)
 end
 
-function AceDebug:GetDebugLevel()
+function SpaceDebug:GetDebugLevel()
 	return self.debuglevel
 end
 
-function AceDebug:CustomLevelDebug(level, r, g, b, frame, delay, a1, ...)
+function SpaceDebug:CustomLevelDebug(level, r, g, b, frame, delay, a1, ...)
 	if not self.debugging or not self.debuglevel then return end
-	AceDebug:argCheck(level, 1, "number")
+	SpaceDebug:argCheck(level, 1, "number")
 	if level < 1 or level > 3 then
-		AceDebug:error("Bad argument #1 to `LevelDebug`, must be a number 1-3")
+		SpaceDebug:error("Bad argument #1 to `LevelDebug`, must be a number 1-3")
 	end
 	if level > self.debuglevel then return end
 
@@ -237,20 +237,20 @@ function AceDebug:CustomLevelDebug(level, r, g, b, frame, delay, a1, ...)
 	print(output, r, g, b, frame or self.debugFrame, delay)
 end
 
-function AceDebug:LevelDebug(level, ...)
+function SpaceDebug:LevelDebug(level, ...)
 	if not self.debugging or not self.debuglevel then return end
-	AceDebug:argCheck(level, 1, "number")
+	SpaceDebug:argCheck(level, 1, "number")
 	if level < 1 or level > 3 then
-		AceDebug:error("Bad argument #1 to `LevelDebug`, must be a number 1-3")
+		SpaceDebug:error("Bad argument #1 to `LevelDebug`, must be a number 1-3")
 	end
 	if level > self.debuglevel then return end
 
-	AceDebug.CustomLevelDebug(self, level, nil, nil, nil, nil, nil, ...)
+	SpaceDebug.CustomLevelDebug(self, level, nil, nil, nil, nil, nil, ...)
 end
 
 
 local options
-function AceDebug:GetAceOptionsDataTable(target)
+function SpaceDebug:GetAceOptionsDataTable(target)
 	if not options then
 		options = {
 			debug = {
@@ -267,7 +267,7 @@ function AceDebug:GetAceOptionsDataTable(target)
 end
 
 
-AceDebug.embeds = AceDebug.embeds or {}
+SpaceDebug.embeds = SpaceDebug.embeds or {}
 
 --- embedding and embed handling
 local mixins = {
@@ -282,18 +282,18 @@ local mixins = {
 	"GetDebugPrefix",
 }
 
--- Embeds AceDebug into the target object making the functions from the mixins list available on target:..
--- @param target target object to embed AceDebug in
-function AceDebug:Embed(target)
-	AceDebug.embeds[target] = true
+-- Embeds SpaceDebug into the target object making the functions from the mixins list available on target:..
+-- @param target target object to embed SpaceDebug in
+function SpaceDebug:Embed(target)
+	SpaceDebug.embeds[target] = true
 	for _, v in pairs(mixins) do
 		target[v] = self[v]
 	end
 	return target
 end
 
-for addon in pairs(AceDebug.embeds) do
-	AceDebug:Embed(addon)
+for addon in pairs(SpaceDebug.embeds) do
+	SpaceDebug:Embed(addon)
 end
 
 
