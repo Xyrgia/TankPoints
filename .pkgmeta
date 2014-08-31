@@ -4,6 +4,7 @@ ignore:
  - TankPoints.wowproj
  - WowAddons.wowsln
  - WowAddons.wowsuo
+ - CalculatorFrame Documentation.psd
 
 externals:
  Libs/LibStub: 
