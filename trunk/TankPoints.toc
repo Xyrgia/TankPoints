@@ -26,7 +26,7 @@ UTF8\utf8.lua
 # Ace Libraries #
 #################
 embeds.xml
-AceDebug-3.0\SpAceDebug-3.0.xml
+SpaceDebug-3.0\SpaceDebug-3.0.xml
 
 ########################################
 # Non-Ace libraries that depend on Ace #

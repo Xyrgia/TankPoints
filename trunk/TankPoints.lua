@@ -18,7 +18,7 @@ local StatLogic = LibStub("LibStatLogic-1.2");
 -- AceAddon Setup --
 --------------------
 -- AceAddon Initialization
-TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0", "spAceDebug-3.0");
+TankPoints = LibStub("AceAddon-3.0"):NewAddon("TankPoints", "AceConsole-3.0", "AceTimer-3.0", "AceEvent-3.0", "SpaceDebug-3.0");
 local TankPoints = TankPoints;
 
 TankPoints.version = "5.1.0 (r"..gsub("$Revision$", "$Revision: (%d+) %$", "%1")..")";
@@ -72,9 +72,9 @@ TankPoints.date = gsub("$Date$", "^.-(%d%d%d%d%-%d%d%-%d%d).-$", "%1");
 --]]
 
 
--------------------------
--- AceDebug-2.0 compat --
--------------------------
+------------------------------
+-- AceDebug-2.0 compat shim --
+------------------------------
 --[[
 TankPoints.debugging = nil
 
