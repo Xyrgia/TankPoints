@@ -3,7 +3,7 @@
 -- @class file
 -- @name SpaceDebug-3.0
 -- @release $Id: SpaceDebug-3.0.lua 975 2010-10-23 11:26:18Z  $
-local MAJOR, MINOR = "AceDebug-3.0", 3
+local MAJOR, MINOR = "SpaceDebug-3.0", 3
 local SpaceDebug, oldminor = LibStub:NewLibrary(MAJOR, MINOR)
 
 if not SpaceDebug then return end
